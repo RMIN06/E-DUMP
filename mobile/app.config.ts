@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { colors } from "./src/theme/tokens.ts";
 import withCompatibleGradle from "./plugins/withCompatibleGradle.ts";
+import withLocalAndroidRelease from "./plugins/withLocalAndroidRelease.ts";
 
 const requiredFonts = [
   "Recoleta-Bold.otf",
@@ -65,4 +66,4 @@ const config: ExpoConfig = {
   ],
 };
 
-export default withCompatibleGradle(config);
+export default withLocalAndroidRelease(withCompatibleGradle(config));

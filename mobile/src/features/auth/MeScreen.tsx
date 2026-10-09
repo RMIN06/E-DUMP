@@ -81,6 +81,7 @@ export function MeScreen({
       </Text>
       <TextAction label="Name" onPress={() => router.push("/name")} />
       {notifications}
+      <TextAction label="Rules" onPress={() => router.push("/rules")} />
       {user?.role === "admin" ? admin : null}
       <TextAction
         label="Clear downloads"

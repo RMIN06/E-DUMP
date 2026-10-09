@@ -57,6 +57,7 @@ export function AuthGate({ children }: PropsWithChildren) {
         </Stack.Protected>
         <Stack.Protected guard={status === "signedIn"}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="rules" />
           <Stack.Screen name="subject/[slug]" />
           <Stack.Screen name="material/[id]" />
           <Stack.Screen name="updates/[id]" />

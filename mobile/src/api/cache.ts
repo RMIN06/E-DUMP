@@ -11,6 +11,9 @@ const allowed = new Set([
   "schedule",
   "materials",
   "material",
+  "announcements",
+  "announcement",
+  "upcoming",
 ]);
 
 type Storage = Pick<typeof AsyncStorage, "getItem" | "setItem" | "removeItem">;

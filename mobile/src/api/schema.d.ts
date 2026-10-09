@@ -113,6 +113,57 @@ export interface paths {
     patch: operations["update_me_api_v1_me_patch"];
     trace?: never;
   };
+  "/api/v1/me/seen-updates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Seen Updates */
+    post: operations["seen_updates_api_v1_me_seen_updates_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/devices": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Register Device */
+    put: operations["register_device_api_v1_me_devices_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/devices/{token}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Unregister Device */
+    delete: operations["unregister_device_api_v1_me_devices__token__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/subjects": {
     parameters: {
       query?: never;
@@ -234,10 +285,218 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/announcements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Updates */
+    get: operations["list_updates_api_v1_announcements_get"];
+    put?: never;
+    /** Create */
+    post: operations["create_api_v1_announcements_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/announcements/upcoming": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Upcoming */
+    get: operations["upcoming_api_v1_announcements_upcoming_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/announcements/unread-count": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Unread */
+    get: operations["unread_api_v1_announcements_unread_count_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/announcements/attachments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Upload */
+    post: operations["upload_api_v1_announcements_attachments_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/announcements/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Detail */
+    get: operations["detail_api_v1_announcements__id__get"];
+    put?: never;
+    post?: never;
+    /** Remove */
+    delete: operations["remove_api_v1_announcements__id__delete"];
+    options?: never;
+    head?: never;
+    /** Edit */
+    patch: operations["edit_api_v1_announcements__id__patch"];
+    trace?: never;
+  };
+  "/api/v1/announcements/{id}/attachments/{file_id}/download": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Download */
+    get: operations["download_api_v1_announcements__id__attachments__file_id__download_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** Announcement */
+    Announcement: {
+      /** Id */
+      id: string;
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: "quiz" | "task" | "datesheet" | "general";
+      /** Title */
+      title: string;
+      /** Body */
+      body: string;
+      /** Subject Slug */
+      subject_slug: string | null;
+      /** Due At */
+      due_at: string | null;
+      /** File Ids */
+      file_ids: string[];
+      /** Attachments */
+      attachments: components["schemas"]["Attachment"][];
+      /** Pinned */
+      pinned: boolean;
+      /** Author Id */
+      author_id: string;
+      /** Author Name */
+      author_name: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Updated At
+       * Format: date-time
+       */
+      updated_at: string;
+    };
+    /** AnnouncementPage */
+    AnnouncementPage: {
+      /** Items */
+      items: components["schemas"]["Announcement"][];
+      /** Next Cursor */
+      next_cursor: string | null;
+    };
+    /** AnnouncementPatch */
+    AnnouncementPatch: {
+      /** Type */
+      type?: ("quiz" | "task" | "datesheet" | "general") | null;
+      /** Title */
+      title?: string | null;
+      /** Body */
+      body?: string | null;
+      /** Subject Slug */
+      subject_slug?: string | null;
+      /** Due At */
+      due_at?: string | null;
+      /** File Ids */
+      file_ids?: string[] | null;
+      /** Pinned */
+      pinned?: boolean | null;
+    };
+    /** AnnouncementWrite */
+    AnnouncementWrite: {
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: "quiz" | "task" | "datesheet" | "general";
+      /** Title */
+      title: string;
+      /** Body */
+      body: string;
+      /** Subject Slug */
+      subject_slug?: string | null;
+      /** Due At */
+      due_at?: string | null;
+      /** File Ids */
+      file_ids?: string[];
+    };
+    /** Attachment */
+    Attachment: {
+      /** File Id */
+      file_id: string;
+      /** Original Name */
+      original_name: string;
+      /** Mime Type */
+      mime_type: string;
+      /** Size Bytes */
+      size_bytes: number;
+    };
+    /** DeviceWrite */
+    DeviceWrite: {
+      /** Expo Push Token */
+      expo_push_token: string;
+      /**
+       * Platform
+       * @enum {string}
+       */
+      platform: "android" | "ios";
+      /** Notifications Enabled */
+      notifications_enabled: boolean;
+    };
     /** Download */
     Download: {
       /** Url */
@@ -441,6 +700,11 @@ export interface components {
       access_token: string;
       /** Refresh Token */
       refresh_token: string;
+    };
+    /** UnreadCount */
+    UnreadCount: {
+      /** Count */
+      count: number;
     };
     /** User */
     User: {
@@ -681,6 +945,84 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["User"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  seen_updates_api_v1_me_seen_updates_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  register_device_api_v1_me_devices_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeviceWrite"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  unregister_device_api_v1_me_devices__token__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {
@@ -956,6 +1298,273 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ReportReceipt"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_updates_api_v1_announcements_get: {
+    parameters: {
+      query?: {
+        type?: ("quiz" | "task" | "datesheet" | "general") | null;
+        subject?: string | null;
+        cursor?: string | null;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AnnouncementPage"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_api_v1_announcements_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AnnouncementWrite"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Announcement"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  upcoming_api_v1_announcements_upcoming_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Announcement"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  unread_api_v1_announcements_unread_count_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UnreadCount"];
+        };
+      };
+    };
+  };
+  upload_api_v1_announcements_attachments_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Attachment"];
+        };
+      };
+    };
+  };
+  detail_api_v1_announcements__id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Announcement"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  remove_api_v1_announcements__id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  edit_api_v1_announcements__id__patch: {
+    parameters: {
+      query?: {
+        notify?: boolean;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AnnouncementPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Announcement"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  download_api_v1_announcements__id__attachments__file_id__download_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        file_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Download"];
         };
       };
       /** @description Validation Error */

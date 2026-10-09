@@ -1,0 +1,113 @@
+cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy --strict app
+All checks passed!
+18 files already formatted
+Success: no issues found in 15 source files
+cd mobile && npm run lint
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 lint
+> eslint . && tsc --noEmit
+
+cd backend && uv run pytest
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
+rootdir: D:\E-DUMP-APP\E-DUMP\backend
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, platformdirs-4.12.4, asyncio-1.4.0, cov-7.1.0, respx-0.23.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 26 items
+
+tests\integration\test_health.py ................                        [ 61%]
+tests\unit\test_foundation_scripts.py ..........                         [100%]
+
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.10-final-0 _______________
+
+Name                             Stmts   Miss  Cover   Missing
+--------------------------------------------------------------
+app\__init__.py                      0      0   100%
+app\config.py                       11      0   100%
+app\db\__init__.py                   0      0   100%
+app\db\client.py                    17      0   100%
+app\deps.py                          9      0   100%
+app\errors.py                        5      0   100%
+app\main.py                         18      0   100%
+app\models\__init__.py               0      0   100%
+app\models\common.py                10      0   100%
+app\repositories\__init__.py         0      0   100%
+app\repositories\health.py           3      0   100%
+app\routers\__init__.py              0      0   100%
+app\routers\health.py               14      0   100%
+app\services\__init__.py             0      0   100%
+app\services\health_service.py       9      0   100%
+--------------------------------------------------------------
+TOTAL                               96      0   100%
+Required test coverage of 85% reached. Total coverage: 100.00%
+============================= 26 passed in 10.54s =============================
+cd backend && uv run coverage report --include='app/services/*,app/deps.py' --fail-under=90
+Name                             Stmts   Miss  Cover
+----------------------------------------------------
+app\deps.py                          9      0   100%
+app\services\__init__.py             0      0   100%
+app\services\health_service.py       9      0   100%
+----------------------------------------------------
+TOTAL                               18      0   100%
+cd mobile && npm run test
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 test
+> jest --ci --coverage --runInBand
+
+----------------|---------|----------|---------|---------|-------------------
+File            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------------|---------|----------|---------|---------|-------------------
+All files       |   97.43 |    79.41 |     100 |   97.22 |                   
+ components     |     100 |       70 |     100 |     100 |                   
+  Heading.tsx   |     100 |      100 |     100 |     100 |                   
+  Screen.tsx    |     100 |       50 |     100 |     100 | 22                
+  Text.tsx      |     100 |    71.42 |     100 |     100 | 21-29             
+ theme          |   96.42 |    83.33 |     100 |      96 |                   
+  motion.ts     |       0 |      100 |     100 |       0 | 2                 
+  responsive.ts |     100 |      100 |     100 |     100 |                   
+  spacing.ts    |     100 |      100 |     100 |     100 |                   
+  tokens.ts     |     100 |      100 |     100 |     100 |                   
+  typography.ts |     100 |    77.77 |     100 |     100 | 33-34,46,64       
+----------------|---------|----------|---------|---------|-------------------
+
+Test Suites: 2 passed, 2 total
+Tests:       30 passed, 30 total
+Snapshots:   0 total
+Time:        29.14 s
+Ran all test suites.
+node --test scripts/audit-policy.test.mjs
+✔ accepts approved advisory and its dependent findings (8.2411ms)
+✔ rejects newly reported advisory (8.4243ms)
+✔ rejects changed package version (0.7652ms)
+✔ rejects expired exception (0.5241ms)
+✔ rejects failed or malformed audit (0.5029ms)
+✔ rejects unresolved dependent findings (1.0176ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 310.4692
+bash scripts/check-slop.sh
+Slop check passed.
+bash scripts/gen-api-types.sh --check
+✨ openapi-typescript 7.13.0
+🚀 C:/Users/ZBOOK/AppData/Local/Temp/tmp.jU25BuKu4w/openapi.json → C:/Users/ZBOOK/AppData/Local/Temp/tmp.jU25BuKu4w/schema.d.ts [115.1ms]
+C:/Users/ZBOOK/AppData/Local/Temp/tmp.jU25BuKu4w/schema.d.ts 202ms
+cd backend && uv run pip-audit
+No known vulnerabilities found
+gitleaks dir . --redact --no-banner
+4:53PM INF scanned ~18061266 bytes (18.06 MB) in 8.65s
+4:53PM INF no leaks found
+node scripts/audit-policy.mjs
+Dependency audit: no unaccepted findings.
+Owner-approved tooling exception through 2026-11-08: GHSA-86w9-cpqp-85rv
+Owner-approved tooling exception through 2026-11-08: GHSA-hp3w-g68c-fv3c
+Owner-approved tooling exception through 2026-11-08: GHSA-vfj7-8cjw-p6xm

@@ -1,0 +1,155 @@
+cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy --strict app
+All checks passed!
+30 files already formatted
+Success: no issues found in 24 source files
+cd mobile && npm run lint
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 lint
+> eslint . && tsc --noEmit
+
+cd backend && uv run pytest
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
+rootdir: D:\E-DUMP-APP\E-DUMP\backend
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, platformdirs-4.12.4, asyncio-1.4.0, cov-7.1.0, respx-0.23.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 88 items
+
+tests\integration\test_auth.py .............................             [ 32%]
+tests\integration\test_body_limit.py ..                                  [ 35%]
+tests\integration\test_health.py ................                        [ 53%]
+tests\unit\test_auth.py ...............................                  [ 88%]
+tests\unit\test_foundation_scripts.py ..........                         [100%]
+
+============================== warnings summary ===============================
+tests/unit/test_auth.py::test_auth_2_invalid_access_claims[wrong_algorithm]
+  D:\E-DUMP-APP\E-DUMP\backend\.venv\Lib\site-packages\jwt\api_jwt.py:149: InsecureKeyLengthWarning: The HMAC key is 32 bytes long, which is below the minimum recommended length of 48 bytes for SHA384. See RFC 7518 Section 3.2.
+    return self._jws.encode(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.10-final-0 _______________
+
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+app\__init__.py                          0      0   100%
+app\config.py                           17      0   100%
+app\db\__init__.py                       0      0   100%
+app\db\client.py                        20      0   100%
+app\db\indexes.py                        7      0   100%
+app\deps.py                             29      0   100%
+app\errors.py                           15      1    93%   15
+app\main.py                             66      0   100%
+app\models\__init__.py                   0      0   100%
+app\models\auth.py                      27      0   100%
+app\models\common.py                    10      0   100%
+app\models\user.py                      39      1    97%   48
+app\repositories\__init__.py             0      0   100%
+app\repositories\health.py               3      0   100%
+app\repositories\refresh_tokens.py      17      0   100%
+app\repositories\users.py               23      0   100%
+app\routers\__init__.py                  0      0   100%
+app\routers\auth.py                     36      0   100%
+app\routers\health.py                   14      0   100%
+app\routers\me.py                       11      0   100%
+app\services\__init__.py                 0      0   100%
+app\services\auth_service.py           117      3    97%   93, 185-186
+app\services\health_service.py           9      0   100%
+app\services\user_service.py             9      1    89%   13
+------------------------------------------------------------------
+TOTAL                                  469      6    99%
+Required test coverage of 85% reached. Total coverage: 98.72%
+======================= 88 passed, 1 warning in 11.09s ========================
+cd backend && uv run coverage report --include='app/services/*,app/deps.py' --fail-under=90
+Name                             Stmts   Miss  Cover
+----------------------------------------------------
+app\deps.py                         29      0   100%
+app\services\__init__.py             0      0   100%
+app\services\auth_service.py       117      3    97%
+app\services\health_service.py       9      0   100%
+app\services\user_service.py         9      1    89%
+----------------------------------------------------
+TOTAL                              164      4    98%
+cd mobile && npm run test
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 test
+> jest --ci --coverage --runInBand
+
+--------------------|---------|----------|---------|---------|--------------------
+File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s  
+--------------------|---------|----------|---------|---------|--------------------
+All files           |    96.4 |    89.65 |   93.58 |   97.35 |                    
+ api                |   95.34 |    97.56 |   85.71 |   94.73 |                    
+  client.ts         |     100 |      100 |     100 |     100 |                    
+  queryClient.ts    |     100 |      100 |     100 |     100 |                    
+  transport.ts      |   95.12 |    97.56 |   85.71 |   94.44 | 91-92              
+ auth               |   99.08 |    91.54 |     100 |     100 |                    
+  session.ts        |   99.08 |    91.54 |     100 |     100 | 80,105,122,182-203 
+ components         |   88.09 |    76.74 |      75 |    87.5 |                    
+  Button.tsx        |     100 |    83.33 |     100 |     100 | 9,29               
+  ErrorLine.tsx     |     100 |       50 |     100 |     100 | 24                 
+  Field.tsx         |     100 |      100 |     100 |     100 |                    
+  Heading.tsx       |     100 |      100 |     100 |     100 |                    
+  Screen.tsx        |   70.58 |    45.45 |   42.85 |   66.66 | 23-25,32-33        
+  Text.tsx          |     100 |      100 |     100 |     100 |                    
+  TextAction.tsx    |     100 |       75 |     100 |     100 | 31                 
+ features/auth      |   96.77 |    93.33 |     100 |     100 |                    
+  AuthGate.tsx      |     100 |      100 |     100 |     100 |                    
+  BlockedScreen.tsx |     100 |      100 |     100 |     100 |                    
+  MeScreen.tsx      |   94.44 |    83.33 |     100 |     100 | 16                 
+  NameScreen.tsx    |   96.15 |     90.9 |     100 |     100 | 20                 
+  SignInScreen.tsx  |   96.55 |    94.44 |     100 |     100 | 21                 
+  hooks.ts          |       0 |        0 |       0 |       0 |                    
+ lib                |     100 |      100 |     100 |     100 |                    
+  email.ts          |     100 |      100 |     100 |     100 |                    
+  session.ts        |     100 |      100 |     100 |     100 |                    
+  storage.ts        |     100 |      100 |     100 |     100 |                    
+ theme              |   96.55 |    83.33 |     100 |   96.15 |                    
+  motion.ts         |       0 |      100 |     100 |       0 | 2                  
+  responsive.ts     |     100 |      100 |     100 |     100 |                    
+  spacing.ts        |     100 |      100 |     100 |     100 |                    
+  tokens.ts         |     100 |      100 |     100 |     100 |                    
+  typography.ts     |     100 |    77.77 |     100 |     100 | 33-34,46,64        
+--------------------|---------|----------|---------|---------|--------------------
+
+Test Suites: 6 passed, 6 total
+Tests:       99 passed, 99 total
+Snapshots:   0 total
+Time:        7.01 s, estimated 8 s
+Ran all test suites.
+node --test scripts/audit-policy.test.mjs
+✔ accepts approved advisory and its dependent findings (1.8167ms)
+✔ rejects newly reported advisory (1.5691ms)
+✔ rejects changed package version (0.212ms)
+✔ rejects expired exception (0.2002ms)
+✔ rejects failed or malformed audit (0.2025ms)
+✔ rejects unresolved dependent findings (0.2093ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 95.0527
+bash scripts/check-slop.sh
+Slop check passed.
+bash scripts/gen-api-types.sh --check
+✨ openapi-typescript 7.13.0
+🚀 C:/Users/ZBOOK/AppData/Local/Temp/tmp.Dad6dKu0iv/openapi.json → C:/Users/ZBOOK/AppData/Local/Temp/tmp.Dad6dKu0iv/schema.d.ts [80.6ms]
+C:/Users/ZBOOK/AppData/Local/Temp/tmp.Dad6dKu0iv/schema.d.ts 107ms
+cd backend && uv run pip-audit
+No known vulnerabilities found
+test -z "$(git ls-files -- backend/.env mobile/.env)" || { echo 'Local environment files must never be tracked.'; exit 1; }
+gitleaks dir . --redact --no-banner
+5:42PM INF scanned ~23844703 bytes (23.84 MB) in 1.76s
+5:42PM INF no leaks found
+node scripts/audit-policy.mjs
+Dependency audit: no unaccepted findings.
+Owner-approved tooling exception through 2026-11-08: GHSA-86w9-cpqp-85rv
+Owner-approved tooling exception through 2026-11-08: GHSA-hp3w-g68c-fv3c
+Owner-approved tooling exception through 2026-11-08: GHSA-vfj7-8cjw-p6xm

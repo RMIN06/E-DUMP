@@ -1,0 +1,217 @@
+cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy --strict app
+All checks passed!
+58 files already formatted
+Success: no issues found in 43 source files
+cd mobile && npm run lint
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 lint
+> eslint . && tsc --noEmit
+
+
+D:\E-DUMP-APP\E-DUMP\mobile\__tests__\setup.ts
+  5:3  warning  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 1 problem (0 errors, 1 warning)
+
+cd backend && uv run pytest
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
+rootdir: D:\E-DUMP-APP\E-DUMP\backend
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, platformdirs-4.12.4, asyncio-1.4.0, cov-7.1.0, respx-0.23.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 179 items
+
+tests\integration\test_auth.py .............................             [ 16%]
+tests\integration\test_body_limit.py ..                                  [ 17%]
+tests\integration\test_catalog.py ...............                        [ 25%]
+tests\integration\test_health.py ................                        [ 34%]
+tests\integration\test_materials.py .................................... [ 54%]
+.........                                                                [ 59%]
+tests\unit\test_auth.py ...............................                  [ 77%]
+tests\unit\test_catalog.py ....                                          [ 79%]
+tests\unit\test_files.py ......................                          [ 91%]
+tests\unit\test_foundation_scripts.py ..........                         [ 97%]
+tests\unit\test_r2.py .....                                              [100%]
+
+============================== warnings summary ===============================
+tests/unit/test_auth.py::test_auth_2_invalid_access_claims[wrong_algorithm]
+  D:\E-DUMP-APP\E-DUMP\backend\.venv\Lib\site-packages\jwt\api_jwt.py:149: InsecureKeyLengthWarning: The HMAC key is 32 bytes long, which is below the minimum recommended length of 48 bytes for SHA384. See RFC 7518 Section 3.2.
+    return self._jws.encode(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.10-final-0 _______________
+
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+app\__init__.py                          0      0   100%
+app\config.py                           24      0   100%
+app\db\__init__.py                       0      0   100%
+app\db\client.py                        30      4    87%   37, 43-45
+app\db\indexes.py                       17      0   100%
+app\deps.py                             44      1    98%   40
+app\errors.py                           16      1    94%   22
+app\integrations\r2.py                  33      0   100%
+app\main.py                             81      2    98%   42-43
+app\models\__init__.py                   0      0   100%
+app\models\auth.py                      27      0   100%
+app\models\common.py                    10      0   100%
+app\models\file.py                      15      0   100%
+app\models\material.py                  58      2    97%   25, 27
+app\models\report.py                    10      0   100%
+app\models\schedule.py                  17      0   100%
+app\models\subject.py                   14      0   100%
+app\models\user.py                      39      1    97%   48
+app\repositories\__init__.py             0      0   100%
+app\repositories\files.py               21      0   100%
+app\repositories\health.py               3      0   100%
+app\repositories\materials.py           38      0   100%
+app\repositories\refresh_tokens.py      17      0   100%
+app\repositories\reports.py              8      0   100%
+app\repositories\schedule_slots.py       8      0   100%
+app\repositories\subjects.py            11      0   100%
+app\repositories\users.py               23      0   100%
+app\routers\__init__.py                  0      0   100%
+app\routers\auth.py                     34      0   100%
+app\routers\health.py                   14      0   100%
+app\routers\materials.py                48      2    96%   64, 75
+app\routers\me.py                       11      0   100%
+app\routers\schedule.py                  9      0   100%
+app\routers\subjects.py                 13      0   100%
+app\services\__init__.py                 0      0   100%
+app\services\auth_service.py           117      3    97%   93, 185-186
+app\services\health_service.py           9      0   100%
+app\services\material_service.py       139     11    92%   51, 56, 59, 201-203, 205-207, 218, 241
+app\services\schedule_service.py        19      0   100%
+app\services\subject_service.py         14      0   100%
+app\services\upload_validation.py       85      3    96%   71, 73, 91
+app\services\user_service.py             9      1    89%   13
+app\tasks\housekeeping.py               21      6    71%   25-30
+------------------------------------------------------------------
+TOTAL                                 1106     37    97%
+Required test coverage of 85% reached. Total coverage: 96.65%
+======================= 179 passed, 1 warning in 33.34s =======================
+cd backend && uv run coverage report --include='app/services/*,app/deps.py' --fail-under=90
+Name                                Stmts   Miss  Cover
+-------------------------------------------------------
+app\deps.py                            44      1    98%
+app\services\__init__.py                0      0   100%
+app\services\auth_service.py          117      3    97%
+app\services\health_service.py          9      0   100%
+app\services\material_service.py      139     11    92%
+app\services\schedule_service.py       19      0   100%
+app\services\subject_service.py        14      0   100%
+app\services\upload_validation.py      85      3    96%
+app\services\user_service.py            9      1    89%
+-------------------------------------------------------
+TOTAL                                 436     19    96%
+cd mobile && npm run test
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 test
+> jest --ci --coverage --runInBand
+
+-----------------------------|---------|----------|---------|---------|--------------------------------------
+File                         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                    
+-----------------------------|---------|----------|---------|---------|--------------------------------------
+All files                    |   88.95 |    80.71 |   80.53 |   90.85 |                                      
+ api                         |   87.71 |    86.08 |   77.55 |   88.59 |                                      
+  cache.ts                   |   91.66 |     90.9 |    87.5 |   97.61 | 69                                   
+  client.ts                  |     100 |      100 |     100 |     100 |                                      
+  materials.ts               |     100 |      100 |     100 |     100 |                                      
+  queryClient.ts             |     100 |      100 |     100 |     100 |                                      
+  schedule.ts                |       0 |      100 |       0 |       0 | 6-9                                  
+  subjects.ts                |       0 |      100 |       0 |       0 | 6-16                                 
+  transport.ts               |   97.67 |    87.34 |   94.11 |   97.33 | 110-111                              
+  useFocusRead.ts            |       0 |        0 |       0 |       0 | 9-14                                 
+ auth                        |   99.08 |    91.54 |     100 |     100 |                                      
+  session.ts                 |   99.08 |    91.54 |     100 |     100 | 80,105,122,182-203                   
+ components                  |   78.82 |    77.27 |   69.69 |   78.31 |                                      
+  Button.tsx                 |     100 |    83.33 |     100 |     100 | 9,29                                 
+  EmptyState.tsx             |     100 |      100 |     100 |     100 |                                      
+  ErrorLine.tsx              |     100 |      100 |     100 |     100 |                                      
+  Field.tsx                  |     100 |      100 |     100 |     100 |                                      
+  FilterText.tsx             |     100 |      100 |     100 |     100 |                                      
+  Heading.tsx                |     100 |      100 |     100 |     100 |                                      
+  Icon.tsx                   |       0 |        0 |       0 |       0 | 11-27                                
+  ProgressLine.tsx           |      25 |      100 |       0 |      25 | 12-14                                
+  Row.tsx                    |      80 |    94.44 |   57.14 |      80 | 51,83-86                             
+  ScheduleRow.tsx            |     100 |       75 |     100 |     100 | 31                                   
+  Screen.tsx                 |   70.58 |    52.94 |   42.85 |   66.66 | 36-38,45-46                          
+  Sheet.tsx                  |     100 |       50 |     100 |     100 | 32                                   
+  TabLabel.tsx               |       0 |        0 |       0 |       0 | 13-35                                
+  Text.tsx                   |     100 |      100 |     100 |     100 |                                      
+  TextAction.tsx             |     100 |      100 |     100 |     100 |                                      
+ features/auth               |   87.69 |    90.56 |   75.67 |   90.83 |                                      
+  AuthGate.tsx               |   88.88 |    91.66 |      80 |   90.47 | 18,23                                
+  BlockedScreen.tsx          |     100 |      100 |     100 |     100 |                                      
+  MeScreen.tsx               |   94.11 |       80 |     100 |     100 | 18-33                                
+  NameScreen.tsx             |   96.15 |     90.9 |     100 |     100 | 20                                   
+  SignInScreen.tsx           |   96.55 |    94.44 |     100 |     100 | 21                                   
+  TabNavigation.tsx          |       0 |      100 |       0 |       0 | 9-57                                 
+  hooks.ts                   |       0 |        0 |       0 |       0 |                                      
+ features/materials          |   81.34 |    61.25 |   72.54 |   85.39 |                                      
+  MaterialScreen.tsx         |   79.36 |    63.33 |   73.33 |   84.48 | 43-47,81,94-97,103,185               
+  SubjectMaterialsScreen.tsx |      80 |    51.28 |   61.11 |   80.55 | 54,102,130,150-162                   
+  UploadScreen.tsx           |   82.35 |     66.1 |   81.25 |    87.5 | 77,95-96,117,124,130-131,191-192,237 
+  options.ts                 |     100 |       50 |     100 |     100 | 19                                   
+ features/materials/hooks    |     100 |     90.9 |     100 |     100 |                                      
+  useOpenFile.ts             |     100 |     90.9 |     100 |     100 | 39                                   
+ features/schedule           |   94.73 |    89.65 |   88.23 |   94.11 |                                      
+  ScheduleScreen.tsx         |   94.73 |    89.65 |   88.23 |   94.11 | 39,108                               
+ features/subjects           |    90.9 |    88.88 |   83.33 |    90.9 |                                      
+  SubjectsScreen.tsx         |    90.9 |    88.88 |   83.33 |    90.9 | 48                                   
+ lib                         |   93.97 |    89.58 |   88.88 |   97.91 |                                      
+  email.ts                   |     100 |      100 |     100 |     100 |                                      
+  files.ts                   |   92.62 |     88.4 |    82.6 |   98.13 | 46,110                               
+  format.ts                  |     100 |    94.11 |     100 |     100 | 6                                    
+  session.ts                 |     100 |      100 |     100 |     100 |                                      
+  storage.ts                 |   93.33 |       75 |     100 |    92.3 | 29                                   
+ theme                       |   96.55 |    85.71 |     100 |   96.15 |                                      
+  motion.ts                  |       0 |      100 |     100 |       0 | 2                                    
+  responsive.ts              |     100 |      100 |     100 |     100 |                                      
+  spacing.ts                 |     100 |      100 |     100 |     100 |                                      
+  tokens.ts                  |     100 |      100 |     100 |     100 |                                      
+  typography.ts              |     100 |    81.81 |     100 |     100 | 35-36,48,66                          
+-----------------------------|---------|----------|---------|---------|--------------------------------------
+
+Test Suites: 15 passed, 15 total
+Tests:       171 passed, 171 total
+Snapshots:   0 total
+Time:        6.13 s, estimated 14 s
+Ran all test suites.
+node --test scripts/audit-policy.test.mjs
+✔ accepts approved advisory and its dependent findings (2.1065ms)
+✔ rejects newly reported advisory (1.4412ms)
+✔ rejects changed package version (0.2363ms)
+✔ rejects expired exception (0.2097ms)
+✔ rejects failed or malformed audit (0.217ms)
+✔ rejects unresolved dependent findings (0.2283ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 151.513
+bash scripts/check-slop.sh
+Slop check passed.
+bash scripts/gen-api-types.sh --check
+✨ openapi-typescript 7.13.0
+🚀 C:/Users/ZBOOK/AppData/Local/Temp/tmp.x1BadDYi3b/openapi.json → C:/Users/ZBOOK/AppData/Local/Temp/tmp.x1BadDYi3b/schema.d.ts [94.7ms]
+C:/Users/ZBOOK/AppData/Local/Temp/tmp.x1BadDYi3b/schema.d.ts 139ms
+cd backend && uv run pip-audit
+No known vulnerabilities found
+test -z "$(git ls-files -- backend/.env mobile/.env)" || { echo 'Local environment files must never be tracked.'; exit 1; }
+gitleaks dir . --redact --no-banner
+7:36PM INF scanned ~24798136 bytes (24.80 MB) in 1.21s
+7:36PM INF no leaks found
+node scripts/audit-policy.mjs
+Dependency audit: no unaccepted findings.
+Owner-approved tooling exception through 2026-11-08: GHSA-86w9-cpqp-85rv
+Owner-approved tooling exception through 2026-11-08: GHSA-hp3w-g68c-fv3c
+Owner-approved tooling exception through 2026-11-08: GHSA-vfj7-8cjw-p6xm

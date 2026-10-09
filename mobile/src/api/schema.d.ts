@@ -106,7 +106,8 @@ export interface paths {
     get: operations["me_api_v1_me_get"];
     put?: never;
     post?: never;
-    delete?: never;
+    /** Delete Account */
+    delete: operations["delete_account_api_v1_me_delete"];
     options?: never;
     head?: never;
     /** Update Me */
@@ -390,10 +391,111 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Users */
+    get: operations["users_api_v1_admin_users_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/users/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Change User */
+    patch: operations["change_user_api_v1_admin_users__id__patch"];
+    trace?: never;
+  };
+  "/api/v1/admin/reports": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Reports */
+    get: operations["reports_api_v1_admin_reports_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/reports/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Resolve Report */
+    patch: operations["resolve_report_api_v1_admin_reports__id__patch"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** AdminReport */
+    AdminReport: {
+      /** Id */
+      id: string;
+      /** Material Id */
+      material_id: string;
+      /** Material Title */
+      material_title: string;
+      /** Material Removed */
+      material_removed: boolean;
+      /** Reporter Name */
+      reporter_name: string;
+      /**
+       * Reason
+       * @enum {string}
+       */
+      reason:
+        "wrong_subject" | "inappropriate" | "copyright" | "duplicate" | "other";
+      /** Note */
+      note: string | null;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "open" | "resolved" | "dismissed";
+      /** Resolved By */
+      resolved_by: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
     /** Announcement */
     Announcement: {
       /** Id */
@@ -622,6 +724,14 @@ export interface components {
        */
       status: "removed";
     };
+    /** ReportAction */
+    ReportAction: {
+      /**
+       * Action
+       * @enum {string}
+       */
+      action: "remove_material" | "dismiss";
+    };
     /** ReportCreate */
     ReportCreate: {
       /**
@@ -735,6 +845,13 @@ export interface components {
       last_login_at: string;
       /** Last Seen Updates At */
       last_seen_updates_at: string | null;
+    };
+    /** UserPatch */
+    UserPatch: {
+      /** Role */
+      role?: ("student" | "admin") | null;
+      /** Is Active */
+      is_active?: boolean | null;
     };
     /** ValidationError */
     ValidationError: {
@@ -921,6 +1038,24 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["User"];
         };
+      };
+    };
+  };
+  delete_account_api_v1_me_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
@@ -1566,6 +1701,136 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["Download"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  users_api_v1_admin_users_get: {
+    parameters: {
+      query?: {
+        q?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["User"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  change_user_api_v1_admin_users__id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["User"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  reports_api_v1_admin_reports_get: {
+    parameters: {
+      query?: {
+        status?: "open" | "resolved" | "dismissed";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminReport"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  resolve_report_api_v1_admin_reports__id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReportAction"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

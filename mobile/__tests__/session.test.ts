@@ -45,11 +45,13 @@ function setup(
     remove: jest.fn(async () => {}),
   };
   const clearCache = jest.fn(async () => {});
+  const clearAdminCache = jest.fn();
   return {
-    auth: createSession({ request, storage, clearCache }),
+    auth: createSession({ request, storage, clearCache, clearAdminCache }),
     send,
     storage,
     clearCache,
+    clearAdminCache,
   };
 }
 test("profile refresh updates permissions and account deletion clears private credentials", async () => {
@@ -87,6 +89,24 @@ test("a denied account deletion retains the signed-in session", async () => {
     "Make another admin first.",
   );
   expect(auth.store.getState().status).toBe("signedIn");
+});
+
+test("a forbidden admin request updates the role and evicts cached admin data without retrying it", async () => {
+  const { auth, send, clearAdminCache } = setup(async (path) => {
+    if (path === "/admin/users")
+      throw new ApiError(403, "forbidden", "An admin is required.");
+    if (path === "/me") return user;
+    return { ...tokens, user: { ...user, role: "admin" }, needs_name: false };
+  });
+  await auth.login(user.email);
+  await expect(auth.request("/admin/users")).rejects.toThrow(
+    "An admin is required.",
+  );
+  expect(auth.store.getState().user?.role).toBe("student");
+  expect(clearAdminCache).toHaveBeenCalledTimes(1);
+  expect(
+    send.mock.calls.filter(([path]) => path === "/admin/users"),
+  ).toHaveLength(1);
 });
 
 function deferred<T>() {

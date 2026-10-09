@@ -1,7 +1,11 @@
 import { createStore } from "zustand/vanilla";
 import type { components } from "../api/schema";
 import { ApiError, publicRequest, type Request } from "../api/transport";
-import { clearPrivateCache, secureSessionStorage } from "../lib/storage";
+import {
+  clearAdminCache,
+  clearPrivateCache,
+  secureSessionStorage,
+} from "../lib/storage";
 import { unregisterNotifications } from "../lib/notifications";
 
 type User = components["schemas"]["User"];
@@ -22,6 +26,7 @@ type Dependencies = {
     remove(): Promise<void>;
   };
   clearCache(): Promise<void>;
+  clearAdminCache?(): void;
   unregisterDevice?(accessToken: string): Promise<void>;
 };
 
@@ -61,11 +66,13 @@ export function createSession(dependencies: Dependencies) {
     store.setState({ accessToken: tokens.access_token });
     return tokens.access_token;
   };
-  const setUser = (user: User) =>
+  const setUser = (user: User) => {
+    if (user.role !== "admin") dependencies.clearAdminCache?.();
     store.setState({
       user,
       status: user.name === null ? "needsName" : "signedIn",
     });
+  };
   const refresh = () => {
     if (flight) return flight;
     const epoch = generation;
@@ -117,8 +124,24 @@ export function createSession(dependencies: Dependencies) {
         !(error instanceof ApiError) ||
         error.status !== 401 ||
         error.code !== "unauthorized"
-      )
+      ) {
+        if (
+          error instanceof ApiError &&
+          error.code === "forbidden" &&
+          (path.startsWith("/admin/") || path.startsWith("/announcements")) &&
+          initialToken
+        ) {
+          try {
+            const user = await dependencies.request<User>("/me", {
+              token: initialToken,
+            });
+            if (epoch === generation) setUser(user);
+          } catch {
+            /* Preserve the server refusal if profile lookup is unavailable. */
+          }
+        }
         throw error;
+      }
       const currentToken = store.getState().accessToken;
       const token =
         currentToken && currentToken !== initialToken
@@ -257,5 +280,6 @@ export const session = createSession({
   request: publicRequest,
   storage: secureSessionStorage,
   clearCache: clearPrivateCache,
+  clearAdminCache,
   unregisterDevice: unregisterNotifications,
 });

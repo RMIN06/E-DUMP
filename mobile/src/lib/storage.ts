@@ -5,6 +5,12 @@ import { privateCache } from "../api/cache";
 import { cancelDownloads } from "./files";
 
 const key = "edump.refresh";
+export function clearAdminCache() {
+  queryClient.removeQueries({
+    predicate: (query) =>
+      ["admin-users", "admin-reports"].includes(String(query.queryKey[0])),
+  });
+}
 export const secureSessionStorage = {
   read: () => SecureStore.getItemAsync(key),
   write: (token: string) =>

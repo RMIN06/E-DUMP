@@ -7,6 +7,7 @@ const withLocalAndroidRelease: ConfigPlugin = (config) => {
   }
   return configPlugins.withAppBuildGradle(config, (native) => {
     let source = native.modResults.contents;
+    if (source.includes("signingConfig signingConfigs.edumpRelease")) return native;
     if (!source.includes("signingConfigs {")) throw new Error("Android signing template changed.");
     source = source.replace("signingConfigs {", `signingConfigs {
         edumpRelease {

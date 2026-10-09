@@ -24,3 +24,20 @@ export function relativeTime(value: string, now = new Date()) {
     return `${Math.floor(age / (24 * 60 * 60 * 1000))}d ago`;
   return formatInTimeZone(value, classZone, "EEE d MMM");
 }
+
+export function dueDate(value: string, now = new Date()) {
+  const day = formatInTimeZone(value, classZone, "yyyy-MM-dd");
+  const today = formatInTimeZone(now, classZone, "yyyy-MM-dd");
+  const tomorrow = formatInTimeZone(
+    new Date(now.getTime() + 24 * 60 * 60 * 1000),
+    classZone,
+    "yyyy-MM-dd",
+  );
+  const label =
+    day === today
+      ? "Today"
+      : day === tomorrow
+        ? "Tomorrow"
+        : formatInTimeZone(value, classZone, "EEE d MMM");
+  return `${label}, ${formatInTimeZone(value, classZone, "h:mm a")}`;
+}

@@ -35,7 +35,8 @@ if (
 
 const config: ExpoConfig = {
   name: "E-DUMP",
-  slug: "edump",
+  slug: "e-dump",
+  owner: "rmin06s-team",
   version: "0.1.0",
   scheme: "edump",
   orientation: "portrait",
@@ -45,6 +46,7 @@ const config: ExpoConfig = {
   backgroundColor: colors.ink,
   ios: { supportsTablet: true, bundleIdentifier: "com.edump.bcs3e" },
   android: { package: "com.edump.bcs3e" },
+  extra: { eas: { projectId: "37e1b246-6c7a-4c9c-926b-7a0be8095b02" } },
   androidStatusBar: { backgroundColor: colors.ink, barStyle: "light-content" },
   androidNavigationBar: {
     backgroundColor: colors.ink,

@@ -1,0 +1,139 @@
+cd mobile && npm run lint
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 lint
+> eslint . && tsc --noEmit
+
+
+D:\E-DUMP-APP\E-DUMP\mobile\__tests__\setup.ts
+   4:3  warning  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+   7:6  warning  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  13:3  warning  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 3 problems (0 errors, 3 warnings)
+
+cd mobile && npm run test
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 test
+> jest --ci --coverage --runInBand
+
+-----------------------------|---------|----------|---------|---------|--------------------------------------------------------------------
+File                         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                  
+-----------------------------|---------|----------|---------|---------|--------------------------------------------------------------------
+All files                    |   79.28 |    70.43 |   67.92 |   81.43 |                                                                    
+ api                         |   74.25 |     79.2 |   58.46 |   74.57 |                                                                    
+  admin.ts                   |       0 |        0 |       0 |       0 | 8-20                                                               
+  announcements.ts           |       0 |        0 |       0 |       0 | 9-55                                                               
+  cache.ts                   |   91.66 |     90.9 |    87.5 |   97.61 | 72                                                                 
+  client.ts                  |     100 |      100 |     100 |     100 |                                                                    
+  materials.ts               |     100 |      100 |     100 |     100 |                                                                    
+  queryClient.ts             |     100 |      100 |     100 |     100 |                                                                    
+  schedule.ts                |       0 |      100 |       0 |       0 | 6-9                                                                
+  subjects.ts                |       0 |      100 |       0 |       0 | 6-16                                                               
+  transport.ts               |   97.67 |    87.34 |   94.11 |   97.33 | 110-111                                                            
+  useFocusRead.ts            |       0 |        0 |       0 |       0 | 9-14                                                               
+ auth                        |   98.49 |    88.88 |     100 |     100 |                                                                    
+  session.ts                 |   98.49 |    88.88 |     100 |     100 | 89,114,138-147,207-228,234-242                                     
+ components                  |   67.16 |    60.76 |   54.34 |   66.66 |                                                                    
+  Button.tsx                 |   81.81 |    71.42 |      50 |      80 | 38-43                                                              
+  EmptyState.tsx             |     100 |      100 |     100 |     100 |                                                                    
+  ErrorLine.tsx              |     100 |      100 |     100 |     100 |                                                                    
+  Field.tsx                  |     100 |      100 |     100 |     100 |                                                                    
+  FilterText.tsx             |      75 |       30 |   71.42 |   72.22 | 35-36,62-64                                                        
+  Heading.tsx                |     100 |    66.66 |     100 |     100 | 37                                                                 
+  Icon.tsx                   |       0 |        0 |       0 |       0 | 12-29                                                              
+  ProgressLine.tsx           |       5 |        0 |       0 |    5.55 | 23-66                                                              
+  Row.tsx                    |      75 |    92.85 |      40 |   73.91 | 57,87-92,124-127                                                   
+  ScheduleRow.tsx            |     100 |       75 |     100 |     100 | 31                                                                 
+  Screen.tsx                 |   72.22 |    52.94 |   42.85 |   68.75 | 38-40,47-48                                                        
+  Sheet.tsx                  |     100 |       50 |     100 |     100 | 38-57                                                              
+  TabLabel.tsx               |       0 |        0 |       0 |       0 | 13-35                                                              
+  Text.tsx                   |     100 |      100 |     100 |     100 |                                                                    
+  TextAction.tsx             |     100 |      100 |     100 |     100 |                                                                    
+ features/admin              |   84.41 |    70.68 |   73.07 |   88.73 |                                                                    
+  AdminLinks.tsx             |     100 |       50 |     100 |     100 | 16                                                                 
+  ReportsScreen.tsx          |   84.84 |    63.63 |      70 |   90.32 | 54-60,83                                                           
+  UsersScreen.tsx            |   82.05 |    76.47 |   69.23 |   85.71 | 56-71,85-99                                                        
+ features/announcements      |    81.3 |    64.01 |   71.21 |   82.74 |                                                                    
+  AnnouncementScreen.tsx     |   83.58 |    57.14 |    64.7 |   86.88 | 50,56,93,104-116,153-165,196                                       
+  UpdateFormScreen.tsx       |   81.48 |    64.65 |   79.31 |   82.65 | 86,101-102,105,121,136-137,143,170,184-193,226,285-286,290-296,325 
+  UpdatesScreen.tsx          |   76.92 |    67.56 |      65 |   76.31 | 53,63,139-150,182-196                                              
+ features/auth               |   83.97 |    77.92 |   68.88 |   88.11 |                                                                    
+  AuthGate.tsx               |   83.87 |    77.27 |   72.72 |    87.5 | 26-28                                                              
+  BlockedScreen.tsx          |     100 |      100 |     100 |     100 |                                                                    
+  MeScreen.tsx               |   88.67 |    63.63 |   83.33 |   95.91 | 84,120                                                             
+  NameScreen.tsx             |   96.15 |     90.9 |     100 |     100 | 20                                                                 
+  SignInScreen.tsx           |   96.55 |    94.44 |     100 |     100 | 21                                                                 
+  TabNavigation.tsx          |       0 |        0 |       0 |       0 | 10-74                                                              
+  hooks.ts                   |       0 |        0 |       0 |       0 |                                                                    
+ features/materials          |    80.3 |    60.84 |   69.81 |   85.08 |                                                                    
+  MaterialScreen.tsx         |   79.36 |    63.33 |   73.33 |   84.48 | 43-47,81,94-97,103,185                                             
+  SubjectMaterialsScreen.tsx |   75.55 |    51.11 |      55 |   79.48 | 59-79,118,147,168-180                                              
+  UploadScreen.tsx           |   82.35 |     66.1 |   81.25 |    87.5 | 77,95-96,117,124,130-131,191-192,237                               
+  options.ts                 |     100 |       50 |     100 |     100 | 19                                                                 
+ features/materials/hooks    |     100 |     90.9 |     100 |     100 |                                                                    
+  useOpenFile.ts             |     100 |     90.9 |     100 |     100 | 39                                                                 
+ features/notifications      |       0 |        0 |       0 |       0 |                                                                    
+  NotificationControl.tsx    |       0 |        0 |       0 |       0 | 16-65                                                              
+  NotificationsSetup.tsx     |       0 |        0 |       0 |       0 | 22-115                                                             
+ features/rules              |   86.11 |    63.15 |   72.72 |    93.1 |                                                                    
+  RulesGate.tsx              |   90.62 |    66.66 |    87.5 |   96.15 | 18                                                                 
+  RulesScreen.tsx            |      50 |    57.14 |   33.33 |   66.66 | 49                                                                 
+ features/schedule           |   94.73 |    89.65 |   88.23 |   94.11 |                                                                    
+  ScheduleScreen.tsx         |   94.73 |    89.65 |   88.23 |   94.11 | 39,108                                                             
+ features/subjects           |    90.9 |    88.88 |   83.33 |    90.9 |                                                                    
+  SubjectsScreen.tsx         |    90.9 |    88.88 |   83.33 |    90.9 | 49                                                                 
+ lib                         |    93.5 |       90 |   85.41 |   97.05 |                                                                    
+  email.ts                   |     100 |      100 |     100 |     100 |                                                                    
+  files.ts                   |   92.62 |     88.4 |    82.6 |   98.13 | 46,110                                                             
+  format.ts                  |     100 |    86.36 |     100 |     100 | 6,37-39                                                            
+  notifications.ts           |   94.82 |    94.87 |   88.88 |   98.11 | 63                                                                 
+  session.ts                 |     100 |      100 |     100 |     100 |                                                                    
+  storage.ts                 |   82.35 |       75 |      75 |      80 | 9-11,35                                                            
+ theme                       |   98.03 |    86.11 |   92.85 |   97.82 |                                                                    
+  animation.ts               |   95.45 |     87.5 |   85.71 |      95 | 15                                                                 
+  motion.ts                  |     100 |      100 |     100 |     100 |                                                                    
+  responsive.ts              |     100 |      100 |     100 |     100 |                                                                    
+  spacing.ts                 |     100 |      100 |     100 |     100 |                                                                    
+  tokens.ts                  |     100 |      100 |     100 |     100 |                                                                    
+  typography.ts              |     100 |    81.81 |     100 |     100 | 35-36,48,66                                                        
+-----------------------------|---------|----------|---------|---------|--------------------------------------------------------------------
+
+Test Suites: 20 passed, 20 total
+Tests:       199 passed, 199 total
+Snapshots:   0 total
+Time:        10.898 s, estimated 27 s
+Ran all test suites.
+node --test scripts/audit-policy.test.mjs
+✔ accepts approved advisory and its dependent findings (1.9909ms)
+✔ rejects newly reported advisory (1.4129ms)
+✔ rejects changed package version (0.1942ms)
+✔ rejects expired exception (0.1939ms)
+✔ rejects failed or malformed audit (0.1892ms)
+✔ rejects unresolved dependent findings (0.1992ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 97.0881
+bash scripts/check-slop.sh
+Slop check passed.
+bash scripts/gen-api-types.sh --check
+✨ openapi-typescript 7.13.0
+🚀 C:/Users/ZBOOK/AppData/Local/Temp/tmp.IR7DoIlZL4/openapi.json → C:/Users/ZBOOK/AppData/Local/Temp/tmp.IR7DoIlZL4/schema.d.ts [130.4ms]
+C:/Users/ZBOOK/AppData/Local/Temp/tmp.IR7DoIlZL4/schema.d.ts 195ms
+cd backend && uv run pip-audit
+No known vulnerabilities found
+test -z "$(git ls-files -- backend/.env mobile/.env)" || { echo 'Local environment files must never be tracked.'; exit 1; }
+gitleaks dir . --redact --no-banner
+11:31PM INF scanned ~25243468 bytes (25.24 MB) in 1.17s
+11:31PM INF no leaks found
+node scripts/audit-policy.mjs
+Dependency audit: no unaccepted findings.
+Owner-approved tooling exception through 2026-11-08: GHSA-86w9-cpqp-85rv
+Owner-approved tooling exception through 2026-11-08: GHSA-hp3w-g68c-fv3c
+Owner-approved tooling exception through 2026-11-08: GHSA-vfj7-8cjw-p6xm

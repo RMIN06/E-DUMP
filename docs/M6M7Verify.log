@@ -1,0 +1,299 @@
+cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy --strict app
+All checks passed!
+75 files already formatted
+Success: no issues found in 55 source files
+cd mobile && npm run lint
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 lint
+> eslint . && tsc --noEmit
+
+
+D:\E-DUMP-APP\E-DUMP\mobile\__tests__\setup.ts
+   4:3  warning  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+   7:6  warning  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  13:3  warning  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 3 problems (0 errors, 3 warnings)
+
+cd backend && uv run pytest
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
+rootdir: D:\E-DUMP-APP\E-DUMP\backend
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, platformdirs-4.12.4, asyncio-1.4.0, cov-7.1.0, respx-0.23.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 227 items
+
+tests\integration\test_admin.py ..................                       [  7%]
+tests\integration\test_announcements.py ..........................       [ 19%]
+tests\integration\test_auth.py .............................             [ 32%]
+tests\integration\test_body_limit.py ..                                  [ 33%]
+tests\integration\test_catalog.py ...............                        [ 39%]
+tests\integration\test_health.py ................                        [ 46%]
+tests\integration\test_materials.py .................................... [ 62%]
+.........                                                                [ 66%]
+tests\unit\test_auth.py ...............................                  [ 80%]
+tests\unit\test_catalog.py ....                                          [ 81%]
+tests\unit\test_files.py ......................                          [ 91%]
+tests\unit\test_foundation_scripts.py ..........                         [ 96%]
+tests\unit\test_push.py ....                                             [ 97%]
+tests\unit\test_r2.py .....                                              [100%]
+
+============================== warnings summary ===============================
+tests/unit/test_auth.py::test_auth_2_invalid_access_claims[wrong_algorithm]
+  D:\E-DUMP-APP\E-DUMP\backend\.venv\Lib\site-packages\jwt\api_jwt.py:149: InsecureKeyLengthWarning: The HMAC key is 32 bytes long, which is below the minimum recommended length of 48 bytes for SHA384. See RFC 7518 Section 3.2.
+    return self._jws.encode(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.10-final-0 _______________
+
+Name                                   Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------
+app\__init__.py                            0      0   100%
+app\config.py                             25      0   100%
+app\db\__init__.py                         0      0   100%
+app\db\client.py                          30      4    87%   37, 43-45
+app\db\indexes.py                         22      0   100%
+app\deps.py                               49      2    96%   41, 84
+app\errors.py                             16      1    94%   22
+app\integrations\push.py                  26      1    96%   39
+app\integrations\r2.py                    33      0   100%
+app\main.py                               85      2    98%   47-48
+app\models\__init__.py                     0      0   100%
+app\models\admin.py                       27      0   100%
+app\models\announcement.py                73      2    97%   42, 60
+app\models\auth.py                        27      0   100%
+app\models\common.py                      10      0   100%
+app\models\device.py                       7      0   100%
+app\models\file.py                        15      0   100%
+app\models\material.py                    58      2    97%   25, 27
+app\models\report.py                      10      0   100%
+app\models\schedule.py                    17      0   100%
+app\models\subject.py                     14      0   100%
+app\models\user.py                        39      1    97%   48
+app\repositories\__init__.py               0      0   100%
+app\repositories\announcements.py         19      0   100%
+app\repositories\devices.py               14      0   100%
+app\repositories\files.py                 21      0   100%
+app\repositories\health.py                 3      0   100%
+app\repositories\materials.py             38      0   100%
+app\repositories\refresh_tokens.py        17      0   100%
+app\repositories\reports.py               21      0   100%
+app\repositories\schedule_slots.py         8      0   100%
+app\repositories\subjects.py              11      0   100%
+app\repositories\users.py                 43      0   100%
+app\routers\__init__.py                    0      0   100%
+app\routers\admin.py                      22      0   100%
+app\routers\announcements.py              52      1    98%   79
+app\routers\auth.py                       34      0   100%
+app\routers\health.py                     14      0   100%
+app\routers\materials.py                  48      2    96%   64, 75
+app\routers\me.py                         28      0   100%
+app\routers\schedule.py                    9      0   100%
+app\routers\subjects.py                   13      0   100%
+app\services\__init__.py                   0      0   100%
+app\services\admin_service.py             61      4    93%   43, 58, 106, 108
+app\services\announcement_service.py     146     11    92%   88, 91, 98, 154, 196-197, 215-216, 226, 259, 292
+app\services\auth_service.py             117      3    97%   93, 185-186
+app\services\device_service.py            13      0   100%
+app\services\health_service.py             9      0   100%
+app\services\material_service.py         139     11    92%   51, 56, 59, 201-203, 205-207, 218, 241
+app\services\push_service.py              22      2    91%   44-45
+app\services\schedule_service.py          19      0   100%
+app\services\subject_service.py           14      0   100%
+app\services\upload_validation.py         85      3    96%   71, 73, 91
+app\services\user_service.py               9      1    89%   13
+app\tasks\housekeeping.py                 21      6    71%   27-32
+--------------------------------------------------------------------
+TOTAL                                   1653     59    96%
+Required test coverage of 85% reached. Total coverage: 96.43%
+================= 227 passed, 1 warning in 129.40s (0:02:09) ==================
+cd backend && uv run coverage report --include='app/services/*,app/deps.py' --fail-under=90
+Name                                   Stmts   Miss  Cover
+----------------------------------------------------------
+app\deps.py                               49      2    96%
+app\services\__init__.py                   0      0   100%
+app\services\admin_service.py             61      4    93%
+app\services\announcement_service.py     146     11    92%
+app\services\auth_service.py             117      3    97%
+app\services\device_service.py            13      0   100%
+app\services\health_service.py             9      0   100%
+app\services\material_service.py         139     11    92%
+app\services\push_service.py              22      2    91%
+app\services\schedule_service.py          19      0   100%
+app\services\subject_service.py           14      0   100%
+app\services\upload_validation.py         85      3    96%
+app\services\user_service.py               9      1    89%
+----------------------------------------------------------
+TOTAL                                    683     37    95%
+cd mobile && npm run test
+npm warn Unknown env config "tmp". This will stop working in the next major version of npm.
+
+> edump-mobile@0.0.0 test
+> jest --ci --coverage --runInBand
+
+FAIL __tests__/motion.test.tsx
+  ● OS reduced-motion changes apply during the session and the listener is removed
+
+    expect(jest.fn()).toHaveBeenCalledTimes(expected)
+
+    Expected number of calls: 1
+    Received number of calls: 2
+
+      43 |   expect(screen.getByText("Animated")).toBeTruthy();
+      44 |   await view.unmount();
+    > 45 |   expect(remove).toHaveBeenCalledTimes(1);
+         |                  ^
+      46 | });
+      47 |
+      48 | test("row entrances are capped and previously seen rows remain instant after remount", async () => {
+
+      at Object.toHaveBeenCalledTimes (__tests__/motion.test.tsx:45:18)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+FAIL __tests__/materialApi.test.tsx
+  ● Console
+
+    console.error
+      An update to HookContainer inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-reconciler/cjs/react-reconciler.development.js:16307:19
+      at runWithFiberInDEV (node_modules/react-reconciler/cjs/react-reconciler.development.js:2508:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-reconciler/cjs/react-reconciler.development.js:16306:9)
+      at scheduleUpdateOnFiber (node_modules/react-reconciler/cjs/react-reconciler.development.js:14070:11)
+      at forceStoreRerender (node_modules/react-reconciler/cjs/react-reconciler.development.js:5935:24)
+      at node_modules/react-reconciler/cjs/react-reconciler.development.js:5920:11
+      at node_modules/@tanstack/query-core/src/notifyManager.ts:83:11
+      at notifyFn (node_modules/@tanstack/query-core/src/notifyManager.ts:25:5)
+      at node_modules/@tanstack/query-core/src/notifyManager.ts:48:13
+          at Array.forEach (<anonymous>)
+      at node_modules/@tanstack/query-core/src/notifyManager.ts:47:25
+      at batchNotifyFn (node_modules/@tanstack/query-core/src/notifyManager.ts:28:5)
+      at Timeout._onTimeout (node_modules/@tanstack/query-core/src/notifyManager.ts:46:9)
+
+  ● cursor pagination retains at most two pages and sends cancellation signals
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+    +   "first",
+        "second",
+    -   "third",
+      ]
+
+      65 |       page.items.map((item) => item.id),
+      66 |     ),
+    > 67 |   ).toEqual(["second", "third"]);
+         |     ^
+      68 |   expect(result.current.hasNextPage).toBe(false);
+      69 |   expect(api).toHaveBeenLastCalledWith(
+      70 |     expect.stringContaining("cursor=third"),
+
+      at Object.toEqual (__tests__/materialApi.test.tsx:67:5)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+-----------------------------|---------|----------|---------|---------|--------------------------------------------------------------------
+File                         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                  
+-----------------------------|---------|----------|---------|---------|--------------------------------------------------------------------
+All files                    |   79.26 |    70.38 |   67.92 |   81.41 |                                                                    
+ api                         |   74.25 |     79.2 |   58.46 |   74.57 |                                                                    
+  admin.ts                   |       0 |        0 |       0 |       0 | 8-20                                                               
+  announcements.ts           |       0 |        0 |       0 |       0 | 9-55                                                               
+  cache.ts                   |   91.66 |     90.9 |    87.5 |   97.61 | 72                                                                 
+  client.ts                  |     100 |      100 |     100 |     100 |                                                                    
+  materials.ts               |     100 |      100 |     100 |     100 |                                                                    
+  queryClient.ts             |     100 |      100 |     100 |     100 |                                                                    
+  schedule.ts                |       0 |      100 |       0 |       0 | 6-9                                                                
+  subjects.ts                |       0 |      100 |       0 |       0 | 6-16                                                               
+  transport.ts               |   97.67 |    87.34 |   94.11 |   97.33 | 110-111                                                            
+  useFocusRead.ts            |       0 |        0 |       0 |       0 | 9-14                                                               
+ auth                        |   98.49 |    88.88 |     100 |     100 |                                                                    
+  session.ts                 |   98.49 |    88.88 |     100 |     100 | 89,114,138-147,207-228,234-242                                     
+ components                  |   67.16 |    60.76 |   54.34 |   66.66 |                                                                    
+  Button.tsx                 |   81.81 |    71.42 |      50 |      80 | 38-43                                                              
+  EmptyState.tsx             |     100 |      100 |     100 |     100 |                                                                    
+  ErrorLine.tsx              |     100 |      100 |     100 |     100 |                                                                    
+  Field.tsx                  |     100 |      100 |     100 |     100 |                                                                    
+  FilterText.tsx             |      75 |       30 |   71.42 |   72.22 | 35-36,62-64                                                        
+  Heading.tsx                |     100 |    66.66 |     100 |     100 | 37                                                                 
+  Icon.tsx                   |       0 |        0 |       0 |       0 | 12-29                                                              
+  ProgressLine.tsx           |       5 |        0 |       0 |    5.55 | 23-66                                                              
+  Row.tsx                    |      75 |    92.85 |      40 |   73.91 | 57,87-92,124-127                                                   
+  ScheduleRow.tsx            |     100 |       75 |     100 |     100 | 31                                                                 
+  Screen.tsx                 |   72.22 |    52.94 |   42.85 |   68.75 | 38-40,47-48                                                        
+  Sheet.tsx                  |     100 |       50 |     100 |     100 | 38-57                                                              
+  TabLabel.tsx               |       0 |        0 |       0 |       0 | 13-35                                                              
+  Text.tsx                   |     100 |      100 |     100 |     100 |                                                                    
+  TextAction.tsx             |     100 |      100 |     100 |     100 |                                                                    
+ features/admin              |   84.41 |    70.68 |   73.07 |   88.73 |                                                                    
+  AdminLinks.tsx             |     100 |       50 |     100 |     100 | 16                                                                 
+  ReportsScreen.tsx          |   84.84 |    63.63 |      70 |   90.32 | 54-60,83                                                           
+  UsersScreen.tsx            |   82.05 |    76.47 |   69.23 |   85.71 | 56-71,85-99                                                        
+ features/announcements      |    81.3 |    64.01 |   71.21 |   82.74 |                                                                    
+  AnnouncementScreen.tsx     |   83.58 |    57.14 |    64.7 |   86.88 | 50,56,93,104-116,153-165,196                                       
+  UpdateFormScreen.tsx       |   81.48 |    64.65 |   79.31 |   82.65 | 86,101-102,105,121,136-137,143,170,184-193,226,285-286,290-296,325 
+  UpdatesScreen.tsx          |   76.92 |    67.56 |      65 |   76.31 | 53,63,139-150,182-196                                              
+ features/auth               |   83.97 |    77.92 |   68.88 |   88.11 |                                                                    
+  AuthGate.tsx               |   83.87 |    77.27 |   72.72 |    87.5 | 26-28                                                              
+  BlockedScreen.tsx          |     100 |      100 |     100 |     100 |                                                                    
+  MeScreen.tsx               |   88.67 |    63.63 |   83.33 |   95.91 | 84,120                                                             
+  NameScreen.tsx             |   96.15 |     90.9 |     100 |     100 | 20                                                                 
+  SignInScreen.tsx           |   96.55 |    94.44 |     100 |     100 | 21                                                                 
+  TabNavigation.tsx          |       0 |        0 |       0 |       0 | 10-74                                                              
+  hooks.ts                   |       0 |        0 |       0 |       0 |                                                                    
+ features/materials          |    80.3 |    60.84 |   69.81 |   85.08 |                                                                    
+  MaterialScreen.tsx         |   79.36 |    63.33 |   73.33 |   84.48 | 43-47,81,94-97,103,185                                             
+  SubjectMaterialsScreen.tsx |   75.55 |    51.11 |      55 |   79.48 | 59-79,118,147,168-180                                              
+  UploadScreen.tsx           |   82.35 |     66.1 |   81.25 |    87.5 | 77,95-96,117,124,130-131,191-192,237                               
+  options.ts                 |     100 |       50 |     100 |     100 | 19                                                                 
+ features/materials/hooks    |     100 |     90.9 |     100 |     100 |                                                                    
+  useOpenFile.ts             |     100 |     90.9 |     100 |     100 | 39                                                                 
+ features/notifications      |       0 |        0 |       0 |       0 |                                                                    
+  NotificationControl.tsx    |       0 |        0 |       0 |       0 | 16-65                                                              
+  NotificationsSetup.tsx     |       0 |        0 |       0 |       0 | 22-115                                                             
+ features/rules              |   86.11 |    63.15 |   72.72 |    93.1 |                                                                    
+  RulesGate.tsx              |   90.62 |    66.66 |    87.5 |   96.15 | 18                                                                 
+  RulesScreen.tsx            |      50 |    57.14 |   33.33 |   66.66 | 49                                                                 
+ features/schedule           |   94.73 |    89.65 |   88.23 |   94.11 |                                                                    
+  ScheduleScreen.tsx         |   94.73 |    89.65 |   88.23 |   94.11 | 39,108                                                             
+ features/subjects           |    90.9 |    88.88 |   83.33 |    90.9 |                                                                    
+  SubjectsScreen.tsx         |    90.9 |    88.88 |   83.33 |    90.9 | 49                                                                 
+ lib                         |   93.44 |    89.85 |   85.41 |   97.04 |                                                                    
+  email.ts                   |     100 |      100 |     100 |     100 |                                                                    
+  files.ts                   |   92.62 |     88.4 |    82.6 |   98.13 | 46,110                                                             
+  format.ts                  |     100 |    86.36 |     100 |     100 | 6,37-39                                                            
+  notifications.ts           |   94.64 |    94.59 |   88.88 |   98.07 | 59                                                                 
+  session.ts                 |     100 |      100 |     100 |     100 |                                                                    
+  storage.ts                 |   82.35 |       75 |      75 |      80 | 9-11,35                                                            
+ theme                       |   98.03 |    86.11 |   92.85 |   97.82 |                                                                    
+  animation.ts               |   95.45 |     87.5 |   85.71 |      95 | 15                                                                 
+  motion.ts                  |     100 |      100 |     100 |     100 |                                                                    
+  responsive.ts              |     100 |      100 |     100 |     100 |                                                                    
+  spacing.ts                 |     100 |      100 |     100 |     100 |                                                                    
+  tokens.ts                  |     100 |      100 |     100 |     100 |                                                                    
+  typography.ts              |     100 |    81.81 |     100 |     100 | 35-36,48,66                                                        
+-----------------------------|---------|----------|---------|---------|--------------------------------------------------------------------
+
+Test Suites: 2 failed, 18 passed, 20 total
+Tests:       2 failed, 196 passed, 198 total
+Snapshots:   0 total
+Time:        28.273 s, estimated 72 s
+Ran all test suites.
+make: *** [Makefile:27: test-mobile] Error 1

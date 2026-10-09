@@ -19,9 +19,11 @@ export default function RootLayout() {
           <Text tone="danger">Fonts could not load. Restart the app.</Text>
         </Screen>
       ) : (
-        <RulesGate><AuthGate>
-          <NotificationsSetup />
-        </AuthGate></RulesGate>
+        <RulesGate>
+          <AuthGate>
+            <NotificationsSetup />
+          </AuthGate>
+        </RulesGate>
       )}
     </SafeAreaProvider>
   );

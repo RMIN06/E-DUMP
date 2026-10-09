@@ -11,8 +11,14 @@ export function useMotionPreference() {
     void AccessibilityInfo.isReduceMotionEnabled().then((value) => {
       if (alive) setReduced(value);
     });
-    const listener = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduced);
-    return () => { alive = false; listener.remove(); };
+    const listener = AccessibilityInfo.addEventListener(
+      "reduceMotionChanged",
+      setReduced,
+    );
+    return () => {
+      alive = false;
+      listener.remove();
+    };
   }, []);
   return reduced;
 }

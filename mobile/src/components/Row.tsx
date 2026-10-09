@@ -41,11 +41,20 @@ export const Row = memo(function Row({
   const below =
     fontScale > 1.3 || titleWidth + metaWidth + space.lg > available;
   return (
-    <Animated.View style={[styles.row, { borderBottomColor: theme.lineSoft }]}
-      entering={reduced || entry === null ? undefined : FadeInUp
-        .duration(motion.durationBase).delay(entry * motion.stagger)
-        .easing(Easing.bezier(...motion.easeOut))
-        .withInitialValues({ opacity: 0, transform: [{ translateY: motion.rowRise }] })}>
+    <Animated.View
+      style={[styles.row, { borderBottomColor: theme.lineSoft }]}
+      entering={
+        reduced || entry === null
+          ? undefined
+          : FadeInUp.duration(motion.durationBase)
+              .delay(entry * motion.stagger)
+              .easing(Easing.bezier(...motion.easeOut))
+              .withInitialValues({
+                opacity: 0,
+                transform: [{ translateY: motion.rowRise }],
+              })
+      }
+    >
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={[title, meta, trailing].filter(Boolean).join(", ")}

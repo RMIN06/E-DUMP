@@ -38,41 +38,65 @@ export function Sheet({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.frame}
       >
-        <Animated.View entering={reduced ? undefined : FadeIn.duration(motion.durationBase)} style={[StyleSheet.absoluteFillObject, { backgroundColor: theme.backdrop }]}>
-          <Pressable style={styles.frame} onPress={onClose} accessibilityRole="button" accessibilityLabel="Close sheet" />
-        </Animated.View>
-        <Animated.View entering={reduced ? undefined : FadeInDown.springify().stiffness(motion.spring.stiffness).damping(motion.spring.damping).mass(motion.spring.mass)} style={[styles.sheet, { backgroundColor: theme.ink, borderTopColor: theme.olive }]}>
-        <ScrollView
-          style={{ backgroundColor: theme.ink }}
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
+        <Animated.View
+          entering={reduced ? undefined : FadeIn.duration(motion.durationBase)}
+          style={[
+            StyleSheet.absoluteFillObject,
+            { backgroundColor: theme.backdrop },
+          ]}
         >
-          <View
-            style={[
-              styles.column,
-              {
-                paddingTop: space.xl,
-                paddingBottom: insets.bottom + space.xl,
-              },
-            ]}
+          <Pressable
+            style={styles.frame}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Close sheet"
+          />
+        </Animated.View>
+        <Animated.View
+          entering={
+            reduced
+              ? undefined
+              : FadeInDown.springify()
+                  .stiffness(motion.spring.stiffness)
+                  .damping(motion.spring.damping)
+                  .mass(motion.spring.mass)
+          }
+          style={[
+            styles.sheet,
+            { backgroundColor: theme.ink, borderTopColor: theme.olive },
+          ]}
+        >
+          <ScrollView
+            style={{ backgroundColor: theme.ink }}
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
           >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-              onPress={onClose}
-              style={styles.close}
+            <View
+              style={[
+                styles.column,
+                {
+                  paddingTop: space.xl,
+                  paddingBottom: insets.bottom + space.xl,
+                },
+              ]}
             >
-              <Text
-                allowFontScaling
-                maxFontSizeMultiplier={textLimits.bodyScale}
-                style={[textStyle("bodyStrong"), { color: theme.moss }]}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close"
+                onPress={onClose}
+                style={styles.close}
               >
-                Close
-              </Text>
-            </Pressable>
-            {children}
-          </View>
-        </ScrollView>
+                <Text
+                  allowFontScaling
+                  maxFontSizeMultiplier={textLimits.bodyScale}
+                  style={[textStyle("bodyStrong"), { color: theme.moss }]}
+                >
+                  Close
+                </Text>
+              </Pressable>
+              {children}
+            </View>
+          </ScrollView>
         </Animated.View>
       </KeyboardAvoidingView>
     </Modal>
@@ -80,7 +104,11 @@ export function Sheet({
 }
 const styles = StyleSheet.create({
   frame: { flex: layout.fill, justifyContent: "flex-end" },
-  sheet: { maxHeight: layout.sheetMaxHeight, borderTopWidth: controls.hairline, paddingTop: space.sm },
+  sheet: {
+    maxHeight: layout.sheetMaxHeight,
+    borderTopWidth: controls.hairline,
+    paddingTop: space.sm,
+  },
   scroll: { flexGrow: layout.fill, alignItems: "center" },
   column: {
     width: layout.columnWidth,

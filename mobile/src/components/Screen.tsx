@@ -52,65 +52,65 @@ export function Screen<T = never>({
   }, [keepFormEndVisible]);
   return (
     <EntryContext.Provider value={entry.current}>
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.screen, { backgroundColor: theme.ink }]}
-    >
-      <StatusBar barStyle="light-content" />
-      {list ? (
-        <FlatList
-          {...list}
-          style={styles.listColumn}
-          contentContainerStyle={{
-            paddingTop: insets.top + space.xl,
-            paddingBottom: insets.bottom + space.xl,
-            paddingLeft: insets.left + space.xl,
-            paddingRight: insets.right + space.xl,
-          }}
-          initialNumToRender={layout.listInitial}
-          maxToRenderPerBatch={layout.listBatch}
-          windowSize={layout.listWindow}
-          removeClippedSubviews={Platform.OS === "android"}
-          onEndReachedThreshold={layout.listEndThreshold}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode={
-            Platform.OS === "ios" ? "interactive" : "on-drag"
-          }
-        />
-      ) : (
-        <ScrollView
-          ref={scroll}
-          onLayout={revealFormEnd}
-          onContentSizeChange={revealFormEnd}
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode={
-            Platform.OS === "ios" ? "interactive" : "on-drag"
-          }
-        >
-          <View
-            style={[
-              styles.column,
-              {
-                paddingTop: insets.top + space.xl,
-                paddingBottom: insets.bottom + space.xl,
-                paddingLeft: insets.left + space.xl,
-                paddingRight: insets.right + space.xl,
-              },
-            ]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={[styles.screen, { backgroundColor: theme.ink }]}
+      >
+        <StatusBar barStyle="light-content" />
+        {list ? (
+          <FlatList
+            {...list}
+            style={styles.listColumn}
+            contentContainerStyle={{
+              paddingTop: insets.top + space.xl,
+              paddingBottom: insets.bottom + space.xl,
+              paddingLeft: insets.left + space.xl,
+              paddingRight: insets.right + space.xl,
+            }}
+            initialNumToRender={layout.listInitial}
+            maxToRenderPerBatch={layout.listBatch}
+            windowSize={layout.listWindow}
+            removeClippedSubviews={Platform.OS === "android"}
+            onEndReachedThreshold={layout.listEndThreshold}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={
+              Platform.OS === "ios" ? "interactive" : "on-drag"
+            }
+          />
+        ) : (
+          <ScrollView
+            ref={scroll}
+            onLayout={revealFormEnd}
+            onContentSizeChange={revealFormEnd}
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={
+              Platform.OS === "ios" ? "interactive" : "on-drag"
+            }
           >
-            {children}
+            <View
+              style={[
+                styles.column,
+                {
+                  paddingTop: insets.top + space.xl,
+                  paddingBottom: insets.bottom + space.xl,
+                  paddingLeft: insets.left + space.xl,
+                  paddingRight: insets.right + space.xl,
+                },
+              ]}
+            >
+              {children}
+            </View>
+          </ScrollView>
+        )}
+        {footer ? (
+          <View
+            style={[styles.footer, { paddingBottom: insets.bottom + space.xl }]}
+          >
+            {footer}
           </View>
-        </ScrollView>
-      )}
-      {footer ? (
-        <View
-          style={[styles.footer, { paddingBottom: insets.bottom + space.xl }]}
-        >
-          {footer}
-        </View>
-      ) : null}
-    </KeyboardAvoidingView>
+        ) : null}
+      </KeyboardAvoidingView>
     </EntryContext.Provider>
   );
 }

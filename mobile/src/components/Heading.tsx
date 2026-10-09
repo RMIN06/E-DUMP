@@ -33,9 +33,16 @@ export function Heading({ variant = "h1", ...props }: Props) {
       allowFontScaling
       maxFontSizeMultiplier={textLimits.headingScale}
       numberOfLines={textLimits.headingLines}
-      entering={reduced ? undefined : FadeInUp.duration(motion.durationBase)
-        .easing(Easing.bezier(...motion.easeOut))
-        .withInitialValues({ opacity: 0, transform: [{ translateY: motion.headingRise }] })}
+      entering={
+        reduced
+          ? undefined
+          : FadeInUp.duration(motion.durationBase)
+              .easing(Easing.bezier(...motion.easeOut))
+              .withInitialValues({
+                opacity: 0,
+                transform: [{ translateY: motion.headingRise }],
+              })
+      }
     />
   );
 }

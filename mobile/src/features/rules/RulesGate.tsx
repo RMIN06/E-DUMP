@@ -10,21 +10,40 @@ export function RulesGate({ children }: PropsWithChildren) {
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     let alive = true;
-    void AsyncStorage.getItem(key).then((value) => {
-      if (alive) setAccepted(value === "accepted");
-    }).catch(() => { if (alive) setAccepted(false); });
-    return () => { alive = false; };
+    void AsyncStorage.getItem(key)
+      .then((value) => {
+        if (alive) setAccepted(value === "accepted");
+      })
+      .catch(() => {
+        if (alive) setAccepted(false);
+      });
+    return () => {
+      alive = false;
+    };
   }, []);
-  useEffect(() => { if (accepted === false) void SplashScreen.hideAsync(); }, [accepted]);
+  useEffect(() => {
+    if (accepted === false) void SplashScreen.hideAsync();
+  }, [accepted]);
   if (accepted === null) return null;
   if (accepted) return children;
   const accept = async () => {
     if (working) return;
     setWorking(true);
     setError(null);
-    try { await AsyncStorage.setItem(key, "accepted"); setAccepted(true); }
-    catch { setError("Couldn't save your choice. Try again."); }
-    finally { setWorking(false); }
+    try {
+      await AsyncStorage.setItem(key, "accepted");
+      setAccepted(true);
+    } catch {
+      setError("Couldn't save your choice. Try again.");
+    } finally {
+      setWorking(false);
+    }
   };
-  return <RulesScreen onContinue={() => void accept()} working={working} error={error} />;
+  return (
+    <RulesScreen
+      onContinue={() => void accept()}
+      working={working}
+      error={error}
+    />
+  );
 }

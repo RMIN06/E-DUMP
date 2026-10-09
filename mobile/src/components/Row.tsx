@@ -4,7 +4,14 @@ import { layout, space, controls } from "../theme/spacing";
 import { useSizeClass } from "../theme/responsive";
 import { useTheme } from "../theme/tokens";
 import { headingStyle, textStyle, textLimits } from "../theme/typography";
-import Animated, { FadeInUp, Easing } from "react-native-reanimated";
+import Animated, {
+  FadeInUp,
+  Easing,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  interpolateColor,
+} from "react-native-reanimated";
 import { useMotionPreference, useRowEntry } from "../theme/animation";
 import { motion } from "../theme/motion";
 
@@ -21,6 +28,8 @@ type Props = {
   accentPrefix?: string;
 };
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 export const Row = memo(function Row({
   title,
   meta,
@@ -36,6 +45,19 @@ export const Row = memo(function Row({
   const theme = useTheme();
   const reduced = useMotionPreference();
   const entry = useRowEntry(entryKey ?? title);
+  const pressed = useSharedValue(0);
+  const pressStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      pressed.value,
+      [0, 1],
+      [theme.ink, theme.pressed],
+    ),
+  }));
+  const setPressed = (value: number) => {
+    pressed.value = reduced
+      ? value
+      : withTiming(value, { duration: motion.pressDuration });
+  };
   const { sizeClass, fontScale } = useSizeClass();
   const [titleWidth, setTitleWidth] = useState(0);
   const [metaWidth, setMetaWidth] = useState(0);
@@ -57,17 +79,14 @@ export const Row = memo(function Row({
               })
       }
     >
-      <Pressable
+      <AnimatedPressable
         accessibilityRole="button"
         accessibilityLabel={[title, meta, trailing].filter(Boolean).join(", ")}
         onPress={onPress}
         onLongPress={onLongPress}
-        style={({ pressed }) => [
-          styles.main,
-          {
-            backgroundColor: pressed ? theme.pressed : theme.ink,
-          },
-        ]}
+        onPressIn={() => setPressed(1)}
+        onPressOut={() => setPressed(0)}
+        style={[styles.main, pressStyle]}
       >
         <View
           onLayout={(event) => setAvailable(event.nativeEvent.layout.width)}
@@ -130,7 +149,7 @@ export const Row = memo(function Row({
             meta
           )}
         </Text>
-      </Pressable>
+      </AnimatedPressable>
       {onDetails ? (
         <Pressable
           accessibilityRole="button"

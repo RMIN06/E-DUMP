@@ -22,4 +22,8 @@ mobile/assets/fonts/*.ttf
 *.keystore
 *.p12
 *.mobileprovision
-
+mobile/google-services.json
+*service-account*.json
+artifacts/
+backups/
+docs/AtlasCaptcha.png

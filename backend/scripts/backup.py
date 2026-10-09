@@ -27,14 +27,23 @@ async def main() -> None:
         config.write_text(json.dumps({"uri": settings.mongodb_uri}), encoding="utf-8")
         os.chmod(config, 0o600)
         archive = Path(folder) / "database.archive.gz"
-        result = subprocess.run(
-            [executable, f"--config={config}", f"--db={settings.mongodb_db}", f"--archive={archive}", "--gzip"],
+        result = await asyncio.to_thread(
+            subprocess.run,
+            [
+                executable,
+                f"--config={config}",
+                f"--db={settings.mongodb_db}",
+                f"--archive={archive}",
+                "--gzip",
+            ],
             capture_output=True,
             timeout=600,
             check=False,
         )
         if result.returncode or not archive.exists() or not archive.stat().st_size:
-            raise SystemExit("Database backup failed; no archive published. Check database access.")
+            raise SystemExit(
+                "Database backup failed; no archive published. Check database access."
+            )
         stamp = datetime.now(UTC).strftime("%Y/%m/%d/%H%M%S")
         key = f"backups/{stamp}.archive.gz"
         with archive.open("rb") as body:

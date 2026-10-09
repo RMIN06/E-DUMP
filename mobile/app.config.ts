@@ -18,7 +18,9 @@ const fontPaths = requiredFonts
 const release = ["preview", "production"].includes(
   process.env.EAS_BUILD_PROFILE ?? "",
 );
-const previewFallback = process.env.EAS_BUILD_PROFILE === "preview" && process.env.EDUMP_PREVIEW_FALLBACK_FONTS === "1";
+const previewFallback =
+  process.env.EAS_BUILD_PROFILE === "preview" &&
+  process.env.EDUMP_PREVIEW_FALLBACK_FONTS === "1";
 if (
   release &&
   !previewFallback &&

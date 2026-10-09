@@ -2,7 +2,11 @@ import { Pressable, StyleSheet, Text } from "react-native";
 import { controls, space } from "../theme/spacing";
 import { useTheme } from "../theme/tokens";
 import { textLimits, textStyle } from "../theme/typography";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { useMotionPreference } from "../theme/animation";
 import { motion } from "../theme/motion";
 
@@ -30,8 +34,16 @@ export function Button({
       accessibilityState={{ disabled: unavailable, busy: loading }}
       disabled={unavailable}
       onPress={onPress}
-      onPressIn={() => { opacity.value = withTiming(controls.pressedOpacity, { duration: reduced ? motion.reducedDuration : motion.pressDuration }); }}
-      onPressOut={() => { opacity.value = withTiming(1, { duration: reduced ? motion.reducedDuration : motion.pressDuration }); }}
+      onPressIn={() => {
+        opacity.value = withTiming(controls.pressedOpacity, {
+          duration: reduced ? motion.reducedDuration : motion.pressDuration,
+        });
+      }}
+      onPressOut={() => {
+        opacity.value = withTiming(1, {
+          duration: reduced ? motion.reducedDuration : motion.pressDuration,
+        });
+      }}
       style={[
         styles.button,
         {

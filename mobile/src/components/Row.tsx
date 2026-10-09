@@ -122,8 +122,13 @@ export const Row = memo(function Row({
           style={[textStyle("caption"), { color: theme.boneMuted }]}
         >
           {accentPrefix && meta.startsWith(accentPrefix) ? (
-            <><Text style={{ color: theme.moss }}>{accentPrefix}</Text>{meta.slice(accentPrefix.length)}</>
-          ) : meta}
+            <>
+              <Text style={{ color: theme.moss }}>{accentPrefix}</Text>
+              {meta.slice(accentPrefix.length)}
+            </>
+          ) : (
+            meta
+          )}
         </Text>
       </Pressable>
       {onDetails ? (

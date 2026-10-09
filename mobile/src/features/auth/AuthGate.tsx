@@ -67,7 +67,10 @@ export function AuthGate({ children }: PropsWithChildren) {
           <Stack.Screen name="updates/[id]" />
           <Stack.Screen
             name="upload/[slug]"
-            options={{ presentation: "modal", animation: reduced ? "none" : "slide_from_bottom" }}
+            options={{
+              presentation: "modal",
+              animation: reduced ? "none" : "slide_from_bottom",
+            }}
           />
         </Stack.Protected>
         <Stack.Protected
@@ -77,7 +80,10 @@ export function AuthGate({ children }: PropsWithChildren) {
           <Stack.Screen name="admin/reports" />
           <Stack.Screen
             name="updates/new"
-            options={{ presentation: "modal", animation: reduced ? "none" : "slide_from_bottom" }}
+            options={{
+              presentation: "modal",
+              animation: reduced ? "none" : "slide_from_bottom",
+            }}
           />
         </Stack.Protected>
       </Stack>

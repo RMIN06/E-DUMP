@@ -106,6 +106,19 @@ async def test_development_openapi_exposes_only_current_milestones(
         "/api/v1/materials/{id}",
         "/api/v1/materials/{id}/download",
         "/api/v1/materials/{id}/report",
+        "/api/v1/announcements",
+        "/api/v1/announcements/attachments",
+        "/api/v1/announcements/upcoming",
+        "/api/v1/announcements/unread-count",
+        "/api/v1/announcements/{id}",
+        "/api/v1/announcements/{id}/attachments/{file_id}/download",
+        "/api/v1/me/devices",
+        "/api/v1/me/devices/{token}",
+        "/api/v1/me/seen-updates",
+        "/api/v1/admin/users",
+        "/api/v1/admin/users/{id}",
+        "/api/v1/admin/reports",
+        "/api/v1/admin/reports/{id}",
     }
     assert (await client.get("/docs")).status_code == 200
     assert (await client.get("/api/v1/subjects")).status_code == 401

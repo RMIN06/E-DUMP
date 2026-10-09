@@ -20,8 +20,7 @@ subprojects {
 `;
     }
     const memoryMarker = "// Bound local native compilation to one job.";
-    if (!native.modResults.contents.includes(memoryMarker)) {
-      native.modResults.contents += `
+    const memoryRules = `
 ${memoryMarker}
 if (System.getenv("EDUMP_LOCAL_ANDROID_RELEASE") == "1") {
   subprojects {
@@ -37,7 +36,15 @@ if (System.getenv("EDUMP_LOCAL_ANDROID_RELEASE") == "1") {
   }
 }
 `;
-    }
+    const anchor = 'apply plugin: "expo-root-project"';
+    const source = native.modResults.contents.replace(memoryRules, "");
+    if (!source.includes(anchor))
+      throw new Error("Android root plugin template changed.");
+    // React's root plugin evaluates :app immediately, so register before it.
+    native.modResults.contents = source.replace(
+      anchor,
+      `${memoryRules}\n${anchor}`,
+    );
     return native;
   });
   return configPlugins.withDangerousMod(config, [

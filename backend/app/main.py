@@ -14,6 +14,7 @@ from app.config import get_settings
 from app.db.client import lifespan
 from app.deps import limiter
 from app.errors import DomainError, Unavailable, domain_handler, unavailable_handler
+from app.routers.announcements import router as announcements_router
 from app.routers.auth import router as auth_router
 from app.routers.health import router as health_router
 from app.routers.materials import router as materials_router
@@ -33,7 +34,10 @@ class JsonBodyLimit:
         headers = dict(scope["headers"])
         upload = (
             scope["method"] == "POST"
-            and re.fullmatch(r"/api/v1/subjects/[^/]+/materials", scope["path"])
+            and re.fullmatch(
+                r"/api/v1/(subjects/[^/]+/materials|announcements/attachments)",
+                scope["path"],
+            )
             is not None
         )
         maximum = (get_settings().max_upload_mb + 1) * 1024 * 1024 if upload else 65536
@@ -96,7 +100,7 @@ def create_app() -> FastAPI:
                 "error": {
                     "code": "file_too_large"
                     if exc.status_code == 413
-                    and request.url.path.endswith("/materials")
+                    and request.url.path.endswith(("/materials", "/attachments"))
                     else "validation_error",
                     "message": "Request body is too large."
                     if exc.status_code == 413
@@ -153,6 +157,7 @@ def create_app() -> FastAPI:
     application.include_router(subjects_router)
     application.include_router(schedule_router)
     application.include_router(materials_router)
+    application.include_router(announcements_router)
     return application
 
 

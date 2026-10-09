@@ -9,6 +9,7 @@ from slowapi.util import get_remote_address
 
 from app.config import get_settings
 from app.errors import DomainError, Unavailable
+from app.integrations.push import ExpoPushClient, PushClient
 from app.integrations.r2 import R2Storage, Storage
 from app.models.user import UserRecord
 from app.services import auth_service
@@ -74,3 +75,13 @@ def require_admin(user: CurrentUser) -> UserRecord:
     if user.role != "admin":
         raise DomainError("forbidden", "An admin is required.", 403)
     return user
+
+
+AdminUser = Annotated[UserRecord, Depends(require_admin)]
+
+
+def get_push_client() -> PushClient:
+    return ExpoPushClient()
+
+
+Push = Annotated[PushClient, Depends(get_push_client)]

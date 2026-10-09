@@ -20,6 +20,7 @@ export const theme = {
   line: colors.olive,
   lineSoft: opacity(colors.olive, 0.55),
   pressed: opacity(colors.bone, 0.06),
+  backdrop: opacity(colors.ink, 0.6),
 } as const;
 
 export function useTheme() {

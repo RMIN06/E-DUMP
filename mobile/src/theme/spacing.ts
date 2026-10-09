@@ -20,6 +20,7 @@ export const layout = {
   listBatch: 10,
   listWindow: 7,
   listEndThreshold: 0.6,
+  sheetMaxHeight: "90%",
 } as const;
 export const controls = {
   buttonHeight: 52,

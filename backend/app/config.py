@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     max_upload_mb: int = Field(default=25, ge=1, le=25)
     upload_quota_mb: int = Field(default=500, ge=1)
     download_url_ttl_sec: int = Field(default=600, ge=1, le=600)
+    expo_push_access_token: SecretStr | None = None
 
 
 @lru_cache

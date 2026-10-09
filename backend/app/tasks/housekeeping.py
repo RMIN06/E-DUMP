@@ -3,7 +3,7 @@ import logging
 from datetime import UTC, datetime, timedelta
 
 from app.integrations.r2 import Storage
-from app.repositories import files, materials
+from app.repositories import announcements, files, materials
 from app.repositories.materials import Database
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,9 @@ async def sweep(database: Database, storage: Storage, lock: asyncio.Lock) -> Non
         for file in await files.stale_pending(
             database, datetime.now(UTC) - timedelta(hours=24)
         ):
-            if await materials.referenced(database, file.id):
+            if await materials.referenced(
+                database, file.id
+            ) or await announcements.referenced(database, file.id):
                 await files.set_status(database, file.id, "ready")
             else:
                 await storage.delete(file.key)

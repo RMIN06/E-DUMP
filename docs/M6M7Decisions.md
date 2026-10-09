@@ -11,3 +11,9 @@ Owner decisions, 9 October 2026:
 - Physical Android acceptance belongs to the owner after delivery. Pending acceptance is recorded honestly; this preview is not the final class rollout.
 
 References: [Render free services](https://render.com/docs/free), [Atlas free limits](https://www.mongodb.com/docs/atlas/reference/free-shared-limitations/).
+# First hosted preview decisions
+
+- The owner approved a separate public `edump-apk` bucket containing only signed preview APKs.
+- Firebase/Google Cloud repeatedly failed to load account resources. The owner approved publishing the first APK with push deferred; in-app Updates stays available.
+- Atlas uses an API user restricted to `readWrite` on `edump`, and to the `edump-preview` cluster. Network access covers this PC and Render Singapore's two outbound ranges.
+- Backend credentials are stored in Render's private environment and ignored local files, outside the APK and Git.

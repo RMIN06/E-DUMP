@@ -45,8 +45,16 @@ const config: ExpoConfig = {
   jsEngine: "hermes",
   backgroundColor: colors.ink,
   ios: { supportsTablet: true, bundleIdentifier: "com.edump.bcs3e" },
-  android: { package: "com.edump.bcs3e" },
-  extra: { eas: { projectId: "37e1b246-6c7a-4c9c-926b-7a0be8095b02" } },
+  android: {
+    package: "com.edump.bcs3e",
+    ...(existsSync(resolve(__dirname, "google-services.json"))
+      ? { googleServicesFile: "./google-services.json" }
+      : {}),
+  },
+  extra: {
+    eas: { projectId: "37e1b246-6c7a-4c9c-926b-7a0be8095b02" },
+    pushConfigured: existsSync(resolve(__dirname, "google-services.json")),
+  },
   androidStatusBar: { backgroundColor: colors.ink, barStyle: "light-content" },
   androidNavigationBar: {
     backgroundColor: colors.ink,

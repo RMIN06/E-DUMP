@@ -10,9 +10,13 @@ const enabledKey = "edump.notifications-enabled";
 let registration: Promise<string> | null = null;
 let generation = 0;
 export const notificationPromptKey = "edump.notification-prompt";
-export const pushProjectId = () =>
-  Constants.easConfig?.projectId ??
-  (Constants.expoConfig?.extra?.eas?.projectId as string | undefined);
+export const pushProjectId = () => {
+  if (Constants.expoConfig?.extra?.pushConfigured === false) return undefined;
+  return (
+    Constants.easConfig?.projectId ??
+    (Constants.expoConfig?.extra?.eas?.projectId as string | undefined)
+  );
+};
 
 export async function registerNotifications(
   request: Request,

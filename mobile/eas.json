@@ -4,7 +4,10 @@
     "development": { "developmentClient": true, "distribution": "internal" },
     "preview": {
       "distribution": "internal",
-      "env": { "EDUMP_PREVIEW_FALLBACK_FONTS": "1" },
+      "env": {
+        "EDUMP_PREVIEW_FALLBACK_FONTS": "1",
+        "EXPO_PUBLIC_API_BASE_URL": "https://edump-api.onrender.com/api/v1"
+      },
       "android": { "buildType": "apk" }
     },
     "production": {}

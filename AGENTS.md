@@ -11,6 +11,13 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 
 ## Owner decisions for M4 onward (9 October 2026)
 - Run focused authorization and functional checks while building; run `make verify` at milestone completion. Defer the final native/device matrix through M7. Do not repeat full verification for every small commit.
-- Push meaningful feature commits regularly. Aim for at least 110 substantive commits by M7; never create empty or cosmetic commits to meet the count.
+- Push meaningful feature commits regularly. The owner's updated M7 target is 100 substantive commits; never create empty or cosmetic commits to meet the count.
 - Use the Expo-compatible native date/time picker for announcement forms. This approved dependency extends the listed stack.
 - Defer Expo project provisioning and real Android push delivery acceptance to M7; physical phone and iOS acceptance remain deferred as documented.
+
+## Android preview decisions (9 October 2026)
+- M6 and M7 are authorized. Publish a standalone Android APK connected to a hosted HTTPS API; defer iOS setup and acceptance.
+- Use platform fallback fonts for the test preview only; production still requires licensed fonts.
+- Render free hosting and MongoDB Atlas free are approved for the preview, including idle sleep and cold starts.
+- Rules support/deletion/takedown contact: l250716@lhr.nu.edu.pk.
+- The owner will perform physical Android functional acceptance using the APK link. Do not label pending device acceptance as passed.

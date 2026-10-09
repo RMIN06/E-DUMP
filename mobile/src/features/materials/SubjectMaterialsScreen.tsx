@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { RefreshControl, StyleSheet, View } from "react-native";
 import { useSubject } from "../../api/subjects";
@@ -26,7 +26,12 @@ import { kindLabel, kindOptions } from "./options";
 import { useOpenFile } from "./hooks/useOpenFile";
 
 const kinds = [{ value: "all" as const, label: "All" }, ...kindOptions];
-export function SubjectMaterialsScreen() {
+export function SubjectMaterialsScreen({
+  updates,
+}: {
+  updates?: (onMaterials: () => void) => ReactNode;
+}) {
+  const [showUpdates, setShowUpdates] = useState(false);
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const subject = useSubject(slug);
   useFocusRead(subject);
@@ -62,6 +67,17 @@ export function SubjectMaterialsScreen() {
           {subject.data.material_count}{" "}
           {subject.data.material_count === 1 ? "file" : "files"}
         </Text>
+      ) : null}
+      {updates ? (
+        <FilterText
+          label="Subject view"
+          options={[
+            { value: "material", label: "Material" },
+            { value: "updates", label: "Updates" },
+          ]}
+          value="material"
+          onChange={(value) => setShowUpdates(value === "updates")}
+        />
       ) : null}
       <Field
         label="Search"
@@ -105,6 +121,7 @@ export function SubjectMaterialsScreen() {
       ) : null}
     </View>
   );
+  if (showUpdates && updates) return updates(() => setShowUpdates(false));
   return (
     <Screen
       footer={

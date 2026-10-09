@@ -204,6 +204,24 @@ export function createSession(dependencies: Dependencies) {
       });
       if (epoch === generation) setUser(user);
     },
+    async syncProfile() {
+      if (!store.getState().accessToken) return;
+      const epoch = generation;
+      const user = await request<User>("/me");
+      if (epoch === generation) setUser(user);
+    },
+    async deleteAccount() {
+      const epoch = generation;
+      const token = store.getState().accessToken;
+      await request<void>("/me", { method: "DELETE" });
+      if (epoch !== generation) return;
+      try {
+        if (token) await dependencies.unregisterDevice?.(token);
+      } catch {
+        /* Backend deletion already removed devices. */
+      }
+      await clear();
+    },
     async signOut() {
       const raw = refreshToken;
       const token = store.getState().accessToken;

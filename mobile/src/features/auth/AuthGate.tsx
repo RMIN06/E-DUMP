@@ -19,9 +19,11 @@ export function AuthGate({ children }: PropsWithChildren) {
     return () => privateCache.stop();
   }, [status, userId]);
   useEffect(() => {
-    const listener = AppState.addEventListener("change", (state) =>
-      focusManager.setFocused(state === "active"),
-    );
+    const listener = AppState.addEventListener("change", (state) => {
+      focusManager.setFocused(state === "active");
+      if (state === "active")
+        void sessionActions.syncProfile().catch(() => undefined);
+    });
     return () => listener.remove();
   }, []);
   useEffect(() => {
@@ -66,6 +68,8 @@ export function AuthGate({ children }: PropsWithChildren) {
         <Stack.Protected
           guard={status === "signedIn" && user?.role === "admin"}
         >
+          <Stack.Screen name="admin/users" />
+          <Stack.Screen name="admin/reports" />
           <Stack.Screen
             name="updates/new"
             options={{ presentation: "modal" }}

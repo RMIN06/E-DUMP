@@ -59,12 +59,13 @@ test("cursor pagination retains at most two pages and sends cancellation signals
   await act(async () => {
     await result.current.fetchNextPage();
   });
-  await waitFor(() => expect(result.current.data?.pages).toHaveLength(2));
-  expect(
-    result.current.data?.pages.flatMap((page) =>
-      page.items.map((item) => item.id),
-    ),
-  ).toEqual(["second", "third"]);
+  await waitFor(() =>
+    expect(
+      result.current.data?.pages.flatMap((page) =>
+        page.items.map((item) => item.id),
+      ),
+    ).toEqual(["second", "third"]),
+  );
   expect(result.current.hasNextPage).toBe(false);
   expect(api).toHaveBeenLastCalledWith(
     expect.stringContaining("cursor=third"),

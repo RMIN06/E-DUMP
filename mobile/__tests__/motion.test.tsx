@@ -22,13 +22,21 @@ test("OS reduced-motion changes apply during the session and the listener is rem
     .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
     .mockResolvedValue(true);
   let change: ((value: boolean) => void) | undefined;
-  const remove = jest.fn();
+  const subscription = AccessibilityInfo.addEventListener(
+    "reduceMotionChanged",
+    () => undefined,
+  );
+  subscription.remove();
+  const remove = jest
+    .spyOn(subscription, "remove")
+    .mockImplementation(() => undefined)
+    .mockClear();
   jest
     .spyOn(AccessibilityInfo, "addEventListener")
-    .mockImplementation((event, listener) => {
+    .mockImplementation((event: string, listener: unknown) => {
       if (event === "reduceMotionChanged")
         change = listener as (value: boolean) => void;
-      return { remove };
+      return subscription;
     });
   const view = await render(<Preference />);
   await waitFor(() => expect(screen.getByText("Reduced")).toBeTruthy());

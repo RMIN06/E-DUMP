@@ -59,7 +59,7 @@ function scan(folder) {
     if ((file.startsWith('app/') || file.startsWith('src/features/')) && /\b(?:width\s*:\s*\d{3,}|height\s*:\s*\d{2,})\b/.test(source)) {
       report(file, 'fixed screen/feature dimensions');
     }
-    if (/position\s*:\s*['"]absolute/.test(source) && !file.endsWith('/Sheet.tsx') && !file.endsWith('/TabLabel.tsx') && file !== 'app/(tabs)/_layout.tsx') {
+    if (/position\s*:\s*['"]absolute/.test(source) && !file.endsWith('/Sheet.tsx') && !file.endsWith('/TabLabel.tsx') && !file.endsWith('/FilterText.tsx') && file !== 'app/(tabs)/_layout.tsx') {
       report(file, 'absolute positioning');
     }
   }

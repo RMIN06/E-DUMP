@@ -7,11 +7,14 @@ import { queryClient } from "../../api/queryClient";
 import { sessionActions, useSession } from "../../lib/session";
 import { theme } from "../../theme/tokens";
 import { privateCache } from "../../api/cache";
+import { useMotionPreference } from "../../theme/animation";
+import { motion } from "../../theme/motion";
 
 void SplashScreen.preventAutoHideAsync();
 
 export function AuthGate({ children }: PropsWithChildren) {
   const { status, user } = useSession();
+  const reduced = useMotionPreference();
   const userId = user?.id;
   useEffect(() => {
     if (status === "signedIn" && userId)
@@ -40,7 +43,8 @@ export function AuthGate({ children }: PropsWithChildren) {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: theme.ink },
-          animation: "none",
+          animation: reduced ? "none" : "slide_from_right",
+          animationDuration: motion.durationBase,
         }}
       >
         <Stack.Screen name="index" />
@@ -63,7 +67,7 @@ export function AuthGate({ children }: PropsWithChildren) {
           <Stack.Screen name="updates/[id]" />
           <Stack.Screen
             name="upload/[slug]"
-            options={{ presentation: "modal" }}
+            options={{ presentation: "modal", animation: reduced ? "none" : "slide_from_bottom" }}
           />
         </Stack.Protected>
         <Stack.Protected
@@ -73,7 +77,7 @@ export function AuthGate({ children }: PropsWithChildren) {
           <Stack.Screen name="admin/reports" />
           <Stack.Screen
             name="updates/new"
-            options={{ presentation: "modal" }}
+            options={{ presentation: "modal", animation: reduced ? "none" : "slide_from_bottom" }}
           />
         </Stack.Protected>
       </Stack>

@@ -76,7 +76,7 @@ export function AnnouncementScreen() {
     try {
       if (remove) {
         await api<void>(`/announcements/${id}`, { method: "DELETE" });
-        for (const file of query.data.attachments) await removeCachedFile(file);
+        await Promise.allSettled(query.data.attachments.map(removeCachedFile));
         queryClient.removeQueries({ queryKey: ["announcement", id] });
       } else {
         const item = await api<Announcement>(`/announcements/${id}`, {

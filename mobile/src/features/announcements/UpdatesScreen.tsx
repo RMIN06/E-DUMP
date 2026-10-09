@@ -9,7 +9,7 @@ import {
   updateTypes,
   type Announcement,
 } from "../../api/announcements";
-import { useSubject } from "../../api/subjects";
+import { useSubject, useSubjects } from "../../api/subjects";
 import { queryClient } from "../../api/queryClient";
 import { useFocusRead } from "../../api/useFocusRead";
 import { Screen } from "../../components/Screen";
@@ -34,7 +34,9 @@ export function UpdatesScreen({
   onMaterials?(): void;
 }) {
   const [type, setType] = useState("all");
-  const query = useUpdates(type, subjectSlug);
+  const [selectedSubject, setSelectedSubject] = useState(subjectSlug ?? "");
+  const query = useUpdates(type, selectedSubject || undefined);
+  const subjects = useSubjects();
   const upcoming = useUpcoming();
   const unread = useUnreadCount();
   const subject = useSubject(subjectSlug ?? "");
@@ -101,6 +103,20 @@ export function UpdatesScreen({
         value={type}
         onChange={setType}
       />
+      {subjectSlug ? (
+        <FilterText
+          label="Update subject"
+          options={[
+            { value: "", label: "All subjects" },
+            ...(subjects.data?.map((item) => ({
+              value: item.slug,
+              label: item.short_name,
+            })) ?? []),
+          ]}
+          value={selectedSubject}
+          onChange={setSelectedSubject}
+        />
+      ) : null}
       {subjectSlug ? (
         <Text variant="caption" tone="muted">
           Updates for {subject.data?.short_name ?? subjectSlug}

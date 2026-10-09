@@ -8,6 +8,8 @@ Install official MongoDB Database Tools. With backend secrets set privately, `ba
 
 Restore drills use a disposable database only: download one private archive, run `mongorestore --archive=PATH --gzip --nsFrom='edump.*' --nsTo='edump_restore_drill.*'` using a private connection configuration, then compare subject/schedule counts and indexes. A backup contains metadata and account records; removed R2 file bytes cannot be recovered from a database archive. Do not use `--drop` against the live database. Remove local archives after the drill. Record the tested archive, date and outcome before final rollout.
 
+`uv run python scripts/restore_drill.py backups/...archive.gz` performs this comparison against a fresh database on local MongoDB (default port 27018). It rejects remote restore targets and removes only the database it creates. On 9 October 2026, `backups/2026/10/09/182057.archive.gz` restored successfully: all nine collection counts and index definitions matched Atlas. The compressed archive remained in private R2; local temporary files and the drill database were removed.
+
 ## Credentials and incidents
 
 Keep the Android signing key and password from `%LOCALAPPDATA%/EDUMP-release` in an owner-controlled encrypted backup. All updates must use that key. Store Expo FCM service account credentials in EAS, not in the app. The APK contains only the API URL and public project identifiers.

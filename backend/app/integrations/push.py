@@ -1,8 +1,11 @@
+import logging
 from typing import Protocol
 
 import httpx
 
 from app.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 
 class PushClient(Protocol):
@@ -32,4 +35,8 @@ class ExpoPushClient:
                     and details.get("error") == "DeviceNotRegistered"
                 ):
                     expired.append(str(message["to"]))
+                else:
+                    logger.warning(
+                        "Expo rejected a notification; Updates remains available."
+                    )
         return expired

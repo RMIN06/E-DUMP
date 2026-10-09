@@ -7,6 +7,8 @@ import { publicRequest, type Request } from "../api/transport";
 
 const tokenKey = "edump.device-token";
 const enabledKey = "edump.notifications-enabled";
+let registration: Promise<string> | null = null;
+let generation = 0;
 export const notificationPromptKey = "edump.notification-prompt";
 export const pushProjectId = () =>
   Constants.easConfig?.projectId ??
@@ -15,6 +17,21 @@ export const pushProjectId = () =>
 export async function registerNotifications(
   request: Request,
   askPermission = false,
+) {
+  if (registration) return registration;
+  const epoch = generation;
+  registration = register(request, askPermission, epoch);
+  try {
+    return await registration;
+  } finally {
+    registration = null;
+  }
+}
+
+async function register(
+  request: Request,
+  askPermission: boolean,
+  epoch: number,
 ) {
   if (!pushProjectId())
     throw new Error(
@@ -38,6 +55,8 @@ export async function registerNotifications(
   const token = (
     await Notifications.getExpoPushTokenAsync({ projectId: pushProjectId() })
   ).data;
+  if (epoch !== generation)
+    throw new Error("Notification registration cancelled.");
   await request<void>("/me/devices", {
     method: "PUT",
     body: {
@@ -47,11 +66,14 @@ export async function registerNotifications(
     },
   });
   await AsyncStorage.setItem(tokenKey, token);
+  if (epoch !== generation)
+    throw new Error("Notification registration cancelled.");
   await AsyncStorage.setItem(enabledKey, "true");
   return token;
 }
 
 export async function disableNotifications(request: Request) {
+  await registration?.catch(() => undefined);
   const token = await AsyncStorage.getItem(tokenKey);
   if (token)
     await request<void>("/me/devices", {
@@ -66,6 +88,8 @@ export async function disableNotifications(request: Request) {
 }
 
 export async function unregisterNotifications(accessToken: string) {
+  generation += 1;
+  await registration?.catch(() => undefined);
   const token = await AsyncStorage.getItem(tokenKey);
   await AsyncStorage.removeItem(tokenKey);
   await AsyncStorage.removeItem(enabledKey);

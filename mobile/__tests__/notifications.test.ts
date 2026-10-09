@@ -38,11 +38,9 @@ beforeEach(async () => {
 afterEach(() => jest.restoreAllMocks());
 
 test("registers after permission, keeps per-device opt-out and unregisters with captured session", async () => {
-  jest
-    .mocked(Notifications.getPermissionsAsync)
-    .mockResolvedValue({
-      granted: true,
-    } as Notifications.NotificationPermissionsStatus);
+  jest.mocked(Notifications.getPermissionsAsync).mockResolvedValue({
+    granted: true,
+  } as Notifications.NotificationPermissionsStatus);
   const token = await registerNotifications(request);
   expect(send).toHaveBeenCalledWith(
     "/me/devices",
@@ -74,25 +72,19 @@ test("registers after permission, keeps per-device opt-out and unregisters with 
   await unregisterNotifications("captured-access");
 });
 test("permission denial does not register a token; enabling can request permission", async () => {
-  jest
-    .mocked(Notifications.getPermissionsAsync)
-    .mockResolvedValue({
-      granted: false,
-    } as Notifications.NotificationPermissionsStatus);
-  jest
-    .mocked(Notifications.requestPermissionsAsync)
-    .mockResolvedValue({
-      granted: false,
-    } as Notifications.NotificationPermissionsStatus);
+  jest.mocked(Notifications.getPermissionsAsync).mockResolvedValue({
+    granted: false,
+  } as Notifications.NotificationPermissionsStatus);
+  jest.mocked(Notifications.requestPermissionsAsync).mockResolvedValue({
+    granted: false,
+  } as Notifications.NotificationPermissionsStatus);
   await expect(registerNotifications(request, true)).rejects.toThrow(
     "phone settings",
   );
   expect(send).not.toHaveBeenCalled();
-  jest
-    .mocked(Notifications.requestPermissionsAsync)
-    .mockResolvedValue({
-      granted: true,
-    } as Notifications.NotificationPermissionsStatus);
+  jest.mocked(Notifications.requestPermissionsAsync).mockResolvedValue({
+    granted: true,
+  } as Notifications.NotificationPermissionsStatus);
   jest.replaceProperty(Platform, "OS", "ios");
   await registerNotifications(request, true);
   expect(Notifications.setNotificationChannelAsync).toHaveBeenCalledTimes(1);
@@ -113,7 +105,7 @@ test("notification taps accept only announcement IDs", () => {
   const response = (id: unknown) =>
     ({
       notification: { request: { content: { data: { announcement_id: id } } } },
-    }) as Notifications.NotificationResponse;
+    }) as unknown as Notifications.NotificationResponse;
   expect(announcementFromResponse(response("a".repeat(24)))).toBe(
     "a".repeat(24),
   );
@@ -121,4 +113,36 @@ test("notification taps accept only announcement IDs", () => {
     announcementFromResponse(response("https://untrusted.example")),
   ).toBeNull();
   expect(announcementFromResponse(response(42))).toBeNull();
+});
+
+test("sign-out waits for in-flight registration then removes the device", async () => {
+  jest
+    .mocked(Notifications.getPermissionsAsync)
+    .mockResolvedValue({
+      granted: true,
+    } as Notifications.NotificationPermissionsStatus);
+  let release: () => void = () => undefined;
+  const pending = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let started: () => void = () => undefined;
+  const ready = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const request: Request = async <T>() => {
+    started();
+    await pending;
+    return undefined as T;
+  };
+  const registering = registerNotifications(request);
+  await ready;
+  const signingOut = unregisterNotifications("old-access");
+  release();
+  await expect(registering).rejects.toThrow("cancelled");
+  await signingOut;
+  expect(publicRequest).toHaveBeenCalledWith(
+    expect.stringContaining("/me/devices/"),
+    { method: "DELETE", token: "old-access" },
+  );
+  expect(await notificationsEnabled()).toBe(false);
 });

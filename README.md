@@ -38,4 +38,13 @@ Cached reads work within an active signed-in session. Offline session restoratio
 keeps M1's sign-in behavior. Clear downloads is available in Me; sign-out clears
 private query data and downloaded files. Physical phone acceptance remains deferred to M7.
 Motion tuning is M6; theme motion values are the documented starting values only.
+M4 adds Updates, coming-up dates, unread counts, private attachments and admin posting.
+Notifications use the owner's Expo project through `Constants.easConfig.projectId`;
+until the project and native push credentials are configured, Me explains that notifications
+are unavailable. Real Android push delivery and the new native-module build are deferred to M7.
+M5 adds private Users and Reports tools in Me for admins, immediate server-side role/status
+checks, and confirmed account deletion. Deletion clears devices and sessions and anonymizes
+retained uploads. An admin must transfer access before deleting the last active admin account.
+Enabled accounts in ADMIN_EMAILS regain admin at each login, per the owner's decision.
+Focused feature tests run during development; milestone verification remains required.
 Semester-end archive/wipe decision is pending; backups are a release milestone.

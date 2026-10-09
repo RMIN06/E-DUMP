@@ -153,6 +153,7 @@ export function SubjectMaterialsScreen({
           <Row
             title={item.title}
             titleVariant="h3"
+            accentPrefix={kindLabel(item.kind)}
             meta={[
               kindLabel(item.kind),
               item.chapter !== null ? `Ch ${item.chapter}` : null,

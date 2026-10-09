@@ -18,6 +18,7 @@ type Props = {
   onDetails?(): void;
   titleVariant?: "bodyStrong" | "h3";
   entryKey?: string;
+  accentPrefix?: string;
 };
 
 export const Row = memo(function Row({
@@ -30,6 +31,7 @@ export const Row = memo(function Row({
   onDetails,
   titleVariant = "bodyStrong",
   entryKey,
+  accentPrefix,
 }: Props) {
   const theme = useTheme();
   const reduced = useMotionPreference();
@@ -119,7 +121,9 @@ export const Row = memo(function Row({
           numberOfLines={textLimits.captionLines}
           style={[textStyle("caption"), { color: theme.boneMuted }]}
         >
-          {meta}
+          {accentPrefix && meta.startsWith(accentPrefix) ? (
+            <><Text style={{ color: theme.moss }}>{accentPrefix}</Text>{meta.slice(accentPrefix.length)}</>
+          ) : meta}
         </Text>
       </Pressable>
       {onDetails ? (

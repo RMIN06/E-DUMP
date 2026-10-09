@@ -162,6 +162,7 @@ export function UpdatesScreen({
           <Row
             title={item.title}
             titleVariant="h3"
+            accentPrefix={`${item.pinned ? "Pinned · " : ""}${item.type.charAt(0).toUpperCase() + item.type.slice(1)}`}
             meta={`${item.pinned ? "Pinned · " : ""}${item.type.charAt(0).toUpperCase() + item.type.slice(1)}${item.subject_slug ? ` · ${item.subject_slug.toUpperCase()}` : ""} · ${item.author_name} · ${relativeTime(item.created_at)}`}
             onPress={() => open(item)}
           />

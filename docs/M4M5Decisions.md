@@ -7,3 +7,5 @@ The owner asked us to select the best-fitting date input. Use the Expo-compatibl
 Push small, substantive commits throughout the work. The target is at least 110 meaningful commits by M7, without empty commits or cosmetic changes to inflate history.
 
 Announcement cursors include the pinned flag alongside creation time and ID so pagination follows the specified pinned-first ordering without dropping unpinned results.
+
+The owner selected restoration of seeded admins on every login. Keep Testing&Authentication.md's bootstrap behavior: enabled users listed in ADMIN_EMAILS regain admin when signing in. Disabling still blocks login; bootstrap does not reactivate disabled accounts. In-app demotion of a seeded admin lasts until their next sign-in.

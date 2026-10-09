@@ -80,7 +80,7 @@ Priority: **P0** = must ship in v1.0, **P1** = ship if time allows, never at the
 | AUTH-3 | Session persists across app restarts (refresh token). Sign out clears it. | P0 |
 | AUTH-4 | A non-matching email shows the inline message "Use your student email, like l25xxxx@lhr.nu.edu.pk". A disabled user sees an "Account disabled" screen with a Sign out action. | P0 |
 | AUTH-5 | Delete my account: removes the user record, device tokens and refresh tokens. Uploaded material stays but is shown as "Former member". | P0 |
-| AUTH-6 | Admin role is assigned by seed (`ADMIN_EMAILS` env) and afterwards by other admins. | P0 |
+| AUTH-6 | Admin role is assigned by seed (`ADMIN_EMAILS` env) and afterwards by other admins. Owner decision, 9 Oct 2026: enabled seeded users regain admin on each login; disabled accounts remain blocked. | P0 |
 
 Known trade-off: email-only login proves nothing about who is typing the email. See `Security and Compliance.md` §2.4 for the accepted risk and the upgrade path.
 

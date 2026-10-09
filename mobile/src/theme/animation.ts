@@ -8,9 +8,11 @@ export function useMotionPreference() {
   const [reduced, setReduced] = useState(initial);
   useEffect(() => {
     let alive = true;
-    void AccessibilityInfo.isReduceMotionEnabled().then((value) => {
-      if (alive) setReduced(value);
-    });
+    void AccessibilityInfo.isReduceMotionEnabled()
+      .then((value) => {
+        if (alive) setReduced(value);
+      })
+      .catch(() => undefined);
     const listener = AccessibilityInfo.addEventListener(
       "reduceMotionChanged",
       setReduced,

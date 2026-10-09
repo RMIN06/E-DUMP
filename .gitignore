@@ -27,3 +27,5 @@ mobile/google-services.json
 artifacts/
 backups/
 docs/Atlas*.png
+docs/*Handoff.png
+docs/*Approval.png

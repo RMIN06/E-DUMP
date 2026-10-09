@@ -1,0 +1,72 @@
+name: Verify
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports: [27017:27017]
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping:1})'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      TEST_MONGODB_URI: mongodb://localhost:27017
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.12.24'
+          python-version: '3.12'
+      - run: cd backend && uv sync --frozen
+      - run: make lint-backend test-backend
+      - run: cd backend && uv run coverage report --include='app/services/*,app/deps.py' --fail-under=90
+  mobile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.12.24'
+          python-version: '3.12'
+      - run: cd backend && uv sync --frozen
+      - run: cd mobile && npm ci
+      - run: make lint-mobile test-mobile check-types
+  slop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: make slop-check
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.12.24'
+          python-version: '3.12'
+      - run: cd backend && uv sync --frozen
+      - run: cd mobile && npm ci
+      - run: cd backend && uv run pip-audit
+      - run: test -z "$(git ls-files -- backend/.env mobile/.env)"
+      - run: node scripts/audit-policy.mjs
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

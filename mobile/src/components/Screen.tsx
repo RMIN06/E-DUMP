@@ -18,6 +18,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { layout, space } from "../theme/spacing";
 import { useTheme } from "../theme/tokens";
+import { EntryContext, type EntryScope } from "../theme/animation";
 
 export function Screen<T = never>({
   children,
@@ -31,6 +32,7 @@ export function Screen<T = never>({
 }>) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const entry = useRef<EntryScope>({ seen: new Set(), count: 0 });
   const scroll = useRef<ScrollView>(null);
   const revealFormEnd = () => {
     if (keepFormEndVisible && Keyboard.isVisible()) {
@@ -49,6 +51,7 @@ export function Screen<T = never>({
     return () => listener.remove();
   }, [keepFormEndVisible]);
   return (
+    <EntryContext.Provider value={entry.current}>
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.screen, { backgroundColor: theme.ink }]}
@@ -108,6 +111,7 @@ export function Screen<T = never>({
         </View>
       ) : null}
     </KeyboardAvoidingView>
+    </EntryContext.Provider>
   );
 }
 

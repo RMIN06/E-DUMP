@@ -4,6 +4,9 @@ import { layout, space, controls } from "../theme/spacing";
 import { useSizeClass } from "../theme/responsive";
 import { useTheme } from "../theme/tokens";
 import { headingStyle, textStyle, textLimits } from "../theme/typography";
+import Animated, { FadeInUp, Easing } from "react-native-reanimated";
+import { useMotionPreference, useRowEntry } from "../theme/animation";
+import { motion } from "../theme/motion";
 
 type Props = {
   title: string;
@@ -14,6 +17,7 @@ type Props = {
   onLongPress?(): void;
   onDetails?(): void;
   titleVariant?: "bodyStrong" | "h3";
+  entryKey?: string;
 };
 
 export const Row = memo(function Row({
@@ -25,8 +29,11 @@ export const Row = memo(function Row({
   onLongPress,
   onDetails,
   titleVariant = "bodyStrong",
+  entryKey,
 }: Props) {
   const theme = useTheme();
+  const reduced = useMotionPreference();
+  const entry = useRowEntry(entryKey ?? title);
   const { sizeClass, fontScale } = useSizeClass();
   const [titleWidth, setTitleWidth] = useState(0);
   const [metaWidth, setMetaWidth] = useState(0);
@@ -34,7 +41,11 @@ export const Row = memo(function Row({
   const below =
     fontScale > 1.3 || titleWidth + metaWidth + space.lg > available;
   return (
-    <View style={[styles.row, { borderBottomColor: theme.lineSoft }]}>
+    <Animated.View style={[styles.row, { borderBottomColor: theme.lineSoft }]}
+      entering={reduced || entry === null ? undefined : FadeInUp
+        .duration(motion.durationBase).delay(entry * motion.stagger)
+        .easing(Easing.bezier(...motion.easeOut))
+        .withInitialValues({ opacity: 0, transform: [{ translateY: motion.rowRise }] })}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={[title, meta, trailing].filter(Boolean).join(", ")}
@@ -118,7 +129,7 @@ export const Row = memo(function Row({
           </Text>
         </Pressable>
       ) : null}
-    </View>
+    </Animated.View>
   );
 });
 const styles = StyleSheet.create({

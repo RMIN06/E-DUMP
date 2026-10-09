@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from bson import ObjectId
@@ -59,3 +60,36 @@ async def seen_updates(database: Database, user_id: ObjectId, now: datetime) -> 
     await database.users.update_one(
         {"_id": user_id}, {"$set": {"last_seen_updates_at": now}}
     )
+
+
+async def search(database: Database, text: str) -> list[UserRecord]:
+    query: dict[str, object] = {}
+    if text.strip():
+        pattern = {"$regex": re.escape(text.strip()), "$options": "i"}
+        query["$or"] = [{"name": pattern}, {"email": pattern}]
+    return [
+        UserRecord.model_validate(row)
+        async for row in database.users.find(query).sort([("name", 1), ("_id", 1)])
+    ]
+
+
+async def active_admin_count(database: Database) -> int:
+    return await database.users.count_documents({"role": "admin", "is_active": True})
+
+
+async def change(
+    database: Database, user_id: ObjectId, fields: dict[str, object]
+) -> UserRecord:
+    document = await database.users.find_one_and_update(
+        {"_id": user_id}, {"$set": fields}, return_document=ReturnDocument.AFTER
+    )
+    return UserRecord.model_validate(document)
+
+
+async def delete(database: Database, user_id: ObjectId) -> None:
+    # Delete dependent credentials first so a failed cleanup can be retried.
+    await database.devices.delete_many({"user_id": user_id})
+    await database.refresh_tokens.delete_many({"user_id": user_id})
+    await database.materials.update_many({"uploader_id": user_id}, {"$set": {"uploader_name_snapshot": "Former member"}})
+    await database.announcements.update_many({"author_id": user_id}, {"$set": {"author_name_snapshot": "Former member"}})
+    await database.users.delete_one({"_id": user_id})

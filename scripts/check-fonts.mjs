@@ -9,7 +9,8 @@ const release = process.argv.includes('--release') ||
 const available = required.concat('Recoleta-SemiBold')
   .filter((name) => existsSync(resolve(root, 'mobile/assets/fonts', `${name}.otf`)));
 const missing = required.filter((name) => !available.includes(name));
-if (release && missing.length) {
+const previewFallback = process.env.EAS_BUILD_PROFILE === 'preview' && process.env.EDUMP_PREVIEW_FALLBACK_FONTS === '1';
+if (release && missing.length && !previewFallback) {
   console.error(`Missing licensed fonts: ${missing.join(', ')}. Add the licensed OTF files before release.`);
   process.exit(1);
 }
@@ -21,4 +22,3 @@ if (process.argv.includes('--prepare')) {
     '// Rebuilt by check-fonts.mjs from licensed files before starting Metro or EAS.\n' +
     `export const fontAssets: Record<string, FontSource> = {${sources.length ? '\n' + sources.join('\n') + '\n' : ''}};\n`);
 }
-

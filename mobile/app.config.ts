@@ -17,8 +17,10 @@ const fontPaths = requiredFonts
 const release = ["preview", "production"].includes(
   process.env.EAS_BUILD_PROFILE ?? "",
 );
+const previewFallback = process.env.EAS_BUILD_PROFILE === "preview" && process.env.EDUMP_PREVIEW_FALLBACK_FONTS === "1";
 if (
   release &&
+  !previewFallback &&
   requiredFonts.some(
     (file) => !existsSync(resolve(__dirname, "assets/fonts", file)),
   )
@@ -31,7 +33,7 @@ if (
 const config: ExpoConfig = {
   name: "E-DUMP",
   slug: "edump",
-  version: "0.0.0",
+  version: "0.1.0",
   scheme: "edump",
   orientation: "portrait",
   userInterfaceStyle: "dark",

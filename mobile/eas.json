@@ -4,6 +4,7 @@
     "development": { "developmentClient": true, "distribution": "internal" },
     "preview": {
       "distribution": "internal",
+      "env": { "EDUMP_PREVIEW_FALLBACK_FONTS": "1" },
       "android": { "buildType": "apk" }
     },
     "production": {}

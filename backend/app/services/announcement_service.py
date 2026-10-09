@@ -273,7 +273,7 @@ async def upload(
                 status="pending",
                 created_at=now,
             )
-            # Save the pending record first so hourly cleanup can reclaim a failed upload.
+            # Persist first so hourly cleanup can reclaim a failed upload.
             await files.insert(database, file)
             await storage.put(file.key, validated.body, file.mime_type)
             return attachment(file)

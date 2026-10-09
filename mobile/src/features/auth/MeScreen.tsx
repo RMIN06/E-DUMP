@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { router } from "expo-router";
 import { ErrorLine } from "../../components/ErrorLine";
 import { Heading } from "../../components/Heading";
@@ -8,7 +8,7 @@ import { TextAction } from "../../components/TextAction";
 import { sessionActions, useSession } from "../../lib/session";
 import { clearDownloads } from "../../lib/files";
 
-export function MeScreen() {
+export function MeScreen({ notifications }: { notifications?: ReactNode }) {
   const { user } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
@@ -51,6 +51,7 @@ export function MeScreen() {
         {user?.email}
       </Text>
       <TextAction label="Name" onPress={() => router.push("/name")} />
+      {notifications}
       <TextAction
         label="Clear downloads"
         disabled={working}

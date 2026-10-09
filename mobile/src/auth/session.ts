@@ -2,6 +2,7 @@ import { createStore } from "zustand/vanilla";
 import type { components } from "../api/schema";
 import { ApiError, publicRequest, type Request } from "../api/transport";
 import { clearPrivateCache, secureSessionStorage } from "../lib/storage";
+import { unregisterNotifications } from "../lib/notifications";
 
 type User = components["schemas"]["User"];
 type Tokens = components["schemas"]["Tokens"];
@@ -21,6 +22,7 @@ type Dependencies = {
     remove(): Promise<void>;
   };
   clearCache(): Promise<void>;
+  unregisterDevice?(accessToken: string): Promise<void>;
 };
 
 export function createSession(dependencies: Dependencies) {
@@ -205,7 +207,6 @@ export function createSession(dependencies: Dependencies) {
     async signOut() {
       const raw = refreshToken;
       const token = store.getState().accessToken;
-      // Device registration and persisted queries begin in later milestones.
       // Revoke best effort; local data is always cleared even when offline.
       let clearError: unknown;
       try {
@@ -214,6 +215,11 @@ export function createSession(dependencies: Dependencies) {
         clearError = error;
       }
       if (raw && token) {
+        try {
+          await dependencies.unregisterDevice?.(token);
+        } catch {
+          /* Device cleanup retries at the next registration. */
+        }
         try {
           await dependencies.request<void>("/auth/logout", {
             method: "POST",
@@ -233,4 +239,5 @@ export const session = createSession({
   request: publicRequest,
   storage: secureSessionStorage,
   clearCache: clearPrivateCache,
+  unregisterDevice: unregisterNotifications,
 });

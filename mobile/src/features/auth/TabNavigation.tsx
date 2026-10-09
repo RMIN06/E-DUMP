@@ -4,13 +4,15 @@ import { Icon } from "../../components/Icon";
 import { TabLabel } from "../../components/TabLabel";
 import { controls, layout, space } from "../../theme/spacing";
 import { useTheme } from "../../theme/tokens";
+import { useUnreadCount } from "../../api/announcements";
 
 export function TabNavigation() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const unread = useUnreadCount();
   return (
     <Tabs
-      initialRouteName="subjects"
+      initialRouteName="updates"
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -24,6 +26,21 @@ export function TabNavigation() {
         sceneStyle: { backgroundColor: theme.ink },
       }}
     >
+      <Tabs.Screen
+        name="updates"
+        options={{
+          title: "Updates",
+          tabBarIcon: ({ focused }) => <Icon name="updates" active={focused} />,
+          tabBarLabel: ({ focused }) => (
+            <TabLabel
+              label={
+                unread.data?.count ? `Updates ${unread.data.count}` : "Updates"
+              }
+              active={focused}
+            />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="subjects"
         options={{

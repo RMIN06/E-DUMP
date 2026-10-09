@@ -4,11 +4,13 @@ import {
   UserRound,
   ChevronLeft,
   Ellipsis,
+  Bell,
 } from "lucide-react-native";
 import { layout } from "../theme/spacing";
 import { useTheme } from "../theme/tokens";
 
 const icons = {
+  updates: Bell,
   subjects: BookOpen,
   schedule: CalendarDays,
   me: UserRound,

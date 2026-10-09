@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type PropsWithChildren } from "react";
 import { AppState } from "react-native";
 import { focusManager, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, Redirect } from "expo-router";
@@ -10,7 +10,7 @@ import { privateCache } from "../../api/cache";
 
 void SplashScreen.preventAutoHideAsync();
 
-export function AuthGate() {
+export function AuthGate({ children }: PropsWithChildren) {
   const { status, user } = useSession();
   const userId = user?.id;
   useEffect(() => {
@@ -33,6 +33,7 @@ export function AuthGate() {
   if (status === "restoring") return null;
   return (
     <QueryClientProvider client={queryClient}>
+      {children}
       <Stack
         screenOptions={{
           headerShown: false,
@@ -56,8 +57,17 @@ export function AuthGate() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="subject/[slug]" />
           <Stack.Screen name="material/[id]" />
+          <Stack.Screen name="updates/[id]" />
           <Stack.Screen
             name="upload/[slug]"
+            options={{ presentation: "modal" }}
+          />
+        </Stack.Protected>
+        <Stack.Protected
+          guard={status === "signedIn" && user?.role === "admin"}
+        >
+          <Stack.Screen
+            name="updates/new"
             options={{ presentation: "modal" }}
           />
         </Stack.Protected>
@@ -73,7 +83,7 @@ export function SessionRedirect() {
     signedOut: "/sign-in",
     needsName: "/name",
     blocked: "/blocked",
-    signedIn: "/subjects",
+    signedIn: "/updates",
   } as const;
   return <Redirect href={paths[status]} />;
 }

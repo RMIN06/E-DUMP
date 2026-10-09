@@ -256,7 +256,7 @@ describe("AUTH-2/AUTH-3: navigation authorization and restore gate", () => {
     ["signedOut", "/sign-in", "(auth)/sign-in"],
     ["needsName", "/name", "(auth)/name"],
     ["blocked", "/blocked", "(auth)/blocked"],
-    ["signedIn", "/subjects", "(tabs)"],
+    ["signedIn", "/updates", "(tabs)"],
   ] as const)(
     "%s exposes only authorized screens",
     async (status, href, route) => {

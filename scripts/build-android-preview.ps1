@@ -32,7 +32,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Android prebuild failed.' }
     Push-Location android
     try {
-        & ./gradlew.bat :app:assembleRelease '-PreactNativeArchitectures=arm64-v8a,armeabi-v7a' --no-daemon --max-workers=1 '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=768m'
+        & ./gradlew.bat :app:assembleRelease '-PreactNativeArchitectures=arm64-v8a,armeabi-v7a' '-Pkotlin.compiler.execution.strategy=in-process' --no-daemon --max-workers=1 '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=768m'
         if ($LASTEXITCODE -ne 0) { throw 'Android release build failed.' }
     } finally { Pop-Location }
     $taskArtifacts = Join-Path $taskRoot 'artifacts/android'

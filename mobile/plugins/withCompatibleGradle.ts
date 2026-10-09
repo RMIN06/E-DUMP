@@ -19,6 +19,25 @@ subprojects {
 }
 `;
     }
+    const memoryMarker = "// Bound local native compilation to one job.";
+    if (!native.modResults.contents.includes(memoryMarker)) {
+      native.modResults.contents += `
+${memoryMarker}
+if (System.getenv("EDUMP_LOCAL_ANDROID_RELEASE") == "1") {
+  subprojects {
+    ["com.android.library", "com.android.application"].each { androidPlugin ->
+      plugins.withId(androidPlugin) {
+        android.defaultConfig.externalNativeBuild.cmake.arguments(
+          "-DCMAKE_JOB_POOLS=edump_native=1",
+          "-DCMAKE_JOB_POOL_COMPILE=edump_native",
+          "-DCMAKE_JOB_POOL_LINK=edump_native"
+        )
+      }
+    }
+  }
+}
+`;
+    }
     return native;
   });
   return configPlugins.withDangerousMod(config, [

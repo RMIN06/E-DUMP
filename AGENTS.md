@@ -8,3 +8,9 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 6. Run `make verify` before declaring a task done; report the result.
 7. Commit small. One feature per branch. No TODO/FIXME left behind.
 8. If a requirement is ambiguous, stop and ask instead of guessing.
+
+## Owner decisions for M4 onward (9 October 2026)
+- Run focused authorization and functional checks while building; run `make verify` at milestone completion. Defer the final native/device matrix through M7. Do not repeat full verification for every small commit.
+- Push meaningful feature commits regularly. Aim for at least 110 substantive commits by M7; never create empty or cosmetic commits to meet the count.
+- Use the Expo-compatible native date/time picker for announcement forms. This approved dependency extends the listed stack.
+- Defer Expo project provisioning and real Android push delivery acceptance to M7; physical phone and iOS acceptance remain deferred as documented.

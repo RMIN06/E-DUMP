@@ -37,6 +37,7 @@ Core: `expo`, `expo-router`, `react-native`, `typescript`, `expo-dev-client`, `e
 | Icons | `lucide-react-native`, `react-native-svg` | Stroke 1.5, used sparingly |
 | Fonts | `expo-font` (config plugin), local files in `mobile/assets/fonts` | Recoleta + Berthold, see `UI.md` |
 | Dates | `date-fns`, `date-fns-tz` | Fixed zone `Asia/Karachi` |
+| Native due-date input | `@react-native-community/datetimepicker` | Owner-approved M4 addition, Expo-compatible version |
 | Offline cache | `@react-native-async-storage/async-storage` | Query persistence |
 | Lint/format | `eslint` (expo config + custom slop rules), `prettier` | |
 | Tests | `jest`, `jest-expo`, `@testing-library/react-native`, `maestro` (E2E) | See `Testing&Authentication.md` |

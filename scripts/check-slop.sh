@@ -15,6 +15,8 @@ const approved = new Set([
   'expo-image', 'react-native-reanimated', 'react-native-gesture-handler',
   'lucide-react-native', 'react-native-svg', 'expo-font', 'date-fns', 'date-fns-tz',
   '@react-native-async-storage/async-storage', 'eslint', 'prettier', 'jest', 'jest-expo',
+  // Owner approved the Expo-compatible native due-date picker for M4.
+  '@react-native-community/datetimepicker',
   '@testing-library/react-native', 'maestro',
   // Owner approved the required Expo peers and lint/test support packages.
   'react', 'expo-linking', 'react-native-screens', 'react-native-safe-area-context',

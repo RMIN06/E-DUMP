@@ -1,11 +1,25 @@
-# Android test preview
+# Android preview 0.1.0
 
-The owner will test the standalone APK on Android. iOS and the final class rollout are deferred. The preview uses platform fonts; production still requires licensed fonts. The free API sleeps when idle, so the first sign-in can need a retry after the API wakes.
+Published 10 October 2026 (Asia/Karachi), from source commit `5bda8ec`.
 
-Provisioning uses the owner's accounts: Render free Docker service, isolated Atlas free cluster, existing private R2 bucket and an Expo project with Android FCM credentials. No credentials are committed or included in the APK. APK distribution must use a separate public release artifact; class files remain private.
+- [Download for most Android phones (ARM64, 45.22 MB)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.0-arm64.apk)
+- [Download for older 32-bit Android phones (ARMv7, 38.98 MB)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.0-armv7.apk)
 
-Before publishing: run `make verify`, verify the production API and readiness endpoint, seed the seven courses and eleven schedule slots, build with bundled JavaScript, verify APK signing and inspect its manifest and assets. Record the API URL, source commit, APK SHA-256, supported ABIs, size and download link with the build result.
+Requires Android 8 or later. Download on the phone and allow installation from the browser when Android asks. This standalone release includes JavaScript; Expo Go and a connection to the development PC are unnecessary. Sign in using the approved student email format and your name. If the first request times out, wait about a minute and retry while the free API wakes up.
 
-Owner phone checks: Rules → sign-in → name → subjects/search/upload/open/cache → updates/post/attachments → schedule → notifications → admin users/reports → sign-out and account deletion. Record failures with the screen, steps and message shown. Installing later previews must preserve the same signing key.
+Package: `com.edump.bcs3e`; version code: `1`. API: `https://edump-api.onrender.com/api/v1`. Only signed installers are in the public `edump-apk` bucket; class uploads and backups remain in private `edump-files`.
 
-Physical push delivery and the final device matrix are pending until exercised. Automated and emulator checks do not substitute for those results.
+## Build evidence
+
+Local `assembleRelease` succeeded. ARM64 signature verification passed with APK signature scheme v2, a 3072-bit RSA release key, and no debuggable application flag. Both APKs contain the hosted API address and bundled JavaScript, exclude the old localhost API address, and passed a scan against the actual private database, JWT and R2 credential values. Both are below the 60 MiB installer budget.
+
+| APK | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ARM64 | 45223350 | `6ede16341570db16ad00029ee5121cfdb4db9562fcb3f1387a4f4dacb2bda46a` |
+| ARMv7 | 38978988 | `c5e302b58d331a89ccf5263049476d338e1f5ed9e7579f887e8fa71f57a903c6` |
+
+Signing certificate SHA-256: `e7b47a76c855e2ee6f97f9f0db379e647e7e3363f21a3eda6d294c1de89994df`.
+
+Both public download URLs returned HTTP 200. Complete unauthenticated downloads matched the byte counts and SHA-256 values above. Local evidence is under ignored `artifacts/release/`: `android-build.log`, `apk-upload.png` and `public-download-verification.json`.
+
+Application verification and live API/backup evidence are recorded in AndroidPreviewVerification.md. This delivery is the first functional preview, with phone acceptance pending. The owner approved fallback fonts, free sleeping hosting and deferred push delivery; in-app Updates remain available. iOS, licensed production fonts, the complete native accessibility/responsiveness matrix, always-on backups and final class rollout remain pending. M6 motion polish still includes the active main-tab underline transition and deletion collapse animation; this preview does not certify every M6/M7 acceptance gate.

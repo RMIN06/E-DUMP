@@ -1,4 +1,4 @@
-import { Text as NativeText, type TextProps } from "react-native";
+import { type TextProps } from "react-native";
 import Animated, { FadeInUp, Easing } from "react-native-reanimated";
 import { useMotionPreference } from "../theme/animation";
 import { motion } from "../theme/motion";

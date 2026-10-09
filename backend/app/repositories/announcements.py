@@ -13,13 +13,24 @@ async def by_id(database: Database, identifier: ObjectId) -> AnnouncementRecord 
     return AnnouncementRecord.model_validate(document) if document else None
 
 
-async def page(database: Database, query: dict[str, object], limit: int, upcoming: bool = False) -> list[AnnouncementRecord]:
-    order = [("due_at", 1), ("_id", 1)] if upcoming else [("pinned", -1), ("created_at", -1), ("_id", -1)]
-    return [AnnouncementRecord.model_validate(row) async for row in database.announcements.find(query).sort(order).limit(limit)]
+async def page(
+    database: Database, query: dict[str, object], limit: int, upcoming: bool = False
+) -> list[AnnouncementRecord]:
+    order = (
+        [("due_at", 1), ("_id", 1)]
+        if upcoming
+        else [("pinned", -1), ("created_at", -1), ("_id", -1)]
+    )
+    return [
+        AnnouncementRecord.model_validate(row)
+        async for row in database.announcements.find(query).sort(order).limit(limit)
+    ]
 
 
 async def update(database: Database, record: AnnouncementRecord) -> None:
-    await database.announcements.replace_one({"_id": record.id}, record.model_dump(by_alias=True))
+    await database.announcements.replace_one(
+        {"_id": record.id}, record.model_dump(by_alias=True)
+    )
 
 
 async def remove(database: Database, identifier: ObjectId) -> None:
@@ -27,8 +38,13 @@ async def remove(database: Database, identifier: ObjectId) -> None:
 
 
 async def referenced(database: Database, file_id: ObjectId) -> bool:
-    return await database.announcements.find_one({"file_ids": str(file_id)}, {"_id": 1}) is not None
+    return (
+        await database.announcements.find_one({"file_ids": str(file_id)}, {"_id": 1})
+        is not None
+    )
 
 
 async def unread(database: Database, since: object) -> int:
-    return await database.announcements.count_documents({"created_at": {"$gt": since}} if since else {})
+    return await database.announcements.count_documents(
+        {"created_at": {"$gt": since}} if since else {}
+    )

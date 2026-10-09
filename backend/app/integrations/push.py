@@ -16,7 +16,9 @@ class ExpoPushClient:
         if token:
             headers["Authorization"] = f"Bearer {token.get_secret_value()}"
         async with httpx.AsyncClient(timeout=15) as client:
-            response = await client.post("https://exp.host/--/api/v2/push/send", json=messages, headers=headers)
+            response = await client.post(
+                "https://exp.host/--/api/v2/push/send", json=messages, headers=headers
+            )
             response.raise_for_status()
             data = response.json().get("data")
         if not isinstance(data, list) or len(data) != len(messages):
@@ -25,6 +27,9 @@ class ExpoPushClient:
         for message, ticket in zip(messages, data, strict=True):
             if isinstance(ticket, dict) and ticket.get("status") == "error":
                 details = ticket.get("details", {})
-                if isinstance(details, dict) and details.get("error") == "DeviceNotRegistered":
+                if (
+                    isinstance(details, dict)
+                    and details.get("error") == "DeviceNotRegistered"
+                ):
                     expired.append(str(message["to"]))
         return expired

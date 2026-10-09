@@ -10,7 +10,10 @@ async def register(database: Database, user_id: ObjectId, data: DeviceWrite) -> 
     now = datetime.now(UTC)
     await database.devices.update_one(
         {"expo_push_token": data.expo_push_token},
-        {"$set": data.model_dump() | {"user_id": user_id, "last_seen_at": now}, "$setOnInsert": {"created_at": now}},
+        {
+            "$set": data.model_dump() | {"user_id": user_id, "last_seen_at": now},
+            "$setOnInsert": {"created_at": now},
+        },
         upsert=True,
     )
 
@@ -24,10 +27,19 @@ async def delete_tokens(database: Database, tokens: list[str]) -> None:
 
 
 async def recipients(database: Database, author_id: ObjectId) -> list[str]:
-    rows = await database.devices.aggregate([
-        {"$match": {"notifications_enabled": True, "user_id": {"$ne": author_id}}},
-        {"$lookup": {"from": "users", "localField": "user_id", "foreignField": "_id", "as": "owner"}},
-        {"$match": {"owner.is_active": True}},
-        {"$project": {"_id": 0, "expo_push_token": 1}},
-    ])
+    rows = await database.devices.aggregate(
+        [
+            {"$match": {"notifications_enabled": True, "user_id": {"$ne": author_id}}},
+            {
+                "$lookup": {
+                    "from": "users",
+                    "localField": "user_id",
+                    "foreignField": "_id",
+                    "as": "owner",
+                }
+            },
+            {"$match": {"owner.is_active": True}},
+            {"$project": {"_id": 0, "expo_push_token": 1}},
+        ]
+    )
     return [str(row["expo_push_token"]) async for row in rows]

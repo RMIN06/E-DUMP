@@ -2,7 +2,14 @@ from datetime import datetime
 from typing import Literal
 
 from bson import ObjectId
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 AnnouncementType = Literal["quiz", "task", "datesheet", "general"]
 
@@ -20,14 +27,18 @@ class AnnouncementWrite(BaseModel):
     @classmethod
     def clean(cls, value: str) -> str:
         value = value.strip()
-        if not value or any(ord(c) < 32 and c not in "\n\t" or ord(c) == 127 for c in value):
+        if not value or any(
+            ord(c) < 32 and c not in "\n\t" or ord(c) == 127 for c in value
+        ):
             raise ValueError("Enter plain text.")
         return value
 
     @field_validator("file_ids")
     @classmethod
     def valid_files(cls, value: list[str]) -> list[str]:
-        if len(set(value)) != len(value) or any(not ObjectId.is_valid(item) for item in value):
+        if len(set(value)) != len(value) or any(
+            not ObjectId.is_valid(item) for item in value
+        ):
             raise ValueError("Invalid attachments.")
         return value
 
@@ -74,7 +85,9 @@ class Announcement(BaseModel):
 
 
 class AnnouncementRecord(AnnouncementWrite):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="ignore")
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True, populate_by_name=True, extra="ignore"
+    )
     id: ObjectId = Field(alias="_id")
     pinned: bool = False
     author_id: ObjectId

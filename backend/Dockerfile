@@ -6,6 +6,7 @@ ENV APP_ENV=production UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy PATH="/app/.venv/
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev && useradd --system --uid 10001 edump
 COPY app ./app
+COPY seeds ./seeds
 USER edump
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

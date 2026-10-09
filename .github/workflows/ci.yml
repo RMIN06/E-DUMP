@@ -22,6 +22,7 @@ jobs:
         with:
           version: '0.12.24'
           python-version: '3.12'
+      - run: cd backend && UV_PROJECT_ENVIRONMENT=.venv-runtime uv run --frozen --no-dev python -c "import app.main"
       - run: cd backend && uv sync --frozen
       - run: make lint-backend test-backend
       - run: cd backend && uv run coverage report --include='app/services/*,app/deps.py' --fail-under=90

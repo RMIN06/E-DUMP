@@ -7,6 +7,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev && useradd --system --uid 10001 edump
 COPY app ./app
 COPY seeds ./seeds
+RUN python -c "import app.main"
 USER edump
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

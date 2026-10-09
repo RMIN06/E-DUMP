@@ -6,6 +6,7 @@ node_modules/
 dist/
 coverage/
 .venv/
+.venv-runtime/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -29,3 +30,4 @@ backups/
 docs/Atlas*.png
 docs/*Handoff.png
 docs/*Approval.png
+atlas-password.local.txt

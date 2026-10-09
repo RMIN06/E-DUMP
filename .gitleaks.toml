@@ -3,7 +3,7 @@ useDefault = true
 
 [[allowlists]]
 description = "Installed dependencies and generated local caches"
-paths = ['''(^|[/\\])(node_modules|\.venv|\.expo|coverage|\.git)([/\\]|$)''']
+paths = ['''(^|[/\\])(node_modules|\.venv|\.venv-runtime|\.expo|coverage|\.git)([/\\]|$)''']
 
 [[allowlists]]
 description = "Local environment files; Make and CI reject these if tracked"

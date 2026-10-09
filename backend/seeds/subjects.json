@@ -1,0 +1,9 @@
+[
+  {"slug":"ds","name":"Data Structures","short_name":"DS","credits":3,"teacher":"Mr. Muhammad Naveed","kind":"theory","sort_order":0,"aliases":[]},
+  {"slug":"ds-lab","name":"Data Structures Lab","short_name":"DS Lab","credits":1,"teacher":"Mr. Bilal Ahmad","kind":"lab","sort_order":1,"aliases":[]},
+  {"slug":"coal","name":"Computer Organization and Assembly Language","short_name":"COAL","credits":3,"teacher":"Ms. Aleena Ahmad","kind":"theory","sort_order":2,"aliases":[]},
+  {"slug":"coal-lab","name":"Computer Organization and Assembly Language Lab","short_name":"COAL Lab","credits":1,"teacher":"Ms. Amina Qaiser","kind":"lab","sort_order":3,"aliases":[]},
+  {"slug":"discrete","name":"Discrete Structures","short_name":"Discrete","credits":3,"teacher":"Ms. Rubab Janjua","kind":"theory","sort_order":4,"aliases":["Discrete Mathematics"]},
+  {"slug":"linear-algebra","name":"Linear Algebra","short_name":"Linear Algebra","credits":3,"teacher":"Dr. Muzamil Hanif VF","kind":"theory","sort_order":5,"aliases":[]},
+  {"slug":"uhq","name":"Understanding of Holy Quran I / Ethics I","short_name":"UHQ / Ethics I","credits":null,"teacher":null,"kind":"theory","sort_order":6,"aliases":[]}
+]

@@ -1,0 +1,13 @@
+[
+  {"subject_slug":"uhq","weekday":1,"start":"08:30","end":"10:20","venue":"C-2"},
+  {"subject_slug":"discrete","weekday":1,"start":"11:30","end":"12:50","venue":"F-303"},
+  {"subject_slug":"linear-algebra","weekday":1,"start":"14:30","end":"15:50","venue":"C-13"},
+  {"subject_slug":"coal","weekday":2,"start":"08:30","end":"09:50","venue":"F-305"},
+  {"subject_slug":"ds-lab","weekday":2,"start":"11:30","end":"14:20","venue":"Lab-14"},
+  {"subject_slug":"ds","weekday":2,"start":"14:30","end":"15:50","venue":"F-203"},
+  {"subject_slug":"discrete","weekday":3,"start":"11:30","end":"12:50","venue":"F-303"},
+  {"subject_slug":"linear-algebra","weekday":3,"start":"14:30","end":"15:50","venue":"C-13"},
+  {"subject_slug":"coal","weekday":4,"start":"08:30","end":"09:50","venue":"F-305"},
+  {"subject_slug":"coal-lab","weekday":4,"start":"11:30","end":"14:20","venue":"Lab-17"},
+  {"subject_slug":"ds","weekday":4,"start":"14:30","end":"15:50","venue":"F-203"}
+]

@@ -4,8 +4,24 @@ import { join } from "node:path";
 
 // React Native 0.83's Foojay resolver uses an API removed in Gradle 9.
 // Pin the latest compatible Gradle 8 maintenance release for every prebuild.
-const withCompatibleGradle: ConfigPlugin = (config) =>
-  configPlugins.withDangerousMod(config, [
+const withCompatibleGradle: ConfigPlugin = (config) => {
+  config = configPlugins.withProjectBuildGradle(config, (native) => {
+    const marker = "// Align Expo development module annotation classpaths.";
+    if (!native.modResults.contents.includes(marker)) {
+      native.modResults.contents += `
+${marker}
+subprojects {
+  if (name in ["expo-dev-menu", "expo-dev-launcher"]) {
+    configurations.configureEach {
+      resolutionStrategy.force "org.jetbrains:annotations:23.0.0"
+    }
+  }
+}
+`;
+    }
+    return native;
+  });
+  return configPlugins.withDangerousMod(config, [
     "android",
     async (nativeConfig) => {
       const file = join(
@@ -23,5 +39,6 @@ const withCompatibleGradle: ConfigPlugin = (config) =>
       return nativeConfig;
     },
   ]);
+};
 
 export default withCompatibleGradle;

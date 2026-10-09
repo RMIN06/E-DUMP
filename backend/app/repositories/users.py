@@ -90,6 +90,10 @@ async def delete(database: Database, user_id: ObjectId) -> None:
     # Delete dependent credentials first so a failed cleanup can be retried.
     await database.devices.delete_many({"user_id": user_id})
     await database.refresh_tokens.delete_many({"user_id": user_id})
-    await database.materials.update_many({"uploader_id": user_id}, {"$set": {"uploader_name_snapshot": "Former member"}})
-    await database.announcements.update_many({"author_id": user_id}, {"$set": {"author_name_snapshot": "Former member"}})
+    await database.materials.update_many(
+        {"uploader_id": user_id}, {"$set": {"uploader_name_snapshot": "Former member"}}
+    )
+    await database.announcements.update_many(
+        {"author_id": user_id}, {"$set": {"author_name_snapshot": "Former member"}}
+    )
     await database.users.delete_one({"_id": user_id})

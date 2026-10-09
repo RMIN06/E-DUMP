@@ -52,6 +52,43 @@ function setup(
     clearCache,
   };
 }
+test("profile refresh updates permissions and account deletion clears private credentials", async () => {
+  const { auth, send, storage, clearCache } = setup(async (path, options) => {
+    if (path === "/me" && options?.method === "DELETE") return undefined;
+    if (path === "/me") return { ...user, role: "admin" };
+    return { ...tokens, user, needs_name: false };
+  });
+  await auth.syncProfile();
+  expect(send).not.toHaveBeenCalled();
+  await auth.login(user.email);
+  await auth.syncProfile();
+  expect(auth.store.getState().user?.role).toBe("admin");
+  await auth.deleteAccount();
+  expect(send).toHaveBeenCalledWith(
+    "/me",
+    expect.objectContaining({ method: "DELETE" }),
+  );
+  expect(auth.store.getState()).toEqual({
+    status: "signedOut",
+    user: null,
+    accessToken: null,
+  });
+  expect(storage.remove).toHaveBeenCalled();
+  expect(clearCache).toHaveBeenCalled();
+});
+test("a denied account deletion retains the signed-in session", async () => {
+  const { auth } = setup(async (path) => {
+    if (path === "/me")
+      throw new ApiError(403, "forbidden", "Make another admin first.");
+    return { ...tokens, user, needs_name: false };
+  });
+  await auth.login(user.email);
+  await expect(auth.deleteAccount()).rejects.toThrow(
+    "Make another admin first.",
+  );
+  expect(auth.store.getState().status).toBe("signedIn");
+});
+
 function deferred<T>() {
   let resolve: (value: T) => void = () => {};
   const promise = new Promise<T>((done) => {

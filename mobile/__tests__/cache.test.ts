@@ -25,6 +25,8 @@ test("offline class cache excludes auth and mutations and limits list pages", as
   await cache.start("student-id");
   client.setQueryData(["auth"], { access_token: "never-persist-this" });
   client.setQueryData(["me"], { email: "never-persist-email" });
+  client.setQueryData(["admin-users"], [{ email: "never-persist-admin-email" }]);
+  client.setQueryData(["admin-reports"], [{ note: "never-persist-report" }]);
   client.setQueryData(["materials", "coal"], {
     pages: [1, 2, 3],
     pageParams: [null, "a", "b"],

@@ -21,10 +21,12 @@ jest.mock("../src/lib/session", () => ({
     restore: jest.fn(),
     updateName: jest.fn(),
     signOut: jest.fn(),
+    syncProfile: jest.fn(async () => undefined),
+    deleteAccount: jest.fn(async () => undefined),
   },
 }));
 jest.mock("../src/api/cache", () => ({
-  privateCache: { start: jest.fn(), stop: jest.fn() },
+  privateCache: { start: jest.fn(async () => undefined), stop: jest.fn() },
 }));
 jest.mock("expo-splash-screen", () => ({
   preventAutoHideAsync: jest.fn(),
@@ -278,6 +280,47 @@ describe("AUTH-2/AUTH-3: navigation authorization and restore gate", () => {
       expect(screen.getByText(href)).toBeTruthy();
     },
   );
+  test.each(["student", "admin"] as const)(
+    "%s can access only their update and admin routes",
+    async (role) => {
+      jest
+        .mocked(useSession)
+        .mockReturnValue({
+          ...state,
+          status: "signedIn",
+          user: { id: "actor", role },
+        } as ReturnType<typeof useSession>);
+      await render(<AuthGate />);
+      for (const name of ["updates/new", "admin/users", "admin/reports"])
+        expect(Boolean(screen.queryByText(name))).toBe(role === "admin");
+      expect(screen.getByText("updates/[id]")).toBeTruthy();
+    },
+  );
+  test("delete account needs confirmation and preserves a server refusal", async () => {
+    jest
+      .mocked(sessionActions.deleteAccount)
+      .mockRejectedValueOnce(
+        new ApiError(403, "forbidden", "Make another admin first."),
+      );
+    await render(<MeScreen />);
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Delete account" }),
+    );
+    expect(sessionActions.deleteAccount).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(/Uploaded material stays as Former member/),
+    ).toBeTruthy();
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Delete my account" }),
+    );
+    expect(
+      screen.getAllByText("Make another admin first.").length,
+    ).toBeGreaterThan(0);
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Delete my account" }),
+    );
+    expect(sessionActions.deleteAccount).toHaveBeenCalledTimes(2);
+  });
   test("splash remains during bounded session restore", async () => {
     jest.mocked(useSession).mockReturnValue({ ...state, status: "restoring" });
     const gate = await render(<AuthGate />);

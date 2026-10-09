@@ -19,7 +19,7 @@ import {
 
 jest.mock("expo-constants", () => ({
   __esModule: true,
-  default: { easConfig: { projectId: "test-project" } },
+  default: { easConfig: { projectId: "test-project" }, expoConfig: null },
 }));
 jest.mock("expo-device", () => ({ isDevice: true }));
 jest.mock("../src/api/transport", () => ({
@@ -36,6 +36,18 @@ beforeEach(async () => {
   jest.replaceProperty(Platform, "OS", "android");
 });
 afterEach(() => jest.restoreAllMocks());
+
+test("the approved preview without Firebase skips native push initialization", async () => {
+  jest.replaceProperty(Constants, "expoConfig", {
+    name: "E-DUMP",
+    slug: "e-dump",
+    extra: { pushConfigured: false },
+  });
+  await expect(registerNotifications(request, true)).rejects.toThrow("preview");
+  expect(Notifications.getExpoPushTokenAsync).not.toHaveBeenCalled();
+  expect(Notifications.requestPermissionsAsync).not.toHaveBeenCalled();
+  expect(send).not.toHaveBeenCalled();
+});
 
 test("registers after permission, keeps per-device opt-out and unregisters with captured session", async () => {
   jest.mocked(Notifications.getPermissionsAsync).mockResolvedValue({
@@ -116,11 +128,9 @@ test("notification taps accept only announcement IDs", () => {
 });
 
 test("sign-out waits for in-flight registration then removes the device", async () => {
-  jest
-    .mocked(Notifications.getPermissionsAsync)
-    .mockResolvedValue({
-      granted: true,
-    } as Notifications.NotificationPermissionsStatus);
+  jest.mocked(Notifications.getPermissionsAsync).mockResolvedValue({
+    granted: true,
+  } as Notifications.NotificationPermissionsStatus);
   let release: () => void = () => undefined;
   const pending = new Promise<void>((resolve) => {
     release = resolve;

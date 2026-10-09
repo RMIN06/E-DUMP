@@ -53,3 +53,9 @@ async def set_name(
         return_document=ReturnDocument.AFTER,
     )
     return UserRecord.model_validate(document) if document else None
+
+
+async def seen_updates(database: Database, user_id: ObjectId, now: datetime) -> None:
+    await database.users.update_one(
+        {"_id": user_id}, {"$set": {"last_seen_updates_at": now}}
+    )

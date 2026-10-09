@@ -46,6 +46,7 @@ const config: ExpoConfig = {
     barStyle: "light-content",
   },
   plugins: [
+    "expo-notifications",
     "expo-router",
     ["expo-font", { fonts: fontPaths }],
     ["expo-splash-screen", { backgroundColor: colors.ink }],

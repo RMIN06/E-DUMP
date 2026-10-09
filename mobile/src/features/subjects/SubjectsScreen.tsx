@@ -7,6 +7,7 @@ import { Text } from "../../components/Text";
 import { Row } from "../../components/Row";
 import { ErrorLine } from "../../components/ErrorLine";
 import { EmptyState } from "../../components/EmptyState";
+import { ProgressLine } from "../../components/ProgressLine";
 import { space } from "../../theme/spacing";
 import { useTheme } from "../../theme/tokens";
 import { useFocusRead } from "../../api/useFocusRead";
@@ -21,7 +22,7 @@ export function SubjectsScreen() {
       <Text variant="caption" tone="muted">
         Seven courses this semester
       </Text>
-      {query.isPending ? <Text tone="muted">Loading subjects…</Text> : null}
+      {query.isPending ? <ProgressLine label="Loading subjects" /> : null}
       {query.isError ? (
         query.data ? (
           <Text variant="caption" tone="muted">

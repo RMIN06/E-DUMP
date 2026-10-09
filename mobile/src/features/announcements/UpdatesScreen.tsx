@@ -142,7 +142,7 @@ export function UpdatesScreen({
         </>
       ) : null}
       {query.isPending ? (
-        <ProgressLine value={0} label="Loading updates" />
+        <ProgressLine label="Loading updates" />
       ) : null}
       {query.isError && !query.data ? (
         <ErrorLine

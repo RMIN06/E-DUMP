@@ -106,7 +106,7 @@ export function SubjectMaterialsScreen({
         value={chapter}
         onChange={setChapter}
       />
-      {query.isPending ? <Text tone="muted">Loading materials…</Text> : null}
+      {query.isPending ? <ProgressLine label="Loading materials" /> : null}
       {query.isError ? (
         query.data ? (
           <Text variant="caption" tone="muted">

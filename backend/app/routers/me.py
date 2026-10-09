@@ -1,11 +1,19 @@
 from fastapi import APIRouter, Response
 
-from app.deps import CurrentUser, Database
+from app.deps import AuthLock, CurrentUser, Database
 from app.models.device import DeviceWrite
 from app.models.user import NameRequest, User
-from app.services import device_service, user_service
+from app.services import admin_service, device_service, user_service
 
 router = APIRouter(prefix="/api/v1/me", tags=["me"])
+
+
+@router.delete("", status_code=204)
+async def delete_account(
+    user: CurrentUser, database: Database, lock: AuthLock
+) -> Response:
+    await admin_service.delete_account(database, lock, user)
+    return Response(status_code=204)
 
 
 @router.get("", response_model=User)

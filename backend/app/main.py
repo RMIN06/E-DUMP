@@ -14,6 +14,7 @@ from app.config import get_settings
 from app.db.client import lifespan
 from app.deps import limiter
 from app.errors import DomainError, Unavailable, domain_handler, unavailable_handler
+from app.routers.admin import router as admin_router
 from app.routers.announcements import router as announcements_router
 from app.routers.auth import router as auth_router
 from app.routers.health import router as health_router
@@ -146,7 +147,7 @@ def create_app() -> FastAPI:
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         if request.url.path.startswith(
-            ("/api/v1/auth/", "/api/v1/me")
+            ("/api/v1/auth/", "/api/v1/me", "/api/v1/admin/")
         ) or request.url.path.endswith("/download"):
             response.headers["Cache-Control"] = "no-store"
         return response
@@ -158,6 +159,7 @@ def create_app() -> FastAPI:
     application.include_router(schedule_router)
     application.include_router(materials_router)
     application.include_router(announcements_router)
+    application.include_router(admin_router)
     return application
 
 

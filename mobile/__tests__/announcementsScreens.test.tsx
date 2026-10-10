@@ -156,6 +156,41 @@ test("admin post and subject view compose without losing navigation", async () =
   await fireEvent.press(screen.getByRole("button", { name: "Material" }));
   expect(materials).toHaveBeenCalled();
 });
+
+test("updates appear once across upcoming and overlapping pages", async () => {
+  const general = {
+    ...item,
+    id: "two",
+    type: "general" as const,
+    title: "Class notice",
+  };
+  jest.mocked(useUpcoming).mockReturnValue({
+    ...base,
+    data: [item, item],
+  } as unknown as ReturnType<typeof useUpcoming>);
+  jest.mocked(useUpdates).mockReturnValue({
+    ...base,
+    data: { pages: [{ items: [item, general] }, { items: [general, item] }] },
+    fetchNextPage: jest.fn(),
+  } as unknown as ReturnType<typeof useUpdates>);
+  await render(<UpdatesScreen />);
+  expect(screen.getAllByText("Linked lists")).toHaveLength(1);
+  expect(screen.getAllByText("Class notice")).toHaveLength(1);
+  expect(screen.queryByText("Nothing here yet")).toBeNull();
+  await fireEvent.press(
+    screen.getByRole("button", { name: /Linked lists, Pinned/ }),
+  );
+  expect(router.push).toHaveBeenCalledWith("/updates/one");
+  await fireEvent.press(screen.getByRole("button", { name: "General" }));
+  expect(screen.queryByText("Coming up")).toBeNull();
+  expect(screen.getAllByText("Linked lists")).toHaveLength(1);
+});
+
+test("upcoming-only feeds keep their update without a false empty state", async () => {
+  await render(<UpdatesScreen />);
+  expect(screen.getAllByText("Linked lists")).toHaveLength(1);
+  expect(screen.queryByText("Nothing here yet")).toBeNull();
+});
 test("attachment opening, pinning, editing and confirmed deletion", async () => {
   await render(<AnnouncementScreen />);
   await fireEvent.press(screen.getByRole("button", { name: /quiz.pdf/ }));

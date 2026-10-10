@@ -42,6 +42,25 @@ export function UpdatesScreen({
   const subject = useSubject(subjectSlug ?? "");
   const { user } = useSession();
   const theme = useTheme();
+  const upcomingIds = new Set<string>();
+  const upcomingItems = subjectSlug
+    ? []
+    : (upcoming.data ?? []).filter((item) => {
+        if (type !== "all" && item.type !== type) return false;
+        if (selectedSubject && item.subject_slug !== selectedSubject)
+          return false;
+        if (upcomingIds.has(item.id)) return false;
+        upcomingIds.add(item.id);
+        return true;
+      });
+  const renderedIds = new Set(upcomingIds);
+  const updates = (
+    query.data?.pages.flatMap((page) => page.items) ?? []
+  ).filter((item) => {
+    if (renderedIds.has(item.id)) return false;
+    renderedIds.add(item.id);
+    return true;
+  });
   useFocusRead(query);
   useFocusRead(upcoming);
   useFocusEffect(
@@ -114,14 +133,16 @@ export function UpdatesScreen({
           Offline. Showing saved data.
         </Text>
       ) : null}
-      {!subjectSlug && upcoming.data?.length ? (
+      {upcomingItems.length ? (
         <>
           <Heading variant="h2">Coming up</Heading>
-          {upcoming.data.map((item) => (
+          {upcomingItems.map((item) => (
             <Row
               key={item.id}
-              title={`${item.type.charAt(0).toUpperCase() + item.type.slice(1)}${item.subject_slug ? ` · ${item.subject_slug.toUpperCase()}` : ""}`}
-              meta={item.title}
+              title={item.title}
+              titleVariant="h3"
+              accentPrefix={`${item.pinned ? "Pinned · " : ""}${item.type.charAt(0).toUpperCase() + item.type.slice(1)}`}
+              meta={`${item.pinned ? "Pinned · " : ""}${item.type.charAt(0).toUpperCase() + item.type.slice(1)}${item.subject_slug ? ` · ${item.subject_slug.toUpperCase()}` : ""} · ${item.author_name}`}
               trailing={item.due_at ? dueDate(item.due_at) : undefined}
               onPress={() => open(item)}
             />
@@ -158,7 +179,7 @@ export function UpdatesScreen({
         ) : null
       }
       list={{
-        data: query.data?.pages.flatMap((page) => page.items) ?? [],
+        data: updates,
         keyExtractor: (item) => item.id,
         ListHeaderComponent: <View style={styles.header}>{header}</View>,
         renderItem: ({ item }) => (
@@ -171,7 +192,7 @@ export function UpdatesScreen({
           />
         ),
         ListEmptyComponent:
-          !query.isPending && !query.isError ? (
+          !query.isPending && !query.isError && !upcomingItems.length ? (
             <EmptyState
               title="Nothing here yet"
               message="Class updates will appear here."

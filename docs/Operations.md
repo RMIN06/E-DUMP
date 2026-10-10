@@ -16,6 +16,12 @@ Restore drills use a disposable database only: download one private archive, run
 
 ## Credentials and incidents
 
+Android push was configured on 10 October 2026. Firebase project `e-dump-android-preview` uses the Spark free plan with Analytics disabled; Cloud Messaging API v1 is enabled (sender ID `234816031605`). Android package `com.edump.bcs3e` is registered. Its public client configuration is supplied through ignored `mobile/google-services.json` for native builds. Expo project `rmin06s-team/e-dump` (`37e1b246-6c7a-4c9c-926b-7a0be8095b02`) has the FCM v1 service credential assigned to this Android identifier.
+
+Dedicated identity `edump-expo-push` has only the Firebase Cloud Messaging API Admin role on that Firebase project. Its private JSON key lives outside the repository in the owner's private release directory and in Expo's credential store. It is not an Android signing key and cannot operate the class database or R2 bucket. Google OAuth and an FCM v1 `validate_only` request passed without sending a notification. Real delivery and tap navigation remain for the owner's physical-phone acceptance.
+
+The app asks for notification permission after sign-in, registers enabled devices, supports the Me notification switch, unregisters on sign-out and opens the corresponding update from a notification tap. Admin-created updates notify other active users' enabled devices; the posting admin's devices are excluded. Edit notifications require the existing Notify again switch. Expo tickets reject/prune unregistered devices; delivery failures do not undo a published announcement.
+
 Keep the Android signing key and password from `%LOCALAPPDATA%/EDUMP-release` in an owner-controlled encrypted backup. All updates must use that key. Store Expo FCM service account credentials in EAS, not in the app. The APK contains only the API URL and public project identifiers.
 
 If credentials leak: revoke refresh tokens, rotate JWT/R2/Atlas credentials, rebuild the backend secrets, and notify affected users through an admin announcement and the owner's email process within 72 hours of confirmation. Do not publish tokens or full-email logs. Retain service logs for at most 14 days.

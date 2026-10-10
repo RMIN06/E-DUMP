@@ -6,7 +6,10 @@ import { TextAction } from "../../components/TextAction";
 import { Button } from "../../components/Button";
 import { ErrorLine } from "../../components/ErrorLine";
 
-export const supportEmail = "l250716@lhr.nu.edu.pk";
+export const supportEmails = [
+  "l250716@lhr.nu.edu.pk",
+  "l250656@lhr.nu.edu.pk",
+] as const;
 export function RulesScreen({
   onContinue,
   onClose,
@@ -48,12 +51,15 @@ export function RulesScreen({
       </Text>
       <Heading variant="h2">Contact</Heading>
       <Text>For support, deletion help or copyright takedown requests:</Text>
-      <TextAction
-        label={supportEmail}
-        onPress={() => {
-          void Linking.openURL(`mailto:${supportEmail}`).catch(() => undefined);
-        }}
-      />
+      {supportEmails.map((email) => (
+        <TextAction
+          key={email}
+          label={email}
+          onPress={() => {
+            void Linking.openURL(`mailto:${email}`).catch(() => undefined);
+          }}
+        />
+      ))}
       {error ? <ErrorLine message={error} /> : null}
       {onContinue ? (
         <Button label="Continue" loading={working} onPress={onContinue} />

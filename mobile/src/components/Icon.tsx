@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import Svg, { Path, Rect, Circle } from "react-native-svg";
+import Svg, { Path, Rect, Circle, Polygon } from "react-native-svg";
+import { brand } from "../theme/brand";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,7 +12,14 @@ import { useMotionPreference } from "../theme/animation";
 import { motion } from "../theme/motion";
 
 type IconName =
-  "updates" | "subjects" | "schedule" | "me" | "back" | "overflow" | "upload";
+  | "updates"
+  | "subjects"
+  | "schedule"
+  | "me"
+  | "back"
+  | "overflow"
+  | "upload"
+  | "brand";
 export function Icon({
   name,
   active = false,
@@ -35,6 +43,21 @@ export function Icon({
   const face = active ? theme.moss : theme.boneMuted;
   const edge = theme.olive;
   const highlight = theme.bone;
+  if (name === "brand") {
+    return (
+      <Svg
+        width={size}
+        height={size}
+        viewBox={brand.viewBox}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      >
+        {brand.layers.map((layer, index) => (
+          <Polygon key={index} points={layer.points} fill={theme[layer.tone]} />
+        ))}
+      </Svg>
+    );
+  }
   if (name === "back" || name === "overflow") {
     return (
       <Svg

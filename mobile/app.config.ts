@@ -37,7 +37,8 @@ const config: ExpoConfig = {
   name: "E-DUMP",
   slug: "e-dump",
   owner: "rmin06s-team",
-  version: "0.1.3",
+  version: "0.1.4",
+  icon: "./assets/brand/icon.png",
   scheme: "edump",
   orientation: "portrait",
   userInterfaceStyle: "dark",
@@ -47,7 +48,11 @@ const config: ExpoConfig = {
   ios: { supportsTablet: true, bundleIdentifier: "com.edump.bcs3e" },
   android: {
     package: "com.edump.bcs3e",
-    versionCode: 4,
+    versionCode: 5,
+    adaptiveIcon: {
+      foregroundImage: "./assets/brand/adaptive-icon.png",
+      backgroundColor: colors.ink,
+    },
     ...(existsSync(resolve(__dirname, "google-services.json"))
       ? { googleServicesFile: "./google-services.json" }
       : {}),
@@ -62,10 +67,24 @@ const config: ExpoConfig = {
     barStyle: "light-content",
   },
   plugins: [
-    "expo-notifications",
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/brand/notification.png",
+        color: colors.moss,
+        defaultChannel: "default",
+      },
+    ],
     "expo-router",
     ["expo-font", { fonts: fontPaths }],
-    ["expo-splash-screen", { backgroundColor: colors.ink }],
+    [
+      "expo-splash-screen",
+      {
+        backgroundColor: colors.ink,
+        image: "./assets/brand/splash.png",
+        imageWidth: 96,
+      },
+    ],
     "./plugins/withPlainSplash.cjs",
     "expo-system-ui",
     "expo-secure-store",

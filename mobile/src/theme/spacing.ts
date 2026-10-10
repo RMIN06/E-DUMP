@@ -15,6 +15,7 @@ export const layout = {
   rowHeight: 64,
   iconSize: 28,
   featureIconSize: 48,
+  brandSize: 96,
   iconStroke: 1.5,
   tabHeight: 80,
   listInitial: 12,

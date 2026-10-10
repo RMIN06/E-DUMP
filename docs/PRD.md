@@ -84,6 +84,8 @@ Priority: **P0** = must ship in v1.0, **P1** = ship if time allows, never at the
 
 Known trade-off: email-only login proves nothing about who is typing the email. See `Security and Compliance.md` §2.4 for the accepted risk and the upgrade path.
 
+Owner extension, 10 October 2026: a branded welcome screen precedes sign-in once per installation. Continue saves the local preference and opens the existing student-email form. Returning signed-in students continue directly to Updates. The same palette-based logo is used for the launcher and splash; no onboarding tour or additional features are introduced.
+
 ### 8.2 Subjects and material
 
 | ID | Requirement | Pri |

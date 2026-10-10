@@ -1,4 +1,4 @@
-# Android preview verification — 9 October 2026
+# Android preview verification â€” 9 October 2026
 
 `make verify` initially reached the mobile tests after backend lint, strict typing and all 227 backend tests passed (96.43% overall coverage). Two mobile test assertions failed: subscription mock history and an observer pagination timing assumption. Commit e1d3c6c corrected those assertions; application behavior was unchanged.
 
@@ -12,8 +12,12 @@ First-preview exceptions: push delivery is deferred by owner approval after Fire
 
 Release tooling checks: the Expo annotation classpath alignment and local CMake one-job pool passed TypeScript checking. Their native behavior is validated by the APK build rather than repeating unrelated application tests. The pool follows [CMake job pool configuration](https://cmake.org/cmake/help/latest/prop_gbl/JOB_POOLS.html); the annotation fix aligns Expo's compile and runtime selections under [Gradle consistent resolution](https://docs.gradle.org/current/userguide/dependency_resolution_consistency.html).
 
-## Polished UI rebuild — 10 October 2026
+## Polished UI rebuild â€” 10 October 2026
 
 Version 0.1.1, Android version code 2, source af38ee4. `assembleRelease` succeeded in 13m 46s: 60 tasks executed and 786 up-to-date. Both ARM64 and ARMv7 APK signatures passed; the ARM64 certificate matches the existing preview signing certificate. AAPT confirms com.edump.bcs3e, Android API floor 26, and no debuggable flag. Both bundles contain the polished upload copy and hosted HTTPS API, exclude the localhost API, and passed scans against the actual private JWT, MongoDB and R2 values.
 
 The UI verification passed 20 suites / 202 mobile tests. The release configuration check reran frontend lint, strict TypeScript and the slop check with `make verify -o lint-backend -o test-backend -o test-mobile -o check-types -o security`, exit 0; it reused the completed mobile tests. Backend checks were not repeated for this frontend-only change. Evidence: ignored artifacts/release/android-build-0.1.1.log, frontend-release-verify-0.1.1.log and apks-0.1.1.json. Native device acceptance remains pending.
+
+## Figma-inspired UI preview — 10 October 2026
+
+Version 0.1.3 / Android code 4, source aea794a. Frontend verification passed 20 suites / 202 tests, lint, strict TypeScript, audit-policy tests and slop check; backend tests were excluded for this UI-only change. `assembleRelease` succeeded in 8m 11s with one Metro worker and the existing native job pool. Both APK signatures passed; package/version/API-floor checks, hosted API and new UI bundle checks, private-credential scans and anonymous public download hashes passed. The preview uses the existing signing certificate. See AndroidPreview.md for the current links and hashes. Physical-phone visual and functional acceptance remain pending.

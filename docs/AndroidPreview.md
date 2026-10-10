@@ -1,4 +1,26 @@
-# Android preview 0.1.2
+# Android preview 0.1.3
+
+Published 10 October 2026 (Asia/Karachi), from source `aea794a`, Android version code `4`.
+
+- [Download for most Android phones (ARM64, 43.72 MB)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.3-arm64.apk)
+- [Download for older 32-bit Android phones (ARMv7, 37.47 MB)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.3-armv7.apk)
+
+This UI update adapts the compact headers, grouped lists and action hierarchy of [Task manager Mobile app UI by Rohan Kumar](https://www.figma.com/community/file/1025672621370192050/task-manager-mobile-app-ui) to E-DUMP. All screens now use a consistent moss context header. Profile actions use filled setting rows; course icons, file counts, list spacing and selected navigation labels establish a clearer hierarchy. Forms and detail screens share the same layout. The assigned palette, feature scope, permissions, API behavior, native upload picker, scalable text and reduced-motion feedback are preserved. No template assets or new dependencies were added.
+
+Install over the existing preview using the same signing certificate. Android 8 or later is required. The bundled API remains `https://edump-api.onrender.com/api/v1`. Both public URLs returned HTTP 200 without authentication, and complete downloads matched the signed local APKs:
+
+| APK | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ARM64 | 43716794 | `cd7095ebb46feadb78c334f7dbf656f01e9233c4c7c09d5223cd175873d193a1` |
+| ARMv7 | 37472432 | `61616237c5eb349e642cfdb1ba458c567a0f164d72e3da535bc98396f8ad6424` |
+
+`assembleRelease` succeeded in 8m 11s with one Metro worker and the existing one-job native compilation limits. Both APK signatures passed; AAPT confirmed package `com.edump.bcs3e`, version `0.1.3`, version code `4`, Android API floor 26, target 36 and no debuggable flag. The context-header bundle and hosted API checks passed, along with scans against actual private credential values.
+
+Frontend `make verify -o lint-backend -o test-backend -o check-types -o security` passed: 20 suites / 202 tests, lint, strict TypeScript, audit-policy tests and slop check. Backend checks were not repeated for this UI-only update. Native visual, keyboard, screen-reader and physical-phone acceptance remain pending. Approved preview font fallbacks, free API cold starts, deferred push and iOS still apply.
+
+Local evidence: ignored `artifacts/release/android-build-0.1.3-final.log`, `frontend-verify-0.1.3.log`, `apks-0.1.3.json`, `public-download-verification-0.1.3.json` and `upload-confirmation-0.1.3.png`.
+
+## Archived Android preview 0.1.2
 
 Published 10 October 2026 (Asia/Karachi), from source `d1ffb09`, Android version code `3`.
 

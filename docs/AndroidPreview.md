@@ -1,4 +1,24 @@
-# Android preview 0.1.0
+# Android preview 0.1.1
+
+Published 10 October 2026 (Asia/Karachi), from source commit `af38ee4`. Android version code: `2`.
+
+- [Download for most Android phones (ARM64, 45.23 MB)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.1-arm64.apk)
+- [Download for older 32-bit Android phones (ARMv7, 38.98 MB)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.1-armv7.apk)
+
+This update adds smooth button feedback, animated tab underlines, clearer upload sections, wrapping filenames and actual upload percentages. It retains the assigned theme, preview font fallbacks and reduced-motion support. Install over 0.1.0; both builds use the same signing certificate. Android 8 or later is required. The bundled HTTPS API remains `https://edump-api.onrender.com/api/v1`.
+
+Both public URLs returned HTTP 200 without authentication. Complete downloads matched the signed local APKs:
+
+| APK | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ARM64 | 45226302 | `bb6c7995802ce3eeb87eaec36143232b4a7d113656634287c9b09771da9f1d8c` |
+| ARMv7 | 38981940 | `eeb799f27d45b86d2a988d37b32265e3f8526d3371668fe8eff48569e8772d23` |
+
+The signed build, hosted API bundle, polished UI bundle and private-credential scan passed. Frontend verification passed 202 tests, lint, strict TypeScript and the slop check; backend tests were not repeated for this UI-only update. Phone, keyboard and screen-reader acceptance remain pending. The existing preview exceptions for fallback fonts, free API cold starts, deferred push and iOS still apply.
+
+The installers are also published in the private repository's [0.1.1 preview release](https://github.com/RMIN06/E-DUMP/releases/tag/v0.1.1-preview), with authenticated download checks passed. Public R2 links above are preferred for phone installation. Local publication evidence is recorded in ignored `artifacts/release/public-download-verification-0.1.1.json`, `github-download-verification-0.1.1.json` and `apks-0.1.1.json`. See AndroidPreviewVerification.md and FrontendPolish.md for build and UI checks.
+
+## Archived Android preview 0.1.0
 
 Published 10 October 2026 (Asia/Karachi), from source commit `5bda8ec`.
 

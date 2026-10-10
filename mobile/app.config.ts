@@ -37,7 +37,7 @@ const config: ExpoConfig = {
   name: "E-DUMP",
   slug: "e-dump",
   owner: "rmin06s-team",
-  version: "0.1.0",
+  version: "0.1.1",
   scheme: "edump",
   orientation: "portrait",
   userInterfaceStyle: "dark",
@@ -47,6 +47,7 @@ const config: ExpoConfig = {
   ios: { supportsTablet: true, bundleIdentifier: "com.edump.bcs3e" },
   android: {
     package: "com.edump.bcs3e",
+    versionCode: 2,
     ...(existsSync(resolve(__dirname, "google-services.json"))
       ? { googleServicesFile: "./google-services.json" }
       : {}),

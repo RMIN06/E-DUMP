@@ -21,3 +21,4 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - Render free hosting and MongoDB Atlas free are approved for the preview, including idle sleep and cold starts.
 - Rules support/deletion/takedown contact: l250716@lhr.nu.edu.pk.
 - The owner will perform physical Android functional acceptance using the APK link. Do not label pending device acceptance as passed.
+- After each completed UI update, build and publish a new signed Android preview APK and provide its verified download link. Increment the app version and Android version code for each published build.

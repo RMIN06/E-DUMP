@@ -1,4 +1,24 @@
-# Android preview 0.1.1
+# Android preview 0.1.2
+
+Published 10 October 2026 (Asia/Karachi), from source `d1ffb09`, Android version code `3`.
+
+- [Download for most Android phones (ARM64, 43.72 MB)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.2-arm64.apk)
+- [Download for older 32-bit Android phones (ARMv7, 37.47 MB)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.2-armv7.apk)
+
+The owner-requested redesign replaces oversized serif preview headings with mobile-sized system sans typography, filled rounded rows and inputs, filled selected filters, sculpted functional icons, a filled upload selector and tactile button scale feedback. Schedule rows share the new surfaces and highlight the current class. All styling uses the assigned palette and theme tokens, remains single-column and respects font scaling and reduced motion. The 21st AI generation attempt returned HTTP 401; no generated draft was retrieved. Existing native dependencies were used.
+
+Install over the earlier preview with the same signing certificate. Android 8 or later is required. The hosted API remains `https://edump-api.onrender.com/api/v1`. Both public URLs returned HTTP 200 without authentication; complete downloads matched these signed local files:
+
+| APK | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ARM64 | 43716226 | `a852986537c5259cb0e795ed42585c0048c10d7ed01fbbeaca56390b30b620bf` |
+| ARMv7 | 37471864 | `fc59fbd6ef583413406957475907d6554cb400af96edb1c504df8053161e681d` |
+
+`assembleRelease` succeeded in 9m 10s. Both signatures passed, version/package checks passed, the new icon/surface tokens and HTTPS API are present in the bundle, and private-credential scans passed. Frontend `make verify -o lint-backend -o test-backend -o check-types -o security` passed: 20 suites / 202 tests, strict TypeScript, lint and slop check. After the schedule surface change, lint/TypeScript/slop verification passed again while reusing those tests. No backend tests ran. Native visual, keyboard, screen-reader and physical-phone acceptance remain pending. Existing preview exceptions for platform fonts, free API cold starts, deferred push and iOS continue to apply.
+
+Local evidence: ignored `artifacts/release/android-build-0.1.2.log`, `frontend-verify-0.1.2.log`, `frontend-final-verify-0.1.2.log`, `apks-0.1.2.json` and `public-download-verification-0.1.2.json`.
+
+## Archived Android preview 0.1.1
 
 Published 10 October 2026 (Asia/Karachi), from source commit `af38ee4`. Android version code: `2`.
 

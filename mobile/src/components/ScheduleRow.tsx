@@ -27,8 +27,8 @@ export function ScheduleRow({
       style={({ pressed }) => [
         styles.row,
         {
-          borderBottomColor: theme.lineSoft,
-          backgroundColor: pressed ? theme.pressed : theme.ink,
+          backgroundColor:
+            pressed || status === "Now" ? theme.accentSoft : theme.surface,
         },
       ]}
     >
@@ -73,8 +73,10 @@ const styles = StyleSheet.create({
   row: {
     minHeight: layout.rowHeight,
     paddingVertical: space.lg,
+    paddingHorizontal: space.lg,
+    marginBottom: space.md,
+    borderRadius: controls.panelRadius,
     gap: space.sm,
-    borderBottomWidth: controls.hairline,
   },
   time: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
 });

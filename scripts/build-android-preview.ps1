@@ -21,6 +21,7 @@ $env:EDUMP_KEYSTORE_PASSWORD = [System.IO.File]::ReadAllText($taskPasswordFile)
 $env:EDUMP_KEYSTORE_FILE = $taskKey.Replace('\', '/')
 $env:EDUMP_KEY_ALIAS = 'edump'
 $env:EDUMP_LOCAL_ANDROID_RELEASE = '1'
+$env:NODE_OPTIONS = '--max-old-space-size=768'
 $env:EAS_BUILD_PROFILE = 'preview'
 $env:EDUMP_PREVIEW_FALLBACK_FONTS = '1'
 $env:EXPO_PUBLIC_API_BASE_URL = $ApiBaseUrl.AbsoluteUri.TrimEnd('/')
@@ -32,7 +33,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Android prebuild failed.' }
     Push-Location android
     try {
-        & ./gradlew.bat :app:assembleRelease '-PreactNativeArchitectures=arm64-v8a,armeabi-v7a' '-Pkotlin.compiler.execution.strategy=in-process' --no-daemon --max-workers=1 '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=768m'
+        & ./gradlew.bat :app:assembleRelease '-PreactNativeArchitectures=arm64-v8a,armeabi-v7a' '-Pkotlin.compiler.execution.strategy=in-process' --no-daemon --max-workers=1 '-Dorg.gradle.jvmargs=-Xmx1024m -XX:MaxMetaspaceSize=768m'
         if ($LASTEXITCODE -ne 0) { throw 'Android release build failed.' }
     } finally { Pop-Location }
     $taskArtifacts = Join-Path $taskRoot 'artifacts/android'

@@ -12,6 +12,13 @@ const withLocalAndroidRelease: ConfigPlugin = (config) => {
   }
   return configPlugins.withAppBuildGradle(config, (native) => {
     let source = native.modResults.contents;
+    const packager = 'extraPackagerArgs = ["--max-workers", "1"]';
+    if (!source.includes(packager)) {
+      if (!source.includes("// extraPackagerArgs = []"))
+        throw new Error("Android Metro template changed.");
+      source = source.replace("// extraPackagerArgs = []", packager);
+      native.modResults.contents = source;
+    }
     if (source.includes("signingConfig signingConfigs.edumpRelease"))
       return native;
     if (!source.includes("signingConfigs {"))

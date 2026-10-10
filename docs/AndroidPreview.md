@@ -1,4 +1,26 @@
-# Android preview 0.1.3
+# Android preview 0.1.4
+
+Published 10 October 2026 (Asia/Karachi), Android version code `5`. Welcome/logo source `80570df`; local build memory controls `83ec939`.
+
+- [Download for most Android phones (ARM64)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.4-arm64.apk)
+- [Download for older 32-bit Android phones (ARMv7)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.4-armv7.apk)
+
+This update adds the palette-matched open-book E-DUMP logo to the launcher, splash and welcome screen. The welcome screen appears once per installation; Continue persists the choice before opening sign-in. Returning signed-in students open their existing app session directly. The existing responsive layout, font scaling, reduced-motion feedback and features remain in place.
+
+Android push is enabled with Firebase Cloud Messaging v1 in the existing Expo project. Sign in and choose Allow notifications, or enable notifications in Me. Other users' admin announcements trigger class alerts; the posting admin's devices are excluded. Notification taps open the matching update. The dedicated messaging credential stays in Expo and the private release directory, outside Git and the APK. Google OAuth and FCM v1 validation passed; physical receipt and tap acceptance remain pending.
+
+Install over the previous preview using the same signing certificate. Android 8 or later is required. The bundled API remains `https://edump-api.onrender.com/api/v1`. Both anonymous public downloads returned HTTP 200 and matched their signed local APKs:
+
+| APK | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ARM64 | 43737815 | `2a13c58a0a80d7d2e6be94104b1675ef568030e623723fa94d0ac57bd11284a8` |
+| ARMv7 | 37493453 | `1ce66c0c772b45111b806834d0aa2a7666520bc79a3990a707f423e3ba787249` |
+
+Release compilation succeeded in 1h 4s. APK signature/package/version checks, native Firebase resource checks, hosted API and welcome bundle checks, and scans against actual private credentials passed. `make verify` checks passed after rerunning its repaired security target: 227 backend tests, 21 mobile suites / 204 tests, lint, strict types, coverage gates, generated API types, slop check and security checks with the approved tooling advisory exception. GitHub CI passed all four jobs at `6453249`; its lockfile repair completes existing optional resolver peers without changing direct app dependencies. Physical Android visual, functional and notification acceptance remain pending. Preview fallback fonts and free API cold starts still apply; iOS remains deferred.
+
+Local evidence is under ignored `artifacts/release`: `android-build-0.1.4.log`, `verify-complete-0.1.4.log`, `fcm-validation-0.1.4.json`, `apks-0.1.4.json`, `public-download-verification-0.1.4.json` and `upload-confirmation-0.1.4.png`.
+
+## Archived Android preview 0.1.3
 
 Published 10 October 2026 (Asia/Karachi), from source `aea794a`, Android version code `4`.
 

@@ -115,3 +115,7 @@ No secret ever goes into an `EXPO_PUBLIC_` variable.
 
 - Node LTS, Python 3.12, `uv`, Docker (for local MongoDB in tests), EAS CLI, Android Studio emulator, Xcode (macOS only) or a physical iPhone via TestFlight.
 - One command per task: `make dev-api`, `make dev-app`, `make test`, `make lint`, `make slop-check` (see `Structure.md`).
+
+## Approved web companion extension (10 October 2026)
+
+The owner approved `react-dom`, `react-native-web`, `@expo/metro-runtime`, `pywebpush` and free web hosting. Expo web shares the existing screens, API, MongoDB and private R2 storage. Platform adapters retain native Android behavior. Browser push uses Web Push with VAPID; no Firebase browser SDK is added.

@@ -19,7 +19,7 @@ const approved = new Set([
   '@react-native-community/datetimepicker',
   '@testing-library/react-native', 'maestro',
   // Owner approved the required Expo peers and lint/test support packages.
-  'react', 'expo-linking', 'react-native-screens', 'react-native-safe-area-context',
+  'react-dom', 'react-native-web', 'react', 'expo-linking', 'react-native-screens', 'react-native-safe-area-context',
   'expo-splash-screen', 'expo-system-ui', 'expo-build-properties', 'expo-asset', 'react-native-worklets',
   '@expo/metro-runtime', '@expo/log-box', '@types/react', '@types/jest', '@types/node',
   'eslint-config-expo', 'react-test-renderer', 'test-renderer', '@react-native/jest-preset',

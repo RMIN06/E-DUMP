@@ -3,7 +3,12 @@
   "project": {
     "name": "E-DUMP",
     "productType": "Private BCS-3E Android/iOS class app",
-    "stack": ["Expo", "React Native", "TypeScript", "Reanimated"]
+    "stack": [
+      "Expo",
+      "React Native",
+      "TypeScript",
+      "Reanimated"
+    ]
   },
   "sources": {
     "tokens": [
@@ -12,7 +17,9 @@
       "mobile/src/theme/spacing.ts",
       "mobile/src/theme/motion.ts"
     ],
-    "components": ["mobile/src/components"],
+    "components": [
+      "mobile/src/components"
+    ],
     "assets": [],
     "instructions": [
       "AGENTS.md",
@@ -65,7 +72,8 @@
   "decisions": [
     "Adapt the layout hierarchy of Rohan Kumar�s Task manager Mobile app UI: compact context headers, grouped lists, an accessible day rail and clear primary actions. https://www.figma.com/community/file/1025672621370192050/task-manager-mobile-app-ui",
     "Use the existing dark E-DUMP palette, native controls, functional sculpted icons and font mappings; no template features, assets or dependencies are copied.",
-    "21st catalogue search returned HTTP 401. The Figma Community cover preview was inspected in the browser for layout inspiration."
+    "21st catalogue search returned HTTP 401. The Figma Community cover preview was inspected in the browser for layout inspiration.",
+    "The authorized web companion keeps E-DUMP primitives and palette, uses a centered 960 px list column and 640 px form column, desktop side navigation from 900 px, and mobile bottom tabs. Browser features use platform adapters; native Android behavior stays shared."
   ],
   "evidence": [
     {

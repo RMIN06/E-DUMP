@@ -42,6 +42,7 @@ jobs:
       - run: cd backend && uv sync --frozen
       - run: cd mobile && npm ci
       - run: make lint-mobile test-mobile check-types
+      - run: cd mobile && npm run export:web
   slop:
     runs-on: ubuntu-latest
     steps:

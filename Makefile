@@ -25,7 +25,7 @@ test-backend:
 	cd backend && $(UV) run coverage report --include='app/services/*,app/deps.py' --fail-under=90
 test-mobile:
 	cd mobile && $(NPM) run test
-	node --test scripts/audit-policy.test.mjs
+	node --test scripts/audit-policy.test.mjs scripts/web-worker.test.mjs
 slop-check:
 	bash scripts/check-slop.sh
 security:

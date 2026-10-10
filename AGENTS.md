@@ -19,9 +19,14 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - M6 and M7 are authorized. Publish a standalone Android APK connected to a hosted HTTPS API; defer iOS setup and acceptance.
 - Use platform fallback fonts for the test preview only; production still requires licensed fonts.
 - Render free hosting and MongoDB Atlas free are approved for the preview, including idle sleep and cold starts.
-- Rules support/deletion/takedown contact: l250716@lhr.nu.edu.pk.
+- Rules support/deletion/takedown contacts: l250716@lhr.nu.edu.pk and l250656@lhr.nu.edu.pk.
 - The owner will perform physical Android functional acceptance using the APK link. Do not label pending device acceptance as passed.
 - After each completed UI update, build and publish a new signed Android preview APK and provide its verified download link. Increment the app version and Android version code for each published build.
 
 ## Owner visual redesign decision (10 October 2026)
 - The owner replaced the earlier text-only visual direction with filled controls and rows, sculpted functional icons, rounded surfaces and mobile-sized system fallback typography. These explicit exceptions supersede UI.md and AntiAISlop.md restrictions on filled panels, radii and functional icon style. Retain the assigned palette, single-column responsiveness, reduced-motion support, token-only styling and existing feature scope; do not add dependencies.
+
+## Owner web companion decision (10 October 2026)
+- A responsive browser companion is authorized, superseding the PRD web non-goal. Retain every class feature, existing palette, shared API/database and native Android app.
+- Approved additions: react-dom, react-native-web, @expo/metro-runtime, pywebpush and free hosting.
+- Each update renders once per Updates feed. Coming up owns its displayed records; the main feed excludes those IDs and overlapping pagination IDs.

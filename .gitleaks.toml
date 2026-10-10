@@ -15,4 +15,4 @@ targetRules = ["gcp-api-key", "generic-api-key"]
 condition = "AND"
 regexTarget = "secret"
 regexes = ['''^AIza[0-9A-Za-z_-]{35}$''']
-paths = ['''^mobile[/\\](android[/\\]app[/\\])?google-services\.json$''']
+paths = ['''^mobile[/\\](android[/\\]app[/\\])?google-services\.json$''', '''^mobile[/\\]android[/\\]app[/\\]build[/\\]intermediates[/\\]lint_vital_partial_results[/\\]release[/\\]lintVitalAnalyzeRelease[/\\]out[/\\]lint-resources\.xml$''']

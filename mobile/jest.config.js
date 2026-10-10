@@ -20,6 +20,9 @@ module.exports = {
     "src/**/*.{ts,tsx}",
     "!src/api/schema.d.ts",
     "!src/theme/fontAssets.ts",
+    // Native coverage remains a native gate; browser adapters have separate
+    // contract tests and live browser checks rather than RN-renderer coverage.
+    "!src/**/*.web.{ts,tsx}",
   ],
   coverageThreshold,
   setupFilesAfterEnv: ["./__tests__/setup.ts"],

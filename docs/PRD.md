@@ -185,3 +185,7 @@ Single release v1.0 containing all P0. Android: sideload APK from an EAS build. 
 2. Provide UHQ teacher and credit hours (the timetable says "Not Mentioned").
 3. Provide 2–4 admin emails.
 4. Provide licensed font files (Recoleta, Berthold) — see `UI.md`.
+
+### Owner amendment � 11 October 2026
+
+MAT-4 now supports selecting multiple files in one picker interaction on Android and web. Each file creates its own material record and editable title; type, chapter and note are shared. Existing per-file format, 25 MB, duplicate, quota and authorization rules apply. Partial failures remain visible and retry skips uploaded files. ANN-4 supports selecting several attachments within its existing three-file total. No new backend endpoint or dependency is required.

@@ -311,3 +311,58 @@ test("edit keeps notify again off by default and supports removing due date and 
     ),
   );
 });
+
+test("announcement batch picker respects remaining slots before uploading", async () => {
+  jest
+    .mocked(Picker.getDocumentAsync)
+    .mockResolvedValue({
+      canceled: false,
+      assets: [0, 1, 2].map((i) => ({
+        uri: `file:///quiz-${i}.pdf`,
+        name: `quiz-${i}.pdf`,
+        size: 100,
+        mimeType: "application/pdf",
+        lastModified: 0,
+      })),
+    });
+  await render(<UpdateFormScreen />);
+  await fireEvent.press(screen.getByRole("button", { name: "Add file" }));
+  expect(
+    await screen.findByText("Choose up to 2 more attachments."),
+  ).toBeTruthy();
+  expect(api).not.toHaveBeenCalled();
+  expect(screen.getByText("Attachments (1/3)")).toBeTruthy();
+});
+test("announcement batch retains successful attachments when another file fails", async () => {
+  jest
+    .mocked(Picker.getDocumentAsync)
+    .mockResolvedValue({
+      canceled: false,
+      assets: [0, 1].map((i) => ({
+        uri: `file:///quiz-${i}.pdf`,
+        name: `quiz-${i}.pdf`,
+        size: 100,
+        mimeType: "application/pdf",
+        lastModified: 0,
+      })),
+    });
+  jest
+    .mocked(api)
+    .mockResolvedValueOnce({
+      ...attachment,
+      file_id: "b".repeat(24),
+      original_name: "quiz-0.pdf",
+    })
+    .mockRejectedValueOnce(new Error("Connection lost."));
+  await render(<UpdateFormScreen />);
+  await fireEvent.press(screen.getByRole("button", { name: "Add file" }));
+  expect(await screen.findByText("quiz-1.pdf: Connection lost.")).toBeTruthy();
+  expect(screen.getByText("Attachments (2/3)")).toBeTruthy();
+  expect(
+    screen.getByRole("button", { name: /Remove quiz-0.pdf/ }),
+  ).toBeTruthy();
+  expect(Picker.getDocumentAsync).toHaveBeenCalledWith(
+    expect.objectContaining({ multiple: true }),
+  );
+  expect(api).toHaveBeenCalledTimes(2);
+});

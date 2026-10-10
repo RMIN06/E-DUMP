@@ -30,3 +30,7 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - A responsive browser companion is authorized, superseding the PRD web non-goal. Retain every class feature, existing palette, shared API/database and native Android app.
 - Approved additions: react-dom, react-native-web, @expo/metro-runtime, pywebpush and free hosting.
 - Each update renders once per Updates feed. Coming up owns its displayed records; the main feed excludes those IDs and overlapping pagination IDs.
+
+## Owner batch upload decision (11 October 2026)
+- Multiple-file selection is approved on Android and web. Material batches create individual records with independent titles through the existing authorized upload endpoint. Shared type/chapter/note apply to each file; size, format, duplicate, quota and rate checks remain per file. Retry skips successful records. Announcement multi-selection retains the existing three-attachment limit.
+- Keep scroll rows stable without text-measurement-driven state changes; disable clipped-subview removal for animated rows while retaining list virtualization.

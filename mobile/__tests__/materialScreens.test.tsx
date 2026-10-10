@@ -123,7 +123,7 @@ beforeEach(() => {
 
 test("MAT-4: picker prefills title and uploads explicit original filename and normalized metadata", async () => {
   await render(<UploadScreen />);
-  await fireEvent.press(screen.getByRole("button", { name: "Choose file" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
   expect(screen.getByLabelText("Title").props.value).toBe("Lecture 3");
   await fireEvent.changeText(screen.getByLabelText("Chapter (optional)"), "03");
   await fireEvent.changeText(
@@ -152,7 +152,7 @@ test("MAT-4: picker prefills title and uploads explicit original filename and no
 });
 test("MAT-4: invalid chapter prevents a write", async () => {
   await render(<UploadScreen />);
-  await fireEvent.press(screen.getByRole("button", { name: "Choose file" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
   await fireEvent.changeText(screen.getByLabelText("Chapter (optional)"), "-1");
   await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
   expect(await screen.findByText("Use a chapter from 0 to 99.")).toBeTruthy();
@@ -167,7 +167,7 @@ test("MAT-4: real upload progress stays visible and file replacement is locked u
     }),
   );
   await render(<UploadScreen />);
-  await fireEvent.press(screen.getByRole("button", { name: "Choose file" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
   await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
   await waitFor(() => expect(api).toHaveBeenCalledTimes(1));
   const upload = jest.mocked(api).mock.calls[0]?.[1]?.upload;
@@ -177,9 +177,7 @@ test("MAT-4: real upload progress stays visible and file replacement is locked u
     screen.getByRole("button", { name: "Uploading 42%" }).props
       .accessibilityState.busy,
   ).toBe(true);
-  await fireEvent.press(
-    screen.getByRole("button", { name: "Choose another file" }),
-  );
+  await fireEvent.press(screen.getByRole("button", { name: "Change files" }));
   expect(Picker.getDocumentAsync).toHaveBeenCalledTimes(1);
   await act(() => finish?.(item));
   await waitFor(() => expect(router.back).toHaveBeenCalled());
@@ -197,9 +195,11 @@ test("MAT-4: oversize file is rejected before upload", async () => {
     ],
   });
   await render(<UploadScreen />);
-  await fireEvent.press(screen.getByRole("button", { name: "Choose file" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
   expect(
-    await screen.findByText("Choose a non-empty file no larger than 25 MB."),
+    await screen.findByText(
+      "large.pdf: choose a non-empty file no larger than 25 MB.",
+    ),
   ).toBeTruthy();
   expect(api).not.toHaveBeenCalled();
 });
@@ -210,7 +210,7 @@ test("MAT-8: duplicate preserves form and links to existing material", async () 
     }),
   );
   await render(<UploadScreen />);
-  await fireEvent.press(screen.getByRole("button", { name: "Choose file" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
   await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
   await fireEvent.press(
     await screen.findByRole("button", { name: "View existing material" }),
@@ -313,4 +313,119 @@ test("MAT-5: detail opens document and failed initial read offers retry", async 
   await view.rerender(<MaterialScreen />);
   await fireEvent.press(screen.getByRole("button", { name: "Try again" }));
   expect(refetch).toHaveBeenCalled();
+});
+
+const batchAssets = [
+  {
+    uri: "file:///first.pdf",
+    name: "First.pdf",
+    size: 100,
+    mimeType: "application/pdf",
+    lastModified: 0,
+  },
+  {
+    uri: "file:///second.pdf",
+    name: "Second.pdf",
+    size: 200,
+    mimeType: "application/pdf",
+    lastModified: 0,
+  },
+];
+test("batch material upload preserves independent titles and retries only failed files", async () => {
+  jest
+    .mocked(Picker.getDocumentAsync)
+    .mockResolvedValue({ canceled: false, assets: batchAssets });
+  jest
+    .mocked(api)
+    .mockRejectedValueOnce(new Error("Connection lost."))
+    .mockResolvedValueOnce({ ...item, id: "second" })
+    .mockResolvedValueOnce(item);
+  await render(<UploadScreen />);
+  await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
+  await fireEvent.changeText(screen.getByLabelText("Title"), "First lecture");
+  await fireEvent.changeText(
+    screen.getByLabelText("Title for Second.pdf"),
+    "Second lecture",
+  );
+  await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
+  expect(
+    await screen.findByText(
+      "1 of 2 files uploaded. Retry the remaining files.",
+    ),
+  ).toBeTruthy();
+  expect(router.back).not.toHaveBeenCalled();
+  expect(api).toHaveBeenNthCalledWith(
+    2,
+    "/subjects/coal/materials",
+    expect.objectContaining({
+      upload: expect.objectContaining({
+        filename: "Second.pdf",
+        fields: { title: "Second lecture", kind: "notes" },
+      }),
+    }),
+  );
+  await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
+  await waitFor(() => expect(router.back).toHaveBeenCalled());
+  expect(api).toHaveBeenCalledTimes(3);
+  expect(api).toHaveBeenLastCalledWith(
+    "/subjects/coal/materials",
+    expect.objectContaining({
+      upload: expect.objectContaining({
+        filename: "First.pdf",
+        fields: { title: "First lecture", kind: "notes" },
+      }),
+    }),
+  );
+});
+test("batch selection retains valid files while rejecting an oversize file", async () => {
+  jest
+    .mocked(Picker.getDocumentAsync)
+    .mockResolvedValue({
+      canceled: false,
+      assets: [
+        ...batchAssets,
+        {
+          ...batchAssets[0]!,
+          uri: "file:///large.pdf",
+          name: "large.pdf",
+          size: 26 * 1024 * 1024,
+        },
+      ],
+    });
+  await render(<UploadScreen />);
+  await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
+  expect(Picker.getDocumentAsync).toHaveBeenCalledWith(
+    expect.objectContaining({ multiple: true }),
+  );
+  expect(screen.getByLabelText("Title for Second.pdf").props.value).toBe(
+    "Second",
+  );
+  expect(
+    screen.getByText(
+      "large.pdf: choose a non-empty file no larger than 25 MB.",
+    ),
+  ).toBeTruthy();
+  await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
+  await waitFor(() => expect(router.back).toHaveBeenCalled());
+  expect(api).toHaveBeenCalledTimes(2);
+});
+test("canceling a batch aborts the current upload and does not start the next file", async () => {
+  jest
+    .mocked(Picker.getDocumentAsync)
+    .mockResolvedValue({ canceled: false, assets: batchAssets });
+  let finish: ((value: Material) => void) | undefined;
+  jest.mocked(api).mockReturnValueOnce(
+    new Promise<Material>((resolve) => {
+      finish = resolve;
+    }),
+  );
+  await render(<UploadScreen />);
+  await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
+  await waitFor(() => expect(api).toHaveBeenCalledTimes(1));
+  const signal = jest.mocked(api).mock.calls[0]?.[1]?.signal;
+  await fireEvent.press(screen.getByRole("button", { name: "Cancel upload" }));
+  expect(signal?.aborted).toBe(true);
+  await act(() => finish?.(item));
+  expect(api).toHaveBeenCalledTimes(1);
 });

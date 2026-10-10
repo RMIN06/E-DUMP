@@ -58,7 +58,11 @@ export function UpdateFormScreen() {
   const [notify, setNotify] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
+  const [choosing, setChoosing] = useState(false);
+  const [activeFile, setActiveFile] = useState(0);
+  const [batchSize, setBatchSize] = useState(0);
   const [saving, setSaving] = useState(false);
+  const mounted = useRef(true);
   const uploading = useRef<AbortController | null>(null);
   const saveFlight = useRef(false);
   const initialized = useRef(false);
@@ -80,67 +84,101 @@ export function UpdateFormScreen() {
       setAttachments(existing.data.attachments);
     }
   }, [existing.data, form]);
-  useEffect(() => () => uploading.current?.abort(), []);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      uploading.current?.abort();
+    };
+  }, []);
   const addFile = async () => {
     if (uploading.current || saveFlight.current || attachments.length >= 3)
       return;
-    uploading.current = new AbortController();
+    const controller = new AbortController();
+    uploading.current = controller;
+    setChoosing(true);
     setError(null);
-    let pickedUri: string | undefined;
+    let assets: DocumentPicker.DocumentPickerAsset[] = [];
     try {
       const picked = await DocumentPicker.getDocumentAsync({
         type: mimeTypes,
-        multiple: false,
+        multiple: true,
         copyToCacheDirectory: true,
       });
-      if (picked.canceled || !picked.assets[0]) return;
-      const file = picked.assets[0];
-      pickedUri = file.uri;
-      let size = file.size;
-      if (size === undefined) {
-        const info = await pickedFileInfo(file.uri);
-        if (info.exists && !info.isDirectory) size = info.size;
-      }
-      if (size === undefined || size <= 0 || size > 25 * 1024 * 1024)
-        throw new Error("Choose a file up to 25 MB.");
-      const extension = file.name.split(".").pop()?.toLowerCase();
-      const mime =
-        file.mimeType ??
-        (
-          {
-            pdf: mimeTypes[0],
-            png: mimeTypes[1],
-            jpg: mimeTypes[2],
-            jpeg: mimeTypes[2],
-            webp: mimeTypes[3],
-            pptx: mimeTypes[4],
-            docx: mimeTypes[5],
-          } as Record<string, string>
-        )[extension ?? ""];
-      if (!mime || !mimeTypes.includes(mime))
-        throw new Error("Choose PDF, DOCX, PPTX, PNG, JPG or WEBP.");
+      if (picked.canceled) return;
+      assets = picked.assets;
+      if (!mounted.current || controller.signal.aborted) return;
+      const remaining = 3 - attachments.length;
+      if (assets.length > remaining)
+        throw new Error(
+          `Choose up to ${remaining} more ${remaining === 1 ? "attachment" : "attachments"}.`,
+        );
+      setChoosing(false);
+      setBatchSize(assets.length);
       setProgress(0);
-      const attached = await api<Attachment>("/announcements/attachments", {
-        method: "POST",
-        signal: uploading.current.signal,
-        upload: {
-          uri: file.uri,
-          filename: file.name,
-          mimeType: mime,
-          fields: {},
-          onProgress: setProgress,
-        },
-      });
-      setAttachments((current) => [...current, attached]);
+      const errors: string[] = [];
+      for (const [index, file] of assets.entries()) {
+        if (!mounted.current || controller.signal.aborted) break;
+        setActiveFile(index + 1);
+        setProgress(0);
+        try {
+          let size = file.size;
+          if (size === undefined) {
+            const info = await pickedFileInfo(file.uri);
+            if (info.exists && !info.isDirectory) size = info.size;
+          }
+          if (size === undefined || size <= 0 || size > 25 * 1024 * 1024)
+            throw new Error("Choose a file up to 25 MB.");
+          const extension = file.name.split(".").pop()?.toLowerCase();
+          const mime =
+            file.mimeType ??
+            (
+              {
+                pdf: mimeTypes[0],
+                png: mimeTypes[1],
+                jpg: mimeTypes[2],
+                jpeg: mimeTypes[2],
+                webp: mimeTypes[3],
+                pptx: mimeTypes[4],
+                docx: mimeTypes[5],
+              } as Record<string, string>
+            )[extension ?? ""];
+          if (!mime || !mimeTypes.includes(mime))
+            throw new Error("Choose PDF, DOCX, PPTX, PNG, JPG or WEBP.");
+          const attached = await api<Attachment>("/announcements/attachments", {
+            method: "POST",
+            signal: controller.signal,
+            upload: {
+              uri: file.uri,
+              filename: file.name,
+              mimeType: mime,
+              fields: {},
+              onProgress: setProgress,
+            },
+          });
+          if (mounted.current)
+            setAttachments((current) => [...current, attached]);
+        } catch (reason) {
+          if (!mounted.current || controller.signal.aborted) break;
+          errors.push(
+            `${file.name}: ${reason instanceof Error ? reason.message : "Couldn't add file."}`,
+          );
+        }
+      }
+      if (mounted.current && errors.length) setError(errors.join("\n"));
     } catch (reason) {
-      if (!uploading.current?.signal.aborted)
+      if (mounted.current && !controller.signal.aborted)
         setError(
-          reason instanceof Error ? reason.message : "Couldn't add file.",
+          reason instanceof Error ? reason.message : "Couldn't add files.",
         );
     } finally {
-      if (pickedUri) void removePickedFile(pickedUri).catch(() => undefined);
+      for (const file of assets)
+        void removePickedFile(file.uri).catch(() => undefined);
       uploading.current = null;
-      setProgress(null);
+      if (mounted.current) {
+        setChoosing(false);
+        setProgress(null);
+      }
     }
   };
   const save = form.handleSubmit(async (values) => {
@@ -172,7 +210,7 @@ export function UpdateFormScreen() {
       setSaving(false);
     }
   });
-  const busy = saving || progress !== null;
+  const busy = saving || choosing || progress !== null;
   return (
     <Screen
       title={id ? "Edit update" : "New update"}
@@ -301,6 +339,9 @@ export function UpdateFormScreen() {
         </>
       ) : null}
       <Text variant="label">Attachments ({attachments.length}/3)</Text>
+      <Text variant="caption" tone="muted">
+        Select up to three files � 25 MB per file
+      </Text>
       {attachments.map((file) => (
         <TextAction
           key={file.file_id}
@@ -320,6 +361,11 @@ export function UpdateFormScreen() {
       />
       {progress !== null ? (
         <>
+          {batchSize > 1 ? (
+            <Text variant="caption">
+              Uploading attachment {activeFile} of {batchSize}
+            </Text>
+          ) : null}
           <ProgressLine value={progress} label="Uploading attachment" />
           <Text variant="caption">Uploading {Math.round(progress * 100)}%</Text>
           <TextAction

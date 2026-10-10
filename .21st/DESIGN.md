@@ -9,3 +9,5 @@ Screen provides a solid moss context header with an ink title, subtitle and opti
 Use theme tokens, a centred tablet column, scalable text, 48 dp controls, and reduced-motion-aware Reanimated feedback. No gradients, shadows, glow, grids, decorative bounce or additional dependencies. Owner-approved filled panels and rounded controls override the initial text-only visual direction.
 
 The 21st catalogue search returned HTTP 401; no external catalogue code was retrieved. Decisions and the Figma reference are recorded in design.json.
+
+11 October 2026: stabilized scrolling by removing measurement-driven row state, bounding list/form viewports and retaining animated row views. Upload selection supports batches with independent titles, per-file errors and retry of unfinished files; update attachments keep the three-file limit. Existing reference, palette and primitives retained. Catalogue search again returned HTTP 401; no external code added.

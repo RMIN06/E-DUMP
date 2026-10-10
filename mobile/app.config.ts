@@ -38,7 +38,7 @@ const config: ExpoConfig = {
   name: "E-DUMP",
   slug: "e-dump",
   owner: "rmin06s-team",
-  version: "0.1.5",
+  version: "0.1.6",
   icon: "./assets/brand/icon.png",
   scheme: "edump",
   orientation: "portrait",
@@ -54,7 +54,7 @@ const config: ExpoConfig = {
   ios: { supportsTablet: true, bundleIdentifier: "com.edump.bcs3e" },
   android: {
     package: "com.edump.bcs3e",
-    versionCode: 6,
+    versionCode: 7,
     adaptiveIcon: {
       foregroundImage: "./assets/brand/adaptive-icon.png",
       backgroundColor: colors.ink,

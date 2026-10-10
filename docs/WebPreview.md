@@ -32,3 +32,9 @@ Device acceptance remains pending the owner's Android and iPhone testing. Automa
 - Browser push registration succeeded for the owner's account. Its provider accepted one owner-only test message with HTTP 201; no class announcement was created or broadcast.
 - Published HTML matches the final export, anonymous profile access returns 401, security headers are present, and the web bundle excludes the actual database, JWT, R2, Firebase service-account and VAPID private credentials.
 - Platform-specific physical-phone, iPhone Home Screen push, keyboard and accessibility acceptance remain pending the owner; automated browser adapter contracts do not certify those devices.
+
+## Scrolling and batch uploads — 11 October 2026
+
+Published preview 0.1.6 shares the Android scrolling fix: stable responsive row layout, bounded viewports, no content shrinking, retained animated native rows and the existing virtualized list limits. Materials now select multiple files, preserve independent titles and per-file results, and retry only unfinished files through the existing upload endpoint. Type/chapter/note are shared; existing per-file validations, quota/rate limits and duplicate checks apply. Updates can select several attachments within their three-file total.
+
+Frontend verification passed with 222 app tests, 13 edge/audit contract tests, lint/strict typing and slop checks; backend code was unchanged and its suites were not rerun. Signed-in desktop and 390 px checks confirmed stable row dimensions during scrolling and no horizontal overflow. Live multi-file selection displayed two editable titles; no class files were created by this browser smoke check. Export credential scans, published HTML equality and anonymous-profile rejection passed. Physical-device acceptance remains pending the owner.

@@ -1,4 +1,27 @@
-# Android preview 0.1.5
+# Android preview 0.1.6
+
+Published 11 October 2026 (Asia/Karachi), Android version code `7`, application source `ad4fdca`.
+
+- [Download for most Android phones (ARM64)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.6-arm64.apk)
+- [Download for older 32-bit Android phones (ARMv7)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.6-armv7.apk)
+- [Open the updated web companion](https://edump-preview.pages.dev)
+
+Shared Android/web scrolling now uses stable row layout without text-measurement state changes, bounded scroll viewports and retained animated views. FlatList virtualization remains enabled. Materials support selecting multiple files with independent titles and common type/chapter/note, per-file progress and errors, and retry that skips successful uploads. Announcement selection supports several attachments within the existing three-file total. Existing palette, features, authorization, formats, 25 MB per-file limit, server quotas and duplicate checks remain in place.
+
+The signed native build succeeded in 8m 10s. Both APKs passed package/version/signature and actual private-credential scans, contain the new batch selection UI and hosted HTTPS API, and remain below 60 MB. The signing certificate is unchanged, allowing installation over the previous preview. Android 8 or later is required. Complete anonymous downloads returned HTTP 200 with matching hashes:
+
+| APK | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ARM64 | 43746931 | `1be5541ea2a71a6fa874b9d3a88acbc051b9307635fcb90537ebe101ea91c75f` |
+| ARMv7 | 37502569 | `5c083308b335f0c3d2748aa20a85430cd7060e82ab3fcb95ce4cace094560134` |
+
+The frontend verification gate passed: `make verify -o lint-backend -o test-backend -o check-types -o security` ran app lint/TypeScript, 222 app tests with coverage, 13 edge/audit contract checks and the slop check. Backend code/dependencies did not change; backend suites and security audits were not rerun for this frontend task. The 21st UI review reported zero findings; catalogue access returned HTTP 401, so existing primitives/design context were reused.
+
+Signed-in browser checks at desktop and 390 px widths confirmed stable row heights/widths while scrolling and no horizontal overflow. The published browser picker accepted two files and presented independently editable titles; the test selection was closed without writing class files. Published HTML matches the new export; anonymous profile access returns 401 with no-store headers; the web export excludes actual private credentials. Physical Android/iPhone functional and accessibility acceptance remain pending the owner. Preview fallback fonts and free API cold starts continue to apply.
+
+Ignored local evidence: artifacts/release/android-0.1.6.log, verify-ui-0.1.6.log, web-export-0.1.6.log, apks-0.1.6.json, public-download-verification-0.1.6.json, web-public-0.1.6.log, subjects-desktop-0.1.6.png, subjects-phone-scroll-0.1.6.png, batch-picker-phone-0.1.6.png, web-publish-0.1.6.png and apk-upload-0.1.6.png.
+
+## Archived Android preview 0.1.5
 
 Published 11 October 2026 (Asia/Karachi), Android version code `6`, application source `7b435e6`.
 

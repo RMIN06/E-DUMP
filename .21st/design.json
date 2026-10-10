@@ -73,7 +73,8 @@
     "Adapt the layout hierarchy of Rohan Kumar�s Task manager Mobile app UI: compact context headers, grouped lists, an accessible day rail and clear primary actions. https://www.figma.com/community/file/1025672621370192050/task-manager-mobile-app-ui",
     "Use the existing dark E-DUMP palette, native controls, functional sculpted icons and font mappings; no template features, assets or dependencies are copied.",
     "21st catalogue search returned HTTP 401. The Figma Community cover preview was inspected in the browser for layout inspiration.",
-    "The authorized web companion keeps E-DUMP primitives and palette, uses a centered 960 px list column and 640 px form column, desktop side navigation from 900 px, and mobile bottom tabs. Browser features use platform adapters; native Android behavior stays shared."
+    "The authorized web companion keeps E-DUMP primitives and palette, uses a centered 960 px list column and 640 px form column, desktop side navigation from 900 px, and mobile bottom tabs. Browser features use platform adapters; native Android behavior stays shared.",
+    "11 October 2026: stabilize scrolling without measurement-driven layout state; retain animated row views and bounded virtualized viewports. Material batches keep per-file titles and retry only unfinished records; announcement batch selection respects three attachments. Existing design system reused after catalogue HTTP 401."
   ],
   "evidence": [
     {

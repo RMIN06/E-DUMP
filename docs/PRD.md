@@ -188,4 +188,4 @@ Single release v1.0 containing all P0. Android: sideload APK from an EAS build. 
 
 ### Owner amendment — 11 October 2026
 
-MAT-4 now supports selecting multiple files in one picker interaction on Android and web. Each file creates its own material record and editable title; type, chapter and note are shared. Existing per-file format, 25 MB, duplicate, quota and authorization rules apply. Partial failures remain visible and retry skips uploaded files. ANN-4 supports selecting several attachments within its existing three-file total. No new backend endpoint or dependency is required.
+MAT-4 now supports selecting multiple files in one picker interaction on Android and web. Each file creates its own material record and editable title; type, chapter and note are shared. Existing per-file format, 25 MB, duplicate, quota and authorization rules apply. Partial failures remain visible and retry skips uploaded files. ANN-1 supports selecting several attachments within its existing three-file total. No new backend endpoint or dependency is required.

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
+import { StyleSheet, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FS from "expo-file-system/legacy";
 import { Controller, useForm } from "react-hook-form";
@@ -18,6 +19,8 @@ import { FilterText } from "../../components/FilterText";
 import { Button } from "../../components/Button";
 import { ErrorLine } from "../../components/ErrorLine";
 import { ProgressLine } from "../../components/ProgressLine";
+import { Row } from "../../components/Row";
+import { space } from "../../theme/spacing";
 import { fileSize } from "../../lib/format";
 import { kindOptions } from "./options";
 
@@ -192,107 +195,120 @@ export function UploadScreen() {
           router.back();
         }}
       />
-      <Heading>Upload</Heading>
-      <TextAction
-        label={file ? "Choose another file" : "Choose file"}
-        disabled={progress !== null}
-        onPress={() => void choose()}
-      />
-      {file ? (
-        <Text variant="caption" tone="muted">
-          {file.name} · {fileSize(file.size ?? 0)}
-        </Text>
-      ) : (
-        <Text variant="caption" tone="muted">
-          PDF, images, PPTX or DOCX · Up to 25 MB
-        </Text>
-      )}
-      <Controller
-        control={form.control}
-        name="title"
-        render={({ field, fieldState }) => (
-          <Field
-            label="Title"
-            value={field.value}
-            onChangeText={field.onChange}
-            onBlur={field.onBlur}
-            error={fieldState.error?.message}
-            maxLength={100}
-            editable={progress === null}
-          />
-        )}
-      />
-      <Text variant="caption" tone="muted">
-        Type
-      </Text>
-      <Controller
-        control={form.control}
-        name="kind"
-        render={({ field }) => (
-          <FilterText
-            label="Material type"
-            options={kindOptions}
-            value={field.value}
-            onChange={(value) => {
-              if (progress === null) field.onChange(value);
-            }}
-          />
-        )}
-      />
-      <Controller
-        control={form.control}
-        name="chapter"
-        render={({ field, fieldState }) => (
-          <Field
-            label="Chapter (optional)"
-            keyboardType="number-pad"
-            value={field.value}
-            onChangeText={field.onChange}
-            error={fieldState.error?.message}
-            maxLength={2}
-            editable={progress === null}
-          />
-        )}
-      />
-      <Controller
-        control={form.control}
-        name="description"
-        render={({ field, fieldState }) => (
-          <>
+      <View style={styles.header}>
+        <Heading>Upload</Heading>
+        <Text tone="muted">Share course material with BCS-3E.</Text>
+      </View>
+      <View style={styles.section}>
+        <Text variant="label">File</Text>
+        <Row
+          title={file ? "Choose another file" : "Choose file"}
+          accessibilityLabel={file ? "Choose another file" : "Choose file"}
+          meta="PDF, images, PPTX or DOCX · Up to 25 MB"
+          disabled={progress !== null}
+          onPress={() => void choose()}
+        />
+        {file ? (
+          <Text variant="body" tone="muted">
+            {file.name} · {fileSize(file.size ?? 0)}
+          </Text>
+        ) : null}
+      </View>
+      <View style={styles.section}>
+        <Controller
+          control={form.control}
+          name="title"
+          render={({ field, fieldState }) => (
             <Field
-              label="Note (optional)"
-              multiline
+              label="Title"
+              value={field.value}
+              onChangeText={field.onChange}
+              onBlur={field.onBlur}
+              error={fieldState.error?.message}
+              maxLength={100}
+              editable={progress === null}
+            />
+          )}
+        />
+        <View style={styles.choice}>
+          <Text variant="caption" tone="muted">
+            Type
+          </Text>
+          <Controller
+            control={form.control}
+            name="kind"
+            render={({ field }) => (
+              <FilterText
+                label="Material type"
+                options={kindOptions}
+                value={field.value}
+                onChange={(value) => {
+                  if (progress === null) field.onChange(value);
+                }}
+              />
+            )}
+          />
+        </View>
+        <Controller
+          control={form.control}
+          name="chapter"
+          render={({ field, fieldState }) => (
+            <Field
+              label="Chapter (optional)"
+              keyboardType="number-pad"
               value={field.value}
               onChangeText={field.onChange}
               error={fieldState.error?.message}
-              maxLength={200}
+              maxLength={2}
               editable={progress === null}
             />
-            <Text variant="caption" tone="muted">
-              {field.value.length}/200
-            </Text>
-          </>
-        )}
-      />
-      {progress !== null ? (
-        <ProgressLine label="Upload progress" value={progress} />
-      ) : null}
-      {error ? <ErrorLine message={error} /> : null}
-      {duplicate ? (
-        <TextAction
-          label="View existing material"
-          onPress={() => router.replace(`/material/${duplicate}`)}
+          )}
         />
-      ) : null}
-      <Button
-        label={
-          progress === null
-            ? "Upload"
-            : `Uploading ${Math.round(progress * 100)}%`
-        }
-        loading={progress !== null}
-        onPress={() => void submit()}
-      />
+      </View>
+      <View style={styles.section}>
+        <Controller
+          control={form.control}
+          name="description"
+          render={({ field, fieldState }) => (
+            <>
+              <Field
+                label="Note (optional)"
+                multiline
+                value={field.value}
+                onChangeText={field.onChange}
+                error={fieldState.error?.message}
+                maxLength={200}
+                editable={progress === null}
+              />
+              <Text variant="caption" tone="muted">
+                {field.value.length}/200
+              </Text>
+            </>
+          )}
+        />
+        {progress !== null ? (
+          <ProgressLine label="Upload progress" value={progress} />
+        ) : null}
+        {error ? <ErrorLine message={error} /> : null}
+        {duplicate ? (
+          <TextAction
+            label="View existing material"
+            onPress={() => router.replace(`/material/${duplicate}`)}
+          />
+        ) : null}
+        <Button
+          label="Upload"
+          loadingLabel={`Uploading ${Math.round((progress ?? 0) * 100)}%`}
+          loading={progress !== null}
+          onPress={() => void submit()}
+        />
+      </View>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  header: { gap: space.sm, paddingBottom: space.lg },
+  section: { gap: space.lg, paddingBottom: space.lg },
+  choice: { gap: space.sm },
+});

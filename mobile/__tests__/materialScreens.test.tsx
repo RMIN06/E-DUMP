@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -156,6 +157,32 @@ test("MAT-4: invalid chapter prevents a write", async () => {
   await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
   expect(await screen.findByText("Use a chapter from 0 to 99.")).toBeTruthy();
   expect(api).not.toHaveBeenCalled();
+});
+
+test("MAT-4: real upload progress stays visible and file replacement is locked until completion", async () => {
+  let finish: ((value: Material) => void) | undefined;
+  jest.mocked(api).mockReturnValueOnce(
+    new Promise<Material>((resolve) => {
+      finish = resolve;
+    }),
+  );
+  await render(<UploadScreen />);
+  await fireEvent.press(screen.getByRole("button", { name: "Choose file" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Upload" }));
+  await waitFor(() => expect(api).toHaveBeenCalledTimes(1));
+  const upload = jest.mocked(api).mock.calls[0]?.[1]?.upload;
+  if (!upload || !finish) throw new Error("Expected an active upload.");
+  await act(() => upload.onProgress(0.42));
+  expect(
+    screen.getByRole("button", { name: "Uploading 42%" }).props
+      .accessibilityState.busy,
+  ).toBe(true);
+  await fireEvent.press(
+    screen.getByRole("button", { name: "Choose another file" }),
+  );
+  expect(Picker.getDocumentAsync).toHaveBeenCalledTimes(1);
+  await act(() => finish?.(item));
+  await waitFor(() => expect(router.back).toHaveBeenCalled());
 });
 test("MAT-4: oversize file is rejected before upload", async () => {
   jest.mocked(Picker.getDocumentAsync).mockResolvedValue({

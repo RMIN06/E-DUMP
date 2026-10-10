@@ -1,3 +1,4 @@
+import { goBack } from "../../lib/navigation";
 import { useRef, useState } from "react";
 import { router } from "expo-router";
 import { api } from "../../api/client";
@@ -52,7 +53,7 @@ export function ReportsScreen() {
   return (
     <Screen
       title={"Reports"}
-      action={<TextAction onAccent label="Me" onPress={() => router.back()} />}
+      action={<TextAction onAccent label="Me" onPress={() => goBack("/(tabs)/me")} />}
     >
       {query.isPending ? <Text tone="muted">Loading reports…</Text> : null}
       {query.isError ? (

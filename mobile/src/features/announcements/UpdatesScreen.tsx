@@ -1,3 +1,4 @@
+import { goBack } from "../../lib/navigation";
 import { useCallback, useState } from "react";
 import { router, useFocusEffect } from "expo-router";
 import { RefreshControl, View, StyleSheet } from "react-native";
@@ -79,7 +80,7 @@ export function UpdatesScreen({
   const header = (
     <>
       {subjectSlug ? (
-        <TextAction label="Subjects" onPress={() => router.back()} />
+        <TextAction label="Subjects" onPress={() => goBack("/(tabs)/subjects")} />
       ) : null}
 
       {subjectSlug && onMaterials ? (

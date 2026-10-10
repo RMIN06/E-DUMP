@@ -1,3 +1,4 @@
+import { goBack } from "../../lib/navigation";
 import { useEffect, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { Platform, Switch } from "react-native";
@@ -181,7 +182,7 @@ export function UpdateFormScreen() {
           onAccent
           label="Updates"
           disabled={busy}
-          onPress={() => router.back()}
+          onPress={() => goBack("/(tabs)/updates")}
         />
       }
     >

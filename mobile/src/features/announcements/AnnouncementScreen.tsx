@@ -1,3 +1,4 @@
+import { goBack } from "../../lib/navigation";
 import { useEffect, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
@@ -88,7 +89,7 @@ export function AnnouncementScreen() {
       for (const key of ["announcements", "upcoming", "unread-updates"])
         void queryClient.invalidateQueries({ queryKey: [key] });
       setConfirm(false);
-      if (remove) router.back();
+      if (remove) goBack("/(tabs)/updates");
     } catch (reason) {
       setError(
         reason instanceof Error ? reason.message : "Couldn't save update.",
@@ -103,7 +104,7 @@ export function AnnouncementScreen() {
     <Screen
       title={item?.title ?? "Update"}
       action={
-        <TextAction onAccent label="Updates" onPress={() => router.back()} />
+        <TextAction onAccent label="Updates" onPress={() => goBack("/(tabs)/updates")} />
       }
     >
       {query.isPending ? (

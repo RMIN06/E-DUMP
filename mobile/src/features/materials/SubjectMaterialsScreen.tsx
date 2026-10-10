@@ -1,3 +1,4 @@
+import { goBack } from "../../lib/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { RefreshControl, StyleSheet, View } from "react-native";
@@ -55,7 +56,7 @@ export function SubjectMaterialsScreen({
   };
   const header = (
     <View style={styles.header}>
-      <TextAction label="Back to Subjects" onPress={() => router.back()} />
+      <TextAction label="Back to Subjects" onPress={() => goBack("/(tabs)/subjects")} />
 
       {subject.data ? (
         <Text variant="caption" tone="muted">

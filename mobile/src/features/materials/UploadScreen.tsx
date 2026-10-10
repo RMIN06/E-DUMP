@@ -1,3 +1,4 @@
+import { goBack } from "../../lib/navigation";
 import { useEffect, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { StyleSheet, View, Pressable } from "react-native";
@@ -165,7 +166,7 @@ export function UploadScreen() {
         queryClient.invalidateQueries({ queryKey: ["subjects"] }),
         queryClient.invalidateQueries({ queryKey: ["subject", slug] }),
       ]);
-      router.back();
+      goBack("/(tabs)/subjects");
     } catch (reason) {
       if (
         reason instanceof ApiError &&
@@ -194,7 +195,7 @@ export function UploadScreen() {
           label={progress === null ? "Close" : "Cancel upload"}
           onPress={() => {
             controller.current?.abort();
-            router.back();
+            goBack("/(tabs)/subjects");
           }}
         />
       }

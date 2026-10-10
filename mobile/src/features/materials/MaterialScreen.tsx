@@ -1,5 +1,6 @@
+import { goBack } from "../../lib/navigation";
 import { useEffect, useState } from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 import { useMaterial, type ReportReason } from "../../api/materials";
@@ -75,7 +76,7 @@ export function MaterialScreen() {
           }),
         ]);
         setSheet(null);
-        router.back();
+        goBack("/(tabs)/subjects");
       }
     } catch (value) {
       setError(
@@ -102,7 +103,7 @@ export function MaterialScreen() {
     <Screen
       title={item?.title ?? "Material"}
       action={
-        <TextAction onAccent label="Back" onPress={() => router.back()} />
+        <TextAction onAccent label="Back" onPress={() => goBack("/(tabs)/subjects")} />
       }
     >
       {item ? (

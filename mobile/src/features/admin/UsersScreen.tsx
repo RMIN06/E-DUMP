@@ -1,5 +1,5 @@
+import { goBack } from "../../lib/navigation";
 import { useEffect, useRef, useState } from "react";
-import { router } from "expo-router";
 import { api } from "../../api/client";
 import { useAdminUsers, type AdminUser, type UserPatch } from "../../api/admin";
 import { useFocusRead } from "../../api/useFocusRead";
@@ -54,7 +54,9 @@ export function UsersScreen() {
   return (
     <Screen
       title={"Users"}
-      action={<TextAction onAccent label="Me" onPress={() => router.back()} />}
+      action={
+        <TextAction onAccent label="Me" onPress={() => goBack("/(tabs)/me")} />
+      }
     >
       <Field
         label="Search users"

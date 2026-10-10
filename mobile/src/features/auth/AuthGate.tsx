@@ -8,6 +8,7 @@ import { sessionActions, useSession } from "../../lib/session";
 import { theme } from "../../theme/tokens";
 import { privateCache } from "../../api/cache";
 import { useMotionPreference } from "../../theme/animation";
+import { useLiveSync } from "../../lib/useLiveSync";
 import { motion } from "../../theme/motion";
 
 void SplashScreen.preventAutoHideAsync();
@@ -16,6 +17,7 @@ export function AuthGate({ children }: PropsWithChildren) {
   const { status, user } = useSession();
   const reduced = useMotionPreference();
   const userId = user?.id;
+  useLiveSync(status === "signedIn");
   useEffect(() => {
     if (status === "signedIn" && userId)
       void privateCache.start(userId).catch(() => undefined);

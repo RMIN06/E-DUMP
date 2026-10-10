@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { Platform, Switch } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { DateTimeInput } from "../../components/DateTimeInput";
 import * as DocumentPicker from "expo-document-picker";
-import * as FS from "expo-file-system/legacy";
+import { removePickedFile, pickedFileInfo } from "../../lib/pickedFiles";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -97,7 +97,7 @@ export function UpdateFormScreen() {
       pickedUri = file.uri;
       let size = file.size;
       if (size === undefined) {
-        const info = await FS.getInfoAsync(file.uri);
+        const info = await pickedFileInfo(file.uri);
         if (info.exists && !info.isDirectory) size = info.size;
       }
       if (size === undefined || size <= 0 || size > 25 * 1024 * 1024)
@@ -137,10 +137,7 @@ export function UpdateFormScreen() {
           reason instanceof Error ? reason.message : "Couldn't add file.",
         );
     } finally {
-      if (pickedUri)
-        void FS.deleteAsync(pickedUri, { idempotent: true }).catch(
-          () => undefined,
-        );
+      if (pickedUri) void removePickedFile(pickedUri).catch(() => undefined);
       uploading.current = null;
       setProgress(null);
     }
@@ -278,7 +275,7 @@ export function UpdateFormScreen() {
       ) : null}
       {picker ? (
         <>
-          <DateTimePicker
+          <DateTimeInput
             value={due ?? new Date()}
             mode={picker}
             timeZoneName="Asia/Karachi"
@@ -294,7 +291,7 @@ export function UpdateFormScreen() {
                 setPicker(picker === "date" ? "time" : null);
             }}
           />
-          {Platform.OS === "ios" ? (
+          {Platform.OS !== "android" ? (
             <TextAction
               label={picker === "date" ? "Set time" : "Done"}
               onPress={() => setPicker(picker === "date" ? "time" : null)}

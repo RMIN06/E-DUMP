@@ -13,9 +13,12 @@
     "lint": "eslint . && tsc --noEmit",
     "test": "jest --ci --coverage --runInBand",
     "check-fonts": "node ../scripts/check-fonts.mjs --release",
-    "eas-build-post-install": "node ../scripts/check-fonts.mjs --prepare --build"
+    "eas-build-post-install": "node ../scripts/check-fonts.mjs --prepare --build",
+    "web": "expo start --web",
+    "export:web": "expo export --platform web --max-workers 1 && node ../scripts/prepare-web.mjs"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~55.0.12",
     "@hookform/resolvers": "5.9.1",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.6.0",
@@ -43,6 +46,7 @@
     "expo-system-ui": "55.0.22",
     "lucide-react-native": "1.54.0",
     "react": "19.2.0",
+    "react-dom": "19.2.0",
     "react-hook-form": "7.89.0",
     "react-native": "0.83.10",
     "react-native-gesture-handler": "2.30.0",
@@ -50,6 +54,7 @@
     "react-native-safe-area-context": "5.6.2",
     "react-native-screens": "4.23.0",
     "react-native-svg": "15.15.3",
+    "react-native-web": "^0.21.0",
     "react-native-worklets": "0.7.4",
     "zod": "4.6.5",
     "zustand": "5.0.15"

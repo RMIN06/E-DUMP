@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { StyleSheet, View, Pressable } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-import * as FS from "expo-file-system/legacy";
+import { removePickedFile, pickedFileInfo } from "../../lib/pickedFiles";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -77,9 +77,7 @@ export function UploadScreen() {
     () => () => {
       controller.current?.abort();
       if (picked.current)
-        void FS.deleteAsync(picked.current.uri, { idempotent: true }).catch(
-          () => undefined,
-        );
+        void removePickedFile(picked.current.uri).catch(() => undefined);
     },
     [],
   );
@@ -96,7 +94,7 @@ export function UploadScreen() {
       const asset = result.assets[0];
       if (!asset) return;
       if (asset.size === undefined) {
-        const info = await FS.getInfoAsync(asset.uri);
+        const info = await pickedFileInfo(asset.uri);
         if (info.exists && !info.isDirectory) asset.size = info.size;
       }
       if (!asset.mimeType) {
@@ -113,12 +111,11 @@ export function UploadScreen() {
         asset.mimeType = types[extension ?? ""];
       }
       if (!asset.size || asset.size > 25 * 1024 * 1024) {
-        await FS.deleteAsync(asset.uri, { idempotent: true });
+        await removePickedFile(asset.uri);
         setError("Choose a non-empty file no larger than 25 MB.");
         return;
       }
-      if (picked.current)
-        await FS.deleteAsync(picked.current.uri, { idempotent: true });
+      if (picked.current) await removePickedFile(picked.current.uri);
       picked.current = asset;
       setFile(asset);
       form.setValue("title", asset.name.replace(/\.[^.]+$/, "").slice(0, 100), {

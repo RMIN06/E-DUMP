@@ -1,3 +1,4 @@
+import { Platform, useWindowDimensions } from "react-native";
 import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "../../components/Icon";
@@ -8,6 +9,8 @@ import { useUnreadCount } from "../../api/announcements";
 
 export function TabNavigation() {
   const theme = useTheme();
+  const { width } = useWindowDimensions();
+  const desktop = Platform.OS === "web" && width >= layout.desktopBreakpoint;
   const insets = useSafeAreaInsets();
   const unread = useUnreadCount();
   return (
@@ -15,11 +18,14 @@ export function TabNavigation() {
       initialRouteName="updates"
       screenOptions={{
         headerShown: false,
+        tabBarPosition: desktop ? "left" : "bottom",
+        tabBarLabelPosition: desktop ? "beside-icon" : "below-icon",
         tabBarStyle: {
           backgroundColor: theme.ink,
           borderTopColor: theme.lineSoft,
           borderTopWidth: controls.hairline,
-          height: layout.tabHeight + insets.bottom,
+          height: desktop ? undefined : layout.tabHeight + insets.bottom,
+          width: desktop ? layout.desktopTabWidth : undefined,
           paddingBottom: insets.bottom,
           paddingTop: space.sm,
         },

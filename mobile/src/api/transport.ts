@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 export type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
@@ -29,7 +30,8 @@ const sendOnce: Request = async <T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> => {
-  const base = process.env.EXPO_PUBLIC_API_BASE_URL;
+  const base =
+    Platform.OS === "web" ? "/api/v1" : process.env.EXPO_PUBLIC_API_BASE_URL;
   if (!base) throw new Error("Can't reach the server. Try again.");
   if (options.upload)
     return uploadOnce<T>(base.replace(/\/$/, "") + path, options);
@@ -41,6 +43,7 @@ const sendOnce: Request = async <T>(
   try {
     const response = await fetch(base.replace(/\/$/, "") + path, {
       method: options.method ?? "GET",
+      credentials: Platform.OS === "web" ? "same-origin" : "omit",
       headers: {
         "Content-Type": "application/json",
         ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
@@ -123,6 +126,11 @@ export const publicRequest: Request = async <T>(
 async function uploadOnce<T>(url: string, options: RequestOptions): Promise<T> {
   const upload = options.upload;
   if (!upload || options.signal?.aborted) throw new Error("Upload cancelled.");
+  const browserFile =
+    Platform.OS === "web"
+      ? await (await fetch(upload.uri, { signal: options.signal })).blob()
+      : null;
+  if (options.signal?.aborted) throw new Error("Upload cancelled.");
   return new Promise<T>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const abort = () => xhr.abort();
@@ -180,11 +188,13 @@ async function uploadOnce<T>(url: string, options: RequestOptions): Promise<T> {
     for (const [key, value] of Object.entries(upload.fields))
       form.append(key, value);
     // React Native accepts a native URI descriptor in place of a browser Blob.
-    form.append("file", {
-      uri: upload.uri,
-      name: upload.filename,
-      type: upload.mimeType,
-    } as unknown as Blob);
+    if (browserFile) form.append("file", browserFile, upload.filename);
+    else
+      form.append("file", {
+        uri: upload.uri,
+        name: upload.filename,
+        type: upload.mimeType,
+      } as unknown as Blob);
     options.signal?.addEventListener("abort", abort, { once: true });
     xhr.send(form);
   });

@@ -186,17 +186,20 @@ const styles = StyleSheet.create({
   scroll: { flexGrow: layout.fill, alignItems: "center" },
   listColumn: {
     width: layout.columnWidth,
-    maxWidth: layout.maxContentWidth,
+    maxWidth:
+      Platform.OS === "web" ? layout.webContentWidth : layout.maxContentWidth,
     alignSelf: "center",
   },
   column: {
     width: layout.columnWidth,
-    maxWidth: layout.maxContentWidth,
+    maxWidth:
+      Platform.OS === "web" ? layout.webFormWidth : layout.maxContentWidth,
     gap: space.lg,
   },
   footer: {
     width: layout.columnWidth,
-    maxWidth: layout.maxContentWidth,
+    maxWidth:
+      Platform.OS === "web" ? layout.webFormWidth : layout.maxContentWidth,
     alignSelf: "center",
     paddingHorizontal: space.xl,
     paddingTop: space.lg,

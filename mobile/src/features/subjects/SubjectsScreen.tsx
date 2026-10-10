@@ -2,7 +2,6 @@ import { router } from "expo-router";
 import { View, StyleSheet, RefreshControl } from "react-native";
 import { useSubjects, type Subject } from "../../api/subjects";
 import { Screen } from "../../components/Screen";
-import { Heading } from "../../components/Heading";
 import { Text } from "../../components/Text";
 import { Row } from "../../components/Row";
 import { Icon } from "../../components/Icon";
@@ -19,10 +18,6 @@ export function SubjectsScreen() {
   const theme = useTheme();
   const header = (
     <View style={styles.header}>
-      <Heading>Subjects</Heading>
-      <Text variant="caption" tone="muted">
-        Seven courses this semester
-      </Text>
       {query.isPending ? <ProgressLine label="Loading subjects" /> : null}
       {query.isError ? (
         query.data ? (
@@ -40,6 +35,8 @@ export function SubjectsScreen() {
   );
   return (
     <Screen
+      title="Subjects"
+      subtitle="Seven courses this semester"
       list={{
         data: query.data ?? [],
         keyExtractor: (item: Subject) => item.id,
@@ -79,5 +76,5 @@ export function SubjectsScreen() {
   );
 }
 const styles = StyleSheet.create({
-  header: { gap: space.sm, marginBottom: space.xl },
+  header: { gap: space.sm },
 });

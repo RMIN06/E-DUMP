@@ -4,7 +4,6 @@ import { AppState, RefreshControl, StyleSheet, View } from "react-native";
 import { useSchedule, type ScheduleSlot } from "../../api/schedule";
 import { useFocusRead } from "../../api/useFocusRead";
 import { Screen } from "../../components/Screen";
-import { Heading } from "../../components/Heading";
 import { Text } from "../../components/Text";
 import { FilterText } from "../../components/FilterText";
 import { EmptyState } from "../../components/EmptyState";
@@ -55,15 +54,13 @@ export function ScheduleScreen() {
     today && !current ? slots.find((slot) => slot.start > time) : undefined;
   return (
     <Screen
+      title="Schedule"
+      subtitle="Class times · Asia/Karachi"
       list={{
         data: slots,
         keyExtractor: (slot: ScheduleSlot) => slot.id,
         ListHeaderComponent: (
           <View style={styles.header}>
-            <Heading>Schedule</Heading>
-            <Text variant="caption" tone="muted">
-              Class times · Asia/Karachi
-            </Text>
             <FilterText
               options={days}
               value={day}
@@ -123,5 +120,5 @@ export function ScheduleScreen() {
   );
 }
 const styles = StyleSheet.create({
-  header: { gap: space.sm, marginBottom: space.xl },
+  header: { gap: space.sm },
 });

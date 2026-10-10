@@ -99,9 +99,12 @@ export function MaterialScreen() {
     }
   };
   return (
-    <Screen>
-      <TextAction label="Back" onPress={() => router.back()} />
-      <Heading>{item?.title ?? "Material"}</Heading>
+    <Screen
+      title={item?.title ?? "Material"}
+      action={
+        <TextAction onAccent label="Back" onPress={() => router.back()} />
+      }
+    >
       {item ? (
         <>
           <Text variant="caption" tone="muted">
@@ -131,7 +134,7 @@ export function MaterialScreen() {
               style={styles.image}
             />
           ) : null}
-          <TextAction
+          <Button
             label={uri ? "Open image" : "Open file"}
             disabled={opening.progress !== null}
             onPress={() => void open()}

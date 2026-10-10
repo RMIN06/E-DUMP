@@ -50,9 +50,10 @@ export function ReportsScreen() {
     }
   };
   return (
-    <Screen>
-      <TextAction label="Me" onPress={() => router.back()} />
-      <Heading>Reports</Heading>
+    <Screen
+      title={"Reports"}
+      action={<TextAction onAccent label="Me" onPress={() => router.back()} />}
+    >
       {query.isPending ? <Text tone="muted">Loading reports…</Text> : null}
       {query.isError ? (
         <ErrorLine

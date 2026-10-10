@@ -74,16 +74,13 @@ export function MeScreen({
     }
   };
   return (
-    <Screen>
-      <Heading>{user?.name ?? "Me"}</Heading>
-      <Text variant="caption" tone="muted">
-        {user?.email}
-      </Text>
-      <TextAction label="Name" onPress={() => router.push("/name")} />
+    <Screen title={user?.name ?? "Me"} subtitle={user?.email}>
+      <TextAction row label="Name" onPress={() => router.push("/name")} />
       {notifications}
-      <TextAction label="Rules" onPress={() => router.push("/rules")} />
+      <TextAction row label="Rules" onPress={() => router.push("/rules")} />
       {user?.role === "admin" ? admin : null}
       <TextAction
+        row
         label="Clear downloads"
         disabled={working}
         onPress={() => void clear()}
@@ -101,11 +98,13 @@ export function MeScreen({
         />
       ) : null}
       <TextAction
+        row
         label="Sign out"
         disabled={working}
         onPress={() => void signOut()}
       />
       <TextAction
+        row
         label="Delete account"
         destructive
         disabled={working}

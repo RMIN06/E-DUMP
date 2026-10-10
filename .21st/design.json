@@ -29,7 +29,7 @@
     "radius": {},
     "shadows": {},
     "motion": {},
-    "density": "editorial single column"
+    "density": "Compact single-column mobile lists with solid accent headers"
   },
   "components": {
     "installed": [],
@@ -57,15 +57,15 @@
     ],
     "avoid": [
       "New dependencies",
-      "Cards or boxed inputs",
       "Gradients, shadows, glow, emojis",
       "Scale bounce",
       "Web DOM animation packages in native app"
     ]
   },
   "decisions": [
-    "Polish the existing editorial interface with smooth opacity press/release feedback, non-overshooting tab springs and a hairline-separated file-selection area.",
-    "21st catalogue search returned HTTP 401; no external component source was retrieved or copied."
+    "Adapt the layout hierarchy of Rohan Kumar�s Task manager Mobile app UI: compact context headers, grouped lists, an accessible day rail and clear primary actions. https://www.figma.com/community/file/1025672621370192050/task-manager-mobile-app-ui",
+    "Use the existing dark E-DUMP palette, native controls, functional sculpted icons and font mappings; no template features, assets or dependencies are copied.",
+    "21st catalogue search returned HTTP 401. The Figma Community cover preview was inspected in the browser for layout inspiration."
   ],
   "evidence": [
     {

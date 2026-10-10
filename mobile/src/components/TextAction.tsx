@@ -19,11 +19,15 @@ export function TextAction({
   onPress,
   destructive = false,
   disabled = false,
+  row = false,
+  onAccent = false,
 }: {
   label: string;
   onPress(): void;
   destructive?: boolean;
   disabled?: boolean;
+  row?: boolean;
+  onAccent?: boolean;
 }) {
   const theme = useTheme();
   const reduced = useMotionPreference();
@@ -45,12 +49,18 @@ export function TextAction({
   return (
     <AnimatedPressable
       accessibilityRole="button"
+      accessibilityLabel={label}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
-      style={[styles.action, feedback]}
+      style={[
+        styles.action,
+        row && styles.row,
+        row && { backgroundColor: theme.surface },
+        feedback,
+      ]}
     >
       <Text
         allowFontScaling
@@ -63,16 +73,36 @@ export function TextAction({
               ? theme.boneMuted
               : destructive
                 ? theme.danger
-                : theme.moss,
+                : onAccent
+                  ? theme.ink
+                  : row
+                    ? theme.bone
+                    : theme.moss,
           },
         ]}
       >
         {label}
       </Text>
+      {row ? (
+        <Text
+          accessible={false}
+          style={[textStyle("h3"), { color: theme.boneMuted }]}
+        >
+          ›
+        </Text>
+      ) : null}
     </AnimatedPressable>
   );
 }
 const styles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.md,
+    paddingHorizontal: space.lg,
+    borderRadius: controls.panelRadius,
+  },
   action: {
     minHeight: controls.touchHeight,
     minWidth: controls.touchHeight,

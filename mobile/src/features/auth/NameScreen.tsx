@@ -4,9 +4,7 @@ import { router } from "expo-router";
 import { Button } from "../../components/Button";
 import { ErrorLine } from "../../components/ErrorLine";
 import { Field } from "../../components/Field";
-import { Heading } from "../../components/Heading";
 import { Screen } from "../../components/Screen";
-import { Text } from "../../components/Text";
 import { sessionActions, useSession } from "../../lib/session";
 import { space } from "../../theme/spacing";
 
@@ -41,9 +39,11 @@ export function NameScreen() {
     }
   };
   return (
-    <Screen keepFormEndVisible>
-      <Heading>Your name</Heading>
-      <Text tone="muted">Shown next to files you upload.</Text>
+    <Screen
+      title="Your name"
+      subtitle="Shown next to files you upload."
+      keepFormEndVisible
+    >
       <View style={styles.form}>
         <Field
           label="Name"
@@ -64,5 +64,5 @@ export function NameScreen() {
   );
 }
 const styles = StyleSheet.create({
-  form: { marginTop: space.xl, gap: space.xl },
+  form: { gap: space.xl },
 });

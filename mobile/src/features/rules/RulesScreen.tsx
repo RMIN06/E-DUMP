@@ -19,9 +19,14 @@ export function RulesScreen({
   error?: string | null;
 }) {
   return (
-    <Screen>
-      {onClose ? <TextAction label="Back to Me" onPress={onClose} /> : null}
-      <Heading>Rules</Heading>
+    <Screen
+      title="Rules"
+      action={
+        onClose ? (
+          <TextAction onAccent label="Back to Me" onPress={onClose} />
+        ) : null
+      }
+    >
       <Text>Course-related material only.</Text>
       <Text>
         Upload only what you are allowed to share. Do not upload leaked papers

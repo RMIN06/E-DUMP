@@ -62,9 +62,7 @@ export function UpdatesScreen({
       {subjectSlug ? (
         <TextAction label="Subjects" onPress={() => router.back()} />
       ) : null}
-      <Heading>
-        {subjectSlug ? (subject.data?.short_name ?? "Subject") : "Updates"}
-      </Heading>
+
       {subjectSlug && onMaterials ? (
         <FilterText
           label="Subject view"
@@ -76,17 +74,6 @@ export function UpdatesScreen({
           onChange={(value) => {
             if (value === "material") onMaterials();
           }}
-        />
-      ) : null}
-      {user?.role === "admin" ? (
-        <TextAction
-          label="Post"
-          onPress={() =>
-            router.push({
-              pathname: "/updates/new",
-              params: subjectSlug ? { subject: subjectSlug } : {},
-            })
-          }
         />
       ) : null}
       {!subjectSlug && unread.data?.count ? (
@@ -141,9 +128,7 @@ export function UpdatesScreen({
           ))}
         </>
       ) : null}
-      {query.isPending ? (
-        <ProgressLine label="Loading updates" />
-      ) : null}
+      {query.isPending ? <ProgressLine label="Loading updates" /> : null}
       {query.isError && !query.data ? (
         <ErrorLine
           message="Couldn't load updates."
@@ -154,6 +139,24 @@ export function UpdatesScreen({
   );
   return (
     <Screen
+      title={subjectSlug ? (subject.data?.short_name ?? "Subject") : "Updates"}
+      subtitle={
+        subjectSlug ? "Course updates" : "Class announcements and deadlines"
+      }
+      action={
+        user?.role === "admin" ? (
+          <TextAction
+            onAccent
+            label="Post"
+            onPress={() =>
+              router.push({
+                pathname: "/updates/new",
+                params: subjectSlug ? { subject: subjectSlug } : {},
+              })
+            }
+          />
+        ) : null
+      }
       list={{
         data: query.data?.pages.flatMap((page) => page.items) ?? [],
         keyExtractor: (item) => item.id,

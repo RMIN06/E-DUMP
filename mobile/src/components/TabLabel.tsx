@@ -31,7 +31,12 @@ export function TabLabel({
     transform: [{ scaleX: selected.value }],
   }));
   return (
-    <View style={styles.label}>
+    <View
+      style={[
+        styles.label,
+        { backgroundColor: active ? theme.accentSoft : theme.clear },
+      ]}
+    >
       <Text
         numberOfLines={1}
         allowFontScaling
@@ -51,7 +56,11 @@ export function TabLabel({
   );
 }
 const styles = StyleSheet.create({
-  label: { paddingBottom: space.xs + controls.focusLine },
+  label: {
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+    borderRadius: controls.radius,
+  },
   underline: {
     position: "absolute",
     bottom: 0,

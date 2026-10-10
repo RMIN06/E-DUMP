@@ -10,8 +10,13 @@ export function AdminLinks() {
   return (
     <>
       <Heading variant="h2">Admin</Heading>
-      <TextAction label="Users" onPress={() => router.push("/admin/users")} />
       <TextAction
+        row
+        label="Users"
+        onPress={() => router.push("/admin/users")}
+      />
+      <TextAction
+        row
         label={
           reports.data ? `Reports (${reports.data.length} open)` : "Reports"
         }

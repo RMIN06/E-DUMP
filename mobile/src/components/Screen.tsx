@@ -13,10 +13,13 @@ import {
   StyleSheet,
   View,
   FlatList,
+  Text,
   type FlatListProps,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { layout, space } from "../theme/spacing";
+import { controls, layout, space } from "../theme/spacing";
+import { headingStyle, textLimits, textStyle } from "../theme/typography";
+import { useSizeClass } from "../theme/responsive";
 import { useTheme } from "../theme/tokens";
 import { EntryContext, type EntryScope } from "../theme/animation";
 
@@ -25,13 +28,48 @@ export function Screen<T = never>({
   keepFormEndVisible = false,
   list,
   footer,
+  title,
+  subtitle,
+  action,
 }: PropsWithChildren<{
   keepFormEndVisible?: boolean;
   list?: Omit<FlatListProps<T>, "style" | "contentContainerStyle">;
   footer?: ReactNode;
+  title?: string;
+  subtitle?: string;
+  action?: ReactNode;
 }>) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { sizeClass } = useSizeClass();
+  const header = title ? (
+    <View style={[styles.masthead, { backgroundColor: theme.moss }]}>
+      <View style={styles.headerTop}>
+        <Text style={[textStyle("label"), { color: theme.ink }]}>
+          E-DUMP / BCS-3E
+        </Text>
+        {action}
+      </View>
+      <Text
+        accessibilityRole="header"
+        allowFontScaling
+        maxFontSizeMultiplier={textLimits.headingScale}
+        style={[headingStyle("h1", sizeClass), { color: theme.ink }]}
+      >
+        {title}
+      </Text>
+      {subtitle ? (
+        <Text
+          allowFontScaling
+          maxFontSizeMultiplier={textLimits.bodyScale}
+          style={[textStyle("caption"), { color: theme.ink }]}
+        >
+          {subtitle}
+        </Text>
+      ) : null}
+    </View>
+  ) : null;
+  const ListHeader = list?.ListHeaderComponent;
   const entry = useRef<EntryScope>({ seen: new Set(), count: 0 });
   const scroll = useRef<ScrollView>(null);
   const revealFormEnd = () => {
@@ -60,6 +98,20 @@ export function Screen<T = never>({
         {list ? (
           <FlatList
             {...list}
+            ListHeaderComponent={
+              title ? (
+                <View style={styles.listHeader}>
+                  {header}
+                  {typeof ListHeader === "function" ? (
+                    <ListHeader />
+                  ) : (
+                    ListHeader
+                  )}
+                </View>
+              ) : (
+                ListHeader
+              )
+            }
             style={styles.listColumn}
             contentContainerStyle={{
               paddingTop: insets.top + space.xl,
@@ -99,6 +151,7 @@ export function Screen<T = never>({
                 },
               ]}
             >
+              {header}
               {children}
             </View>
           </ScrollView>
@@ -116,6 +169,19 @@ export function Screen<T = never>({
 }
 
 const styles = StyleSheet.create({
+  masthead: {
+    padding: space.xl,
+    borderRadius: controls.panelRadius,
+    gap: space.md,
+  },
+  headerTop: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.sm,
+  },
+  listHeader: { gap: space.lg, paddingBottom: space.lg },
   screen: { flex: layout.fill },
   scroll: { flexGrow: layout.fill, alignItems: "center" },
   listColumn: {

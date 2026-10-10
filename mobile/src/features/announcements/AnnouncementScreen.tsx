@@ -100,8 +100,12 @@ export function AnnouncementScreen() {
   };
   const item = query.data;
   return (
-    <Screen>
-      <TextAction label="Updates" onPress={() => router.back()} />
+    <Screen
+      title={item?.title ?? "Update"}
+      action={
+        <TextAction onAccent label="Updates" onPress={() => router.back()} />
+      }
+    >
       {query.isPending ? (
         <ProgressLine value={0} label="Loading update" />
       ) : null}
@@ -123,7 +127,7 @@ export function AnnouncementScreen() {
             {item.pinned ? "Pinned · " : ""}
             {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
           </Text>
-          <Heading>{item.title}</Heading>
+
           <Text variant="caption" tone="muted">
             {item.subject_slug ? `${item.subject_slug.toUpperCase()} · ` : ""}
             {item.author_name} · {relativeTime(item.created_at)}

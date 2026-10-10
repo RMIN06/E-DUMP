@@ -52,9 +52,10 @@ export function UsersScreen() {
     }
   };
   return (
-    <Screen>
-      <TextAction label="Me" onPress={() => router.back()} />
-      <Heading>Users</Heading>
+    <Screen
+      title={"Users"}
+      action={<TextAction onAccent label="Me" onPress={() => router.back()} />}
+    >
       <Field
         label="Search users"
         placeholder="Name or email"

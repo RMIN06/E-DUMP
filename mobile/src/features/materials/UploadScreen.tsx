@@ -11,7 +11,6 @@ import { ApiError } from "../../api/transport";
 import { queryClient } from "../../api/queryClient";
 import type { Material } from "../../api/materials";
 import { Screen } from "../../components/Screen";
-import { Heading } from "../../components/Heading";
 import { Text } from "../../components/Text";
 import { TextAction } from "../../components/TextAction";
 import { Field } from "../../components/Field";
@@ -189,18 +188,20 @@ export function UploadScreen() {
     }
   });
   return (
-    <Screen>
-      <TextAction
-        label={progress === null ? "Close" : "Cancel upload"}
-        onPress={() => {
-          controller.current?.abort();
-          router.back();
-        }}
-      />
-      <View style={styles.header}>
-        <Heading>Upload</Heading>
-        <Text tone="muted">Share course material with BCS-3E.</Text>
-      </View>
+    <Screen
+      title="Upload"
+      subtitle="Share course material with BCS-3E."
+      action={
+        <TextAction
+          onAccent
+          label={progress === null ? "Close" : "Cancel upload"}
+          onPress={() => {
+            controller.current?.abort();
+            router.back();
+          }}
+        />
+      }
+    >
       <View style={styles.section}>
         <Text variant="label">File</Text>
         <Pressable

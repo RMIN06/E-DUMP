@@ -3,9 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Button } from "../../components/Button";
 import { ErrorLine } from "../../components/ErrorLine";
 import { Field } from "../../components/Field";
-import { Heading } from "../../components/Heading";
 import { Screen } from "../../components/Screen";
-import { Text } from "../../components/Text";
 import { ApiError } from "../../api/transport";
 import { emailMessage, studentEmail } from "../../lib/email";
 import { sessionActions } from "../../lib/session";
@@ -47,9 +45,11 @@ export function SignInScreen() {
     }
   };
   return (
-    <Screen keepFormEndVisible>
-      <Heading variant="display">BCS-3E</Heading>
-      <Text tone="muted">Class material and alerts, in one place.</Text>
+    <Screen
+      title="BCS-3E"
+      subtitle="Class material and alerts, in one place."
+      keepFormEndVisible
+    >
       <View style={styles.form}>
         <Field
           label="Student email"
@@ -79,5 +79,5 @@ export function SignInScreen() {
   );
 }
 const styles = StyleSheet.create({
-  form: { marginTop: space.xl, gap: space.xl },
+  form: { gap: space.xl },
 });

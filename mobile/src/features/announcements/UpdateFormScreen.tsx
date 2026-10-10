@@ -18,7 +18,6 @@ import {
 import { useSubjects } from "../../api/subjects";
 import { queryClient } from "../../api/queryClient";
 import { Screen } from "../../components/Screen";
-import { Heading } from "../../components/Heading";
 import { Field } from "../../components/Field";
 import { Text } from "../../components/Text";
 import { TextAction } from "../../components/TextAction";
@@ -177,13 +176,18 @@ export function UpdateFormScreen() {
   });
   const busy = saving || progress !== null;
   return (
-    <Screen keepFormEndVisible>
-      <TextAction
-        label="Updates"
-        disabled={busy}
-        onPress={() => router.back()}
-      />
-      <Heading>{id ? "Edit update" : "New update"}</Heading>
+    <Screen
+      title={id ? "Edit update" : "New update"}
+      keepFormEndVisible
+      action={
+        <TextAction
+          onAccent
+          label="Updates"
+          disabled={busy}
+          onPress={() => router.back()}
+        />
+      }
+    >
       {id && existing.isPending ? (
         <ProgressLine value={0} label="Loading update" />
       ) : null}

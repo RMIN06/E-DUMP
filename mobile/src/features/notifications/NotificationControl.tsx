@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Switch } from "react-native";
+import { Switch, View, StyleSheet } from "react-native";
+import { controls, space } from "../../theme/spacing";
 import { useFocusEffect } from "expo-router";
 import { api } from "../../api/client";
 import {
@@ -57,15 +58,17 @@ export function NotificationControl() {
   };
   return (
     <>
-      <Text>Notifications</Text>
-      <Switch
-        accessibilityLabel="Notifications"
-        value={enabled}
-        disabled={busy || !pushProjectId()}
-        onValueChange={(value) => void toggle(value)}
-        trackColor={{ false: theme.olive, true: theme.moss }}
-        thumbColor={theme.bone}
-      />
+      <View style={[styles.setting, { backgroundColor: theme.surface }]}>
+        <Text>Notifications</Text>
+        <Switch
+          accessibilityLabel="Notifications"
+          value={enabled}
+          disabled={busy || !pushProjectId()}
+          onValueChange={(value) => void toggle(value)}
+          trackColor={{ false: theme.olive, true: theme.moss }}
+          thumbColor={theme.bone}
+        />
+      </View>
       {!pushProjectId() ? (
         <Text variant="caption" tone="muted">
           Notifications will be available after the preview is configured.
@@ -75,3 +78,14 @@ export function NotificationControl() {
     </>
   );
 }
+const styles = StyleSheet.create({
+  setting: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.md,
+    padding: space.lg,
+    borderRadius: controls.panelRadius,
+  },
+});

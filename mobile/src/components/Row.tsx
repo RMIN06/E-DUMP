@@ -88,7 +88,10 @@ export const Row = memo(function Row({
       }
     >
       {leading ? (
-        <View style={styles.leading} pointerEvents="none">
+        <View
+          style={[styles.leading, { backgroundColor: theme.accentSoft }]}
+          pointerEvents="none"
+        >
           {leading}
         </View>
       ) : null}
@@ -146,7 +149,11 @@ export const Row = memo(function Row({
                   ),
                 )
               }
-              style={[textStyle("caption"), { color: theme.boneMuted }]}
+              style={[
+                textStyle("caption"),
+                styles.badge,
+                { color: theme.moss, backgroundColor: theme.accentSoft },
+              ]}
             >
               {trailing}
             </Text>
@@ -194,14 +201,19 @@ const styles = StyleSheet.create({
     minHeight: layout.rowHeight,
     paddingVertical: space.lg,
     paddingHorizontal: space.lg,
-    marginBottom: space.md,
+    marginBottom: space.sm,
     borderRadius: controls.panelRadius,
     gap: space.sm,
     flexDirection: "row",
     alignItems: "flex-start",
   },
   main: { flex: layout.fill, gap: space.sm },
-  leading: { paddingTop: space.xs, paddingRight: space.sm },
+  leading: { padding: space.sm, borderRadius: controls.radius },
+  badge: {
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+    borderRadius: controls.radius,
+  },
   details: {
     minWidth: controls.touchHeight,
     minHeight: controls.touchHeight,

@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     minHeight: layout.rowHeight,
     paddingVertical: space.lg,
     paddingHorizontal: space.lg,
-    marginBottom: space.md,
+    marginBottom: space.sm,
     borderRadius: controls.panelRadius,
     gap: space.sm,
   },

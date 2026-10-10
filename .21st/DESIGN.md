@@ -1,7 +1,11 @@
 # E-DUMP design context
 
-Native Expo app for BCS-3E, using the existing dark editorial theme. Sources and decisions are recorded in design.json.
+Native Expo app for BCS-3E. Use the four existing brand colours, dark mode, licensed font mappings with approved preview fallbacks, native controls and one responsive column.
 
-Reuse Screen, Heading, Text, Row, Button, TextAction, Field, FilterText, TabLabel and ProgressLine. Keep one column, the 24 pt axis, token spacing, Recoleta/Berthold mappings and the four brand colours. File selection is a full-width Row with type/size guidance and selected-file text. Motion is implemented using Reanimated with reduced-motion support. No gradients, shadows, decorative bounce or additional dependencies.
+The layout reference is [Task manager Mobile app UI by Rohan Kumar](https://www.figma.com/community/file/1025672621370192050/task-manager-mobile-app-ui), viewed through Figma Community. Adapt its compact context headers, grouped lists and action hierarchy to the existing E-DUMP routes. No template source, assets, features or dependencies are copied.
 
-The 21st catalogue search was attempted and returned HTTP 401. This implementation reuses project primitives rather than external catalogue source.
+Screen provides a solid moss context header with an ink title, subtitle and optional existing route action. Row and ScheduleRow use compact filled surfaces; functional icon tiles and file-count badges establish hierarchy. Profile actions use grouped setting rows. Filters remain horizontal and scrollable. Forms retain their native inputs and keyboard handling; upload selection keeps the native document picker and real progress.
+
+Use theme tokens, a centred tablet column, scalable text, 48 dp controls, and reduced-motion-aware Reanimated feedback. No gradients, shadows, glow, grids, decorative bounce or additional dependencies. Owner-approved filled panels and rounded controls override the initial text-only visual direction.
+
+The 21st catalogue search returned HTTP 401; no external catalogue code was retrieved. Decisions and the Figma reference are recorded in design.json.

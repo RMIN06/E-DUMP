@@ -9,7 +9,6 @@ import {
 } from "../../api/materials";
 import { useFocusRead } from "../../api/useFocusRead";
 import { Screen } from "../../components/Screen";
-import { Heading } from "../../components/Heading";
 import { Text } from "../../components/Text";
 import { TextAction } from "../../components/TextAction";
 import { Field } from "../../components/Field";
@@ -57,10 +56,7 @@ export function SubjectMaterialsScreen({
   const header = (
     <View style={styles.header}>
       <TextAction label="Back to Subjects" onPress={() => router.back()} />
-      <View style={styles.title}>
-        <Heading>{subject.data?.short_name ?? "Subject"}</Heading>
-        <TextAction label="Upload" onPress={upload} />
-      </View>
+
       {subject.data ? (
         <Text variant="caption" tone="muted">
           {subject.data.teacher ?? "Credits and teacher to be added"} ·{" "}
@@ -124,6 +120,9 @@ export function SubjectMaterialsScreen({
   if (showUpdates && updates) return updates(() => setShowUpdates(false));
   return (
     <Screen
+      title={subject.data?.short_name ?? "Subject"}
+      subtitle="Course material"
+      action={<TextAction onAccent label="Upload" onPress={upload} />}
       footer={
         opening.progress !== null ? (
           <>
@@ -195,7 +194,7 @@ export function SubjectMaterialsScreen({
   );
 }
 const styles = StyleSheet.create({
-  header: { gap: space.lg, marginBottom: space.xl },
+  header: { gap: space.lg },
   title: {
     flexDirection: "row",
     flexWrap: "wrap",

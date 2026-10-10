@@ -1,4 +1,4 @@
-import { memo, useState, type ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { layout, space, controls } from "../theme/spacing";
 import { useSizeClass } from "../theme/responsive";
@@ -65,15 +65,10 @@ export const Row = memo(function Row({
       : withTiming(value, { duration: motion.pressDuration });
   };
   const { sizeClass, fontScale } = useSizeClass();
-  const [titleWidth, setTitleWidth] = useState(0);
-  const [metaWidth, setMetaWidth] = useState(0);
-  const [available, setAvailable] = useState(0);
-  const below =
-    sizeClass === "compact" ||
-    fontScale > 1.3 ||
-    titleWidth + metaWidth + space.lg > available;
+  const below = sizeClass === "compact" || fontScale > 1.3;
   return (
     <Animated.View
+      collapsable={false}
       style={[styles.row, { backgroundColor: theme.surface }]}
       entering={
         reduced || entry === null
@@ -109,10 +104,7 @@ export const Row = memo(function Row({
         onPressOut={() => setPressed(0)}
         style={[styles.main, pressStyle]}
       >
-        <View
-          onLayout={(event) => setAvailable(event.nativeEvent.layout.width)}
-          style={[styles.titleLine, below && styles.stacked]}
-        >
+        <View style={[styles.titleLine, below && styles.stacked]}>
           <Text
             allowFontScaling
             maxFontSizeMultiplier={
@@ -121,17 +113,10 @@ export const Row = memo(function Row({
             numberOfLines={
               heading ? textLimits.headingLines : textLimits.rowLines
             }
-            onTextLayout={(event) =>
-              setTitleWidth(
-                Math.max(
-                  0,
-                  ...event.nativeEvent.lines.map((line) => line.width),
-                ),
-              )
-            }
             style={[
               heading ? headingStyle("h2", sizeClass) : textStyle(titleVariant),
               styles.title,
+              below && styles.stackedTitle,
               { color: disabled ? theme.boneMuted : theme.bone },
             ]}
           >
@@ -141,14 +126,6 @@ export const Row = memo(function Row({
             <Text
               allowFontScaling
               maxFontSizeMultiplier={textLimits.bodyScale}
-              onTextLayout={(event) =>
-                setMetaWidth(
-                  Math.max(
-                    0,
-                    ...event.nativeEvent.lines.map((line) => line.width),
-                  ),
-                )
-              }
               style={[
                 textStyle("caption"),
                 styles.badge,
@@ -207,9 +184,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
   },
-  main: { flex: layout.fill, gap: space.sm },
+  main: { flex: layout.fill, minWidth: layout.zero, gap: space.sm },
   leading: { padding: space.sm, borderRadius: controls.radius },
   badge: {
+    maxWidth: layout.columnWidth,
+    flexShrink: layout.fill,
+    alignSelf: "flex-start",
     paddingHorizontal: space.sm,
     paddingVertical: space.xs,
     borderRadius: controls.radius,
@@ -220,7 +200,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  titleLine: { flexDirection: "row", alignItems: "baseline", gap: space.lg },
+  titleLine: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    gap: space.lg,
+  },
   stacked: { flexDirection: "column", alignItems: "stretch", gap: space.sm },
-  title: { flexShrink: layout.fill },
+  title: {
+    flexGrow: layout.fill,
+    flexShrink: layout.fill,
+    flexBasis: layout.zero,
+    minWidth: layout.zero,
+  },
+  stackedTitle: { flexBasis: "auto" },
 });

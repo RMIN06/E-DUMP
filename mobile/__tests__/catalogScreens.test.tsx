@@ -101,9 +101,7 @@ test.each([1, 1.6])(
     );
     const title = screen.getByText("COAL");
     expect(title.props.numberOfLines).toBe(3);
-    await fireEvent(title, "textLayout", {
-      nativeEvent: { lines: [{ width: 200 }] },
-    });
+    expect(title.props.onTextLayout).toBeUndefined();
     expect(StyleSheet.flatten(title.parent?.props.style).flexDirection).toBe(
       "column",
     );

@@ -159,3 +159,7 @@ Automated checks to add:
 - [ ] Offline, slow-network and error states shown in plain text.
 - [ ] Android Back and iOS swipe-back behave as in Â§10.
 - [ ] Reduce Motion respected.
+
+## Scroll stability correction — 11 October 2026
+
+Rows select inline or stacked trailing metadata from viewport class and font scale, never from repeated text measurements. The scroll viewport is bounded with flex and zero minimum height; content does not shrink into its viewport. Animated rows keep their native view and clipped-subview removal is disabled on Android/web to avoid losing translated content during scrolling. Existing FlatList window/batch limits remain; this overrides the earlier Android clipping recommendation.

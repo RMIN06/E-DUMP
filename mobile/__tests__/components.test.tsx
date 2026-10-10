@@ -119,3 +119,27 @@ describe("PRD §9 accessibility/platforms: M0 primitives", () => {
     });
   });
 });
+
+test("scrolling lists retain animated rows and a bounded viewport", async () => {
+  await render(
+    <Screen
+      title="Subjects"
+      list={{
+        data: ["COAL"],
+        renderItem: ({ item }) => <Text>{item}</Text>,
+        keyExtractor: (item) => item,
+      }}
+    />,
+  );
+  const lists = screen.container.queryAll(
+    (node) => node.props.removeClippedSubviews !== undefined,
+  );
+  expect(lists.length).toBeGreaterThan(0);
+  expect(
+    lists.every((node) => node.props.removeClippedSubviews === false),
+  ).toBe(true);
+  expect(Native.StyleSheet.flatten(lists[0]?.props.style)).toMatchObject({
+    flex: 1,
+    minHeight: 0,
+  });
+});

@@ -9,6 +9,7 @@ export const space = {
   huge: 64,
 } as const;
 export const layout = {
+  zero: 0,
   fill: 1,
   columnWidth: "100%",
   maxContentWidth: 560,

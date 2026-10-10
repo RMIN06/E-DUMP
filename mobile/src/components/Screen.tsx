@@ -122,7 +122,7 @@ export function Screen<T = never>({
             initialNumToRender={layout.listInitial}
             maxToRenderPerBatch={layout.listBatch}
             windowSize={layout.listWindow}
-            removeClippedSubviews={Platform.OS === "android"}
+            removeClippedSubviews={false}
             onEndReachedThreshold={layout.listEndThreshold}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode={
@@ -132,6 +132,7 @@ export function Screen<T = never>({
         ) : (
           <ScrollView
             ref={scroll}
+            style={styles.viewport}
             onLayout={revealFormEnd}
             onContentSizeChange={revealFormEnd}
             contentContainerStyle={styles.scroll}
@@ -182,15 +183,19 @@ const styles = StyleSheet.create({
     gap: space.sm,
   },
   listHeader: { gap: space.lg, paddingBottom: space.lg },
-  screen: { flex: layout.fill },
+  screen: { flex: layout.fill, minHeight: layout.zero },
+  viewport: { flex: layout.fill, minHeight: layout.zero },
   scroll: { flexGrow: layout.fill, alignItems: "center" },
   listColumn: {
+    flex: layout.fill,
+    minHeight: layout.zero,
     width: layout.columnWidth,
     maxWidth:
       Platform.OS === "web" ? layout.webContentWidth : layout.maxContentWidth,
     alignSelf: "center",
   },
   column: {
+    flexShrink: layout.zero,
     width: layout.columnWidth,
     maxWidth:
       Platform.OS === "web" ? layout.webFormWidth : layout.maxContentWidth,

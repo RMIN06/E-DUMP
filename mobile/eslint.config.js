@@ -20,7 +20,16 @@ const banned = [
 
 module.exports = defineConfig([
   expo,
-  { ignores: ["coverage/**", ".expo/**", "src/api/schema.d.ts"] },
+  {
+    ignores: [
+      "coverage/**",
+      ".expo/**",
+      "android/**",
+      "ios/**",
+      "dist/**",
+      "src/api/schema.d.ts",
+    ],
+  },
   {
     files: ["**/*.ts", "**/*.tsx"],
     rules: {

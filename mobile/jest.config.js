@@ -8,6 +8,13 @@ for (const folder of ["./src/auth/", "./src/lib/"]) {
 
 module.exports = {
   preset: "jest-expo",
+  modulePathIgnorePatterns: [
+    "<rootDir>/android/",
+    "<rootDir>/ios/",
+    "<rootDir>/coverage/",
+    "<rootDir>/.expo/",
+    "<rootDir>/dist/",
+  ],
   testMatch: ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",

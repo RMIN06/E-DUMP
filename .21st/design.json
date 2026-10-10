@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "project": {
+    "name": "E-DUMP",
+    "productType": "Private BCS-3E Android/iOS class app",
+    "stack": ["Expo", "React Native", "TypeScript", "Reanimated"]
+  },
+  "sources": {
+    "tokens": [
+      "mobile/src/theme/tokens.ts",
+      "mobile/src/theme/typography.ts",
+      "mobile/src/theme/spacing.ts",
+      "mobile/src/theme/motion.ts"
+    ],
+    "components": ["mobile/src/components"],
+    "assets": [],
+    "instructions": [
+      "AGENTS.md",
+      "docs/UI.md",
+      "docs/MobileResponsiveness.md",
+      "docs/AntiAISlop.md"
+    ]
+  },
+  "design": {
+    "colorMode": "dark",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "editorial single column"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [
+      "Screen",
+      "Heading",
+      "Text",
+      "Row",
+      "Button",
+      "TextAction",
+      "Field",
+      "FilterText",
+      "TabLabel",
+      "ProgressLine"
+    ],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [
+      "Use existing theme tokens and Recoleta/Berthold font mappings",
+      "One column with 24 pt left axis and centred tablet content",
+      "Native Reanimated implements motion.dev guidance",
+      "OS reduced motion disables physical transitions",
+      "File selection uses native document picker and real upload progress"
+    ],
+    "avoid": [
+      "New dependencies",
+      "Cards or boxed inputs",
+      "Gradients, shadows, glow, emojis",
+      "Scale bounce",
+      "Web DOM animation packages in native app"
+    ]
+  },
+  "decisions": [
+    "Polish the existing editorial interface with smooth opacity press/release feedback, non-overshooting tab springs and a hairline-separated file-selection area.",
+    "21st catalogue search returned HTTP 401; no external component source was retrieved or copied."
+  ],
+  "evidence": [
+    {
+      "fact": "project.instructions",
+      "source": "AGENTS.md"
+    }
+  ],
+  "generatedAt": "2026-10-10T04:32:24.498Z"
+}

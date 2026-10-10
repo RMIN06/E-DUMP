@@ -3,8 +3,16 @@ useDefault = true
 
 [[allowlists]]
 description = "Installed dependencies and generated local caches"
-paths = ['''(^|[/\\])(node_modules|\.venv|\.venv-runtime|\.expo|coverage|\.git)([/\\]|$)''']
+paths = ['''(^|[/\\])(node_modules|\.venv|\.venv-runtime|\.expo|coverage|\.git|\.gradle)([/\\]|$)''', '''^artifacts[/\\]mongo-push[/\\]''']
 
 [[allowlists]]
 description = "Local environment files; Make and CI reject these if tracked"
 paths = ['''(^|[/\\])(backend|mobile)[/\\]\.env$''']
+
+[[allowlists]]
+description = "Public Firebase Android client API key, not a server credential"
+targetRules = ["gcp-api-key", "generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^AIza[0-9A-Za-z_-]{35}$''']
+paths = ['''^mobile[/\\](android[/\\]app[/\\])?google-services\.json$''']

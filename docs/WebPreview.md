@@ -23,3 +23,12 @@ Browser notifications use a root service worker, VAPID and pywebpush. Subscripti
 `cd mobile && npm run export:web` produces `mobile/dist`, including the advanced-mode Pages `_worker.js` API proxy. Upload a ZIP whose root contains those files to the free edump-preview Pages project. No private credentials belong in this bundle. Set WEB_PUSH_PUBLIC_KEY and WEB_PUSH_PRIVATE_KEY only in the Render API environment.
 
 Device acceptance remains pending the owner's Android and iPhone testing. Automated checks and desktop/narrow browser smoke checks are reported separately.
+
+## Preview validation — 10 October 2026
+
+- Live web address: https://edump-preview.pages.dev.
+- `make verify` passed: 243 backend tests, 214 app tests, edge/audit contract tests, lint, strict typing, schema checks, slop checks and security audits. After the direct-link navigation fix, the focused mobile/slop gate passed with 216 app tests and 13 edge/audit tests; backend code did not change.
+- Signed-in desktop and 390 px browser checks covered Updates without repeated IDs, Subjects, private image download/viewing, Schedule, profile and both support contacts. Reloaded direct links return to their parent section.
+- Browser push registration succeeded for the owner's account. Its provider accepted one owner-only test message with HTTP 201; no class announcement was created or broadcast.
+- Published HTML matches the final export, anonymous profile access returns 401, security headers are present, and the web bundle excludes the actual database, JWT, R2, Firebase service-account and VAPID private credentials.
+- Platform-specific physical-phone, iPhone Home Screen push, keyboard and accessibility acceptance remain pending the owner; automated browser adapter contracts do not certify those devices.

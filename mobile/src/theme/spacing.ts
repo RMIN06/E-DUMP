@@ -29,4 +29,6 @@ export const controls = {
   hairline: 1,
   focusLine: 2,
   pressedOpacity: 0.85,
+  multilineMinLines: 3,
+  multilineMaxLines: 6,
 } as const;

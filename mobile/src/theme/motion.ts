@@ -1,13 +1,13 @@
-// M6: Motion MCP accessibility guidance, translated to native Reanimated.
-// Near-critical spring (damping ratio 0.87) keeps editorial navigation restrained.
+// Motion MCP transitions/accessibility: native opacity feedback and springs without overshoot.
 export const motion = {
   durationFast: 160,
   durationBase: 260,
   durationSlow: 420,
   easeOut: [0.2, 0, 0, 1],
   easeInOut: [0.4, 0, 0.2, 1],
-  spring: { stiffness: 260, damping: 28, mass: 1 },
+  spring: { stiffness: 260, damping: 33, mass: 1, overshootClamping: true },
   pressDuration: 80,
+  releaseDuration: 160,
   headingRise: 12,
   rowRise: 8,
   stagger: 28,

@@ -9,6 +9,7 @@ import {
 import { controls, space } from "../theme/spacing";
 import { useTheme } from "../theme/tokens";
 import { textLimits, textStyle } from "../theme/typography";
+import { useSizeClass } from "../theme/responsive";
 
 type Props = Omit<
   TextInputProps,
@@ -17,6 +18,10 @@ type Props = Omit<
 export function Field({ label, error, onFocus, onBlur, ...props }: Props) {
   const theme = useTheme();
   const [focused, setFocused] = useState(false);
+  const { fontScale } = useSizeClass();
+  const lineHeight =
+    Number(textStyle("body").lineHeight) *
+    Math.min(fontScale, textLimits.bodyScale);
   return (
     <View style={styles.field}>
       <Text
@@ -31,6 +36,7 @@ export function Field({ label, error, onFocus, onBlur, ...props }: Props) {
         accessibilityLabel={label}
         maxFontSizeMultiplier={textLimits.bodyScale}
         placeholderTextColor={theme.boneMuted}
+        selectionColor={theme.moss}
         onFocus={(event) => {
           setFocused(true);
           onFocus?.(event);
@@ -42,6 +48,11 @@ export function Field({ label, error, onFocus, onBlur, ...props }: Props) {
         style={[
           textStyle("body"),
           styles.input,
+          props.multiline && {
+            minHeight: lineHeight * controls.multilineMinLines + space.xl,
+            maxHeight: lineHeight * controls.multilineMaxLines + space.xl,
+            textAlignVertical: "top",
+          },
           {
             color: theme.bone,
             borderBottomColor: focused ? theme.moss : theme.olive,

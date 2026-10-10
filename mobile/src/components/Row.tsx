@@ -26,6 +26,8 @@ type Props = {
   titleVariant?: "bodyStrong" | "h3";
   entryKey?: string;
   accentPrefix?: string;
+  disabled?: boolean;
+  accessibilityLabel?: string;
 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -41,6 +43,8 @@ export const Row = memo(function Row({
   titleVariant = "bodyStrong",
   entryKey,
   accentPrefix,
+  disabled = false,
+  accessibilityLabel,
 }: Props) {
   const theme = useTheme();
   const reduced = useMotionPreference();
@@ -81,7 +85,12 @@ export const Row = memo(function Row({
     >
       <AnimatedPressable
         accessibilityRole="button"
-        accessibilityLabel={[title, meta, trailing].filter(Boolean).join(", ")}
+        accessibilityLabel={
+          accessibilityLabel ??
+          [title, meta, trailing].filter(Boolean).join(", ")
+        }
+        accessibilityState={{ disabled }}
+        disabled={disabled}
         onPress={onPress}
         onLongPress={onLongPress}
         onPressIn={() => setPressed(1)}
@@ -111,7 +120,7 @@ export const Row = memo(function Row({
             style={[
               heading ? headingStyle("h2", sizeClass) : textStyle(titleVariant),
               styles.title,
-              { color: theme.bone },
+              { color: disabled ? theme.boneMuted : theme.bone },
             ]}
           >
             {title}
@@ -154,6 +163,8 @@ export const Row = memo(function Row({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`Details for ${title}`}
+          accessibilityState={{ disabled }}
+          disabled={disabled}
           onPress={onDetails}
           style={styles.details}
         >

@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import { controls, space } from "../theme/spacing";
 import { useTheme } from "../theme/tokens";
 import { textLimits, textStyle } from "../theme/typography";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -16,11 +18,13 @@ export function Button({
   label,
   onPress,
   loading = false,
+  loadingLabel = "Working…",
   disabled = false,
 }: {
   label: string;
   onPress(): void;
   loading?: boolean;
+  loadingLabel?: string;
   disabled?: boolean;
 }) {
   const theme = useTheme();
@@ -28,6 +32,9 @@ export function Button({
   const reduced = useMotionPreference();
   const opacity = useSharedValue(1);
   const animated = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  useEffect(() => {
+    opacity.value = 1;
+  }, [unavailable, reduced, opacity]);
   return (
     <AnimatedPressable
       accessibilityRole="button"
@@ -37,11 +44,13 @@ export function Button({
       onPressIn={() => {
         opacity.value = withTiming(controls.pressedOpacity, {
           duration: reduced ? motion.reducedDuration : motion.pressDuration,
+          easing: Easing.bezier(...motion.easeOut),
         });
       }}
       onPressOut={() => {
         opacity.value = withTiming(1, {
-          duration: reduced ? motion.reducedDuration : motion.pressDuration,
+          duration: reduced ? motion.reducedDuration : motion.releaseDuration,
+          easing: Easing.bezier(...motion.easeOut),
         });
       }}
       style={[
@@ -61,7 +70,7 @@ export function Button({
           { color: unavailable ? theme.boneMuted : theme.ink },
         ]}
       >
-        {loading ? "Working…" : label}
+        {loading ? loadingLabel : label}
       </Text>
     </AnimatedPressable>
   );

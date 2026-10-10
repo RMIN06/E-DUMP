@@ -1,13 +1,41 @@
-import { render, screen } from "@testing-library/react-native";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 import * as Native from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Heading } from "../src/components/Heading";
 import { Screen } from "../src/components/Screen";
 import { Text } from "../src/components/Text";
 import { TextAction } from "../src/components/TextAction";
+import { Button } from "../src/components/Button";
 import { theme } from "../src/theme/tokens";
 
 describe("PRD §9 accessibility/platforms: M0 primitives", () => {
+  test("busy buttons announce progress and prevent repeated submission", async () => {
+    const press = jest.fn();
+    await render(
+      <Button
+        label="Upload"
+        loading
+        loadingLabel="Uploading 42%"
+        onPress={press}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Uploading 42%" });
+    expect(button.props.accessibilityState).toEqual({
+      disabled: true,
+      busy: true,
+    });
+    await fireEvent.press(button);
+    expect(press).not.toHaveBeenCalled();
+  });
+  test("disabled text actions show their unavailable state and ignore taps", async () => {
+    const press = jest.fn();
+    await render(<TextAction label="Add file" disabled onPress={press} />);
+    await fireEvent.press(screen.getByRole("button", { name: "Add file" }));
+    expect(press).not.toHaveBeenCalled();
+    expect(
+      Native.StyleSheet.flatten(screen.getByText("Add file").props.style).color,
+    ).toBe(theme.boneMuted);
+  });
   test("short text actions retain a 48 dp target in both dimensions", async () => {
     await render(<TextAction label="Close" onPress={() => undefined} />);
     expect(

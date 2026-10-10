@@ -14,4 +14,6 @@ export const motion = {
   staggerLimit: 8,
   indeterminateDuration: 1400,
   reducedDuration: 0,
+  pressScale: 0.975,
+  iconActiveScale: 1.08,
 } as const;

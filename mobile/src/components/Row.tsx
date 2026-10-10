@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { layout, space, controls } from "../theme/spacing";
 import { useSizeClass } from "../theme/responsive";
@@ -28,6 +28,7 @@ type Props = {
   accentPrefix?: string;
   disabled?: boolean;
   accessibilityLabel?: string;
+  leading?: ReactNode;
 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -45,6 +46,7 @@ export const Row = memo(function Row({
   accentPrefix,
   disabled = false,
   accessibilityLabel,
+  leading,
 }: Props) {
   const theme = useTheme();
   const reduced = useMotionPreference();
@@ -54,7 +56,7 @@ export const Row = memo(function Row({
     backgroundColor: interpolateColor(
       pressed.value,
       [0, 1],
-      [theme.ink, theme.pressed],
+      [theme.clear, theme.accentSoft],
     ),
   }));
   const setPressed = (value: number) => {
@@ -67,10 +69,12 @@ export const Row = memo(function Row({
   const [metaWidth, setMetaWidth] = useState(0);
   const [available, setAvailable] = useState(0);
   const below =
-    fontScale > 1.3 || titleWidth + metaWidth + space.lg > available;
+    sizeClass === "compact" ||
+    fontScale > 1.3 ||
+    titleWidth + metaWidth + space.lg > available;
   return (
     <Animated.View
-      style={[styles.row, { borderBottomColor: theme.lineSoft }]}
+      style={[styles.row, { backgroundColor: theme.surface }]}
       entering={
         reduced || entry === null
           ? undefined
@@ -83,6 +87,11 @@ export const Row = memo(function Row({
               })
       }
     >
+      {leading ? (
+        <View style={styles.leading} pointerEvents="none">
+          {leading}
+        </View>
+      ) : null}
       <AnimatedPressable
         accessibilityRole="button"
         accessibilityLabel={
@@ -184,12 +193,15 @@ const styles = StyleSheet.create({
   row: {
     minHeight: layout.rowHeight,
     paddingVertical: space.lg,
+    paddingHorizontal: space.lg,
+    marginBottom: space.md,
+    borderRadius: controls.panelRadius,
     gap: space.sm,
-    borderBottomWidth: controls.hairline,
     flexDirection: "row",
     alignItems: "flex-start",
   },
   main: { flex: layout.fill, gap: space.sm },
+  leading: { paddingTop: space.xs, paddingRight: space.sm },
   details: {
     minWidth: controls.touchHeight,
     minHeight: controls.touchHeight,

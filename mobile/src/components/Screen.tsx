@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   column: {
     width: layout.columnWidth,
     maxWidth: layout.maxContentWidth,
-    gap: space.sm,
+    gap: space.lg,
   },
   footer: {
     width: layout.columnWidth,

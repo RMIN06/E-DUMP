@@ -55,6 +55,7 @@ export function Field({ label, error, onFocus, onBlur, ...props }: Props) {
           },
           {
             color: theme.bone,
+            backgroundColor: focused ? theme.surfaceFocus : theme.surface,
             borderBottomColor: focused ? theme.moss : theme.olive,
             borderBottomWidth: focused ? controls.focusLine : controls.hairline,
           },
@@ -75,5 +76,10 @@ export function Field({ label, error, onFocus, onBlur, ...props }: Props) {
 }
 const styles = StyleSheet.create({
   field: { gap: space.sm },
-  input: { minHeight: controls.touchHeight, paddingVertical: space.md },
+  input: {
+    minHeight: controls.buttonHeight,
+    paddingVertical: space.lg,
+    paddingHorizontal: space.lg,
+    borderRadius: controls.radius,
+  },
 });

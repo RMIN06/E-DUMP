@@ -18,21 +18,21 @@ export const fontNames = {
 } as const;
 
 const sizes = {
-  display: { fontSize: 56, lineHeight: 58, letterSpacing: -1 },
-  h1: { fontSize: 44, lineHeight: 48, letterSpacing: -0.6 },
-  h2: { fontSize: 28, lineHeight: 32, letterSpacing: -0.3 },
+  display: { fontSize: 40, lineHeight: 46, letterSpacing: -1 },
+  h1: { fontSize: 32, lineHeight: 38, letterSpacing: -0.6 },
+  h2: { fontSize: 20, lineHeight: 26, letterSpacing: -0.3 },
   h3: { fontSize: 18, lineHeight: 24, letterSpacing: 0 },
   body: { fontSize: 16, lineHeight: 24, letterSpacing: 0 },
   bodyStrong: { fontSize: 16, lineHeight: 24, letterSpacing: 0 },
-  caption: { fontSize: 13, lineHeight: 18, letterSpacing: 0.1 },
+  caption: { fontSize: 13, lineHeight: 19, letterSpacing: 0.1 },
   label: { fontSize: 14, lineHeight: 18, letterSpacing: 0 },
 } as const;
 const compactSizes = {
-  display: { fontSize: 48, lineHeight: 50 },
-  h1: { fontSize: 38, lineHeight: 42 },
-  h2: { fontSize: 24, lineHeight: 28 },
+  display: { fontSize: 36, lineHeight: 42 },
+  h1: { fontSize: 28, lineHeight: 34 },
+  h2: { fontSize: 18, lineHeight: 24 },
 } as const;
-const fallbackHeading = Platform.OS === "ios" ? "Times New Roman" : "serif";
+const fallbackHeading = Platform.OS === "ios" ? "System" : "sans-serif";
 const fallbackBody = Platform.OS === "ios" ? "System" : "sans-serif";
 
 export type HeadingVariant = "display" | "h1" | "h2";

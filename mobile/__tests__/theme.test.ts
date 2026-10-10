@@ -55,20 +55,20 @@ describe("PRD §9 accessibility: palette and readable type", () => {
   });
   test("compact headings use the specified reduced scale", () => {
     expect(headingStyle("display", "compact")).toMatchObject({
-      fontSize: 48,
-      lineHeight: 50,
-    });
-    expect(headingStyle("h1", "compact")).toMatchObject({
-      fontSize: 38,
+      fontSize: 36,
       lineHeight: 42,
     });
+    expect(headingStyle("h1", "compact")).toMatchObject({
+      fontSize: 28,
+      lineHeight: 34,
+    });
     expect(headingStyle("h2", "compact")).toMatchObject({
-      fontSize: 24,
-      lineHeight: 28,
+      fontSize: 18,
+      lineHeight: 24,
     });
     expect(headingStyle("h1", "regular")).toMatchObject({
-      fontSize: 44,
-      lineHeight: 48,
+      fontSize: 32,
+      lineHeight: 38,
     });
   });
   test.each(["body", "bodyStrong", "caption", "label"] as const)(

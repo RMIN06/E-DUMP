@@ -31,10 +31,15 @@ export function Button({
   const unavailable = loading || disabled;
   const reduced = useMotionPreference();
   const opacity = useSharedValue(1);
-  const animated = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  const scale = useSharedValue(1);
+  const animated = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }],
+  }));
   useEffect(() => {
     opacity.value = 1;
-  }, [unavailable, reduced, opacity]);
+    scale.value = 1;
+  }, [unavailable, reduced, opacity, scale]);
   return (
     <AnimatedPressable
       accessibilityRole="button"
@@ -42,12 +47,18 @@ export function Button({
       disabled={unavailable}
       onPress={onPress}
       onPressIn={() => {
+        scale.value = reduced
+          ? 1
+          : withTiming(motion.pressScale, { duration: motion.pressDuration });
         opacity.value = withTiming(controls.pressedOpacity, {
           duration: reduced ? motion.reducedDuration : motion.pressDuration,
           easing: Easing.bezier(...motion.easeOut),
         });
       }}
       onPressOut={() => {
+        scale.value = reduced
+          ? 1
+          : withTiming(1, { duration: motion.releaseDuration });
         opacity.value = withTiming(1, {
           duration: reduced ? motion.reducedDuration : motion.releaseDuration,
           easing: Easing.bezier(...motion.easeOut),

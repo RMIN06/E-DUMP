@@ -61,7 +61,7 @@ describe("PRD §9 accessibility/platforms: M0 primitives", () => {
     expect(heading.props.allowFontScaling).toBe(true);
     expect(heading.props.maxFontSizeMultiplier).toBe(1.3);
     const style = Native.StyleSheet.flatten(heading.props.style);
-    expect(style.fontSize).toBe(width < 360 ? 38 : 44);
+    expect(style.fontSize).toBe(width < 360 ? 28 : 32);
     expect(style.width).toBeUndefined();
     expect(style.height).toBeUndefined();
   });

@@ -57,7 +57,13 @@ export function FilterText<T extends string>({
           accessibilityRole="button"
           accessibilityState={{ selected: option.value === value }}
           onPress={() => onChange(option.value)}
-          style={styles.target}
+          style={[
+            styles.target,
+            {
+              backgroundColor:
+                option.value === value ? theme.moss : theme.surface,
+            },
+          ]}
           onLayout={(event) => {
             const { x, width } = event.nativeEvent.layout;
             setPositions((previous) =>
@@ -75,7 +81,7 @@ export function FilterText<T extends string>({
             style={[
               textStyle("body"),
               {
-                color: option.value === value ? theme.moss : theme.boneMuted,
+                color: option.value === value ? theme.ink : theme.boneMuted,
               },
             ]}
           >
@@ -93,11 +99,13 @@ const styles = StyleSheet.create({
     left: 0,
     height: controls.focusLine,
   },
-  filters: { gap: space.lg },
+  filters: { gap: space.sm },
   target: {
     minHeight: controls.touchHeight,
     minWidth: controls.touchHeight,
     justifyContent: "center",
     paddingVertical: space.sm,
+    paddingHorizontal: space.lg,
+    borderRadius: controls.radius,
   },
 });

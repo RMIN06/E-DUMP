@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FS from "expo-file-system/legacy";
 import { Controller, useForm } from "react-hook-form";
@@ -19,8 +19,9 @@ import { FilterText } from "../../components/FilterText";
 import { Button } from "../../components/Button";
 import { ErrorLine } from "../../components/ErrorLine";
 import { ProgressLine } from "../../components/ProgressLine";
-import { Row } from "../../components/Row";
-import { space } from "../../theme/spacing";
+import { Icon } from "../../components/Icon";
+import { space, controls, layout } from "../../theme/spacing";
+import { useTheme } from "../../theme/tokens";
 import { fileSize } from "../../lib/format";
 import { kindOptions } from "./options";
 
@@ -58,6 +59,7 @@ const mimeTypes = [
 ] as const;
 
 export function UploadScreen() {
+  const theme = useTheme();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const [file, setFile] = useState<DocumentPicker.DocumentPickerAsset | null>(
     null,
@@ -201,13 +203,27 @@ export function UploadScreen() {
       </View>
       <View style={styles.section}>
         <Text variant="label">File</Text>
-        <Row
-          title={file ? "Choose another file" : "Choose file"}
+        <Pressable
+          accessibilityRole="button"
           accessibilityLabel={file ? "Choose another file" : "Choose file"}
-          meta="PDF, images, PPTX or DOCX · Up to 25 MB"
+          accessibilityState={{ disabled: progress !== null }}
           disabled={progress !== null}
           onPress={() => void choose()}
-        />
+          style={({ pressed }) => [
+            styles.filePicker,
+            {
+              backgroundColor: pressed ? theme.accentSoft : theme.surfaceFocus,
+            },
+          ]}
+        >
+          <Icon name="upload" active size={layout.featureIconSize} />
+          <Text variant="bodyStrong">
+            {file ? "Choose another file" : "Choose file"}
+          </Text>
+          <Text variant="caption" tone="muted">
+            PDF, images, PPTX or DOCX · Up to 25 MB
+          </Text>
+        </Pressable>
         {file ? (
           <Text variant="body" tone="muted">
             {file.name} · {fileSize(file.size ?? 0)}
@@ -311,4 +327,12 @@ const styles = StyleSheet.create({
   header: { gap: space.sm, paddingBottom: space.lg },
   section: { gap: space.lg, paddingBottom: space.lg },
   choice: { gap: space.sm },
+  filePicker: {
+    minHeight: controls.uploadHeight,
+    padding: space.xl,
+    borderRadius: controls.panelRadius,
+    gap: space.md,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

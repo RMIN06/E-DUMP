@@ -5,6 +5,7 @@ import { Screen } from "../../components/Screen";
 import { Heading } from "../../components/Heading";
 import { Text } from "../../components/Text";
 import { Row } from "../../components/Row";
+import { Icon } from "../../components/Icon";
 import { ErrorLine } from "../../components/ErrorLine";
 import { EmptyState } from "../../components/EmptyState";
 import { ProgressLine } from "../../components/ProgressLine";
@@ -53,6 +54,7 @@ export function SubjectsScreen() {
         ),
         renderItem: ({ item }) => (
           <Row
+            leading={<Icon name="subjects" active />}
             title={item.name}
             heading
             meta={

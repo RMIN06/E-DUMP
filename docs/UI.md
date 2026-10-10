@@ -1,5 +1,7 @@
 # UI — E-DUMP
 
+Owner update, 10 October 2026: the Android preview now uses the requested filled, rounded native controls and sculpted functional icons. Screen titles are 32/38 (compact 28/34), section/subject titles 20/26 (compact 18/24), display 40/46 (compact 36/42). Body remains 16/24. Preview headings use the platform sans fallback instead of serif; licensed font mappings remain available. Controls use a 12 pt radius, rows/upload selector 16 pt, all defined in theme tokens. This owner-approved direction supersedes the older text-only and no-filled-container visual rules below and in AntiAISlop.md. Palette, feature scope, accessibility, single-column layout and other bans remain binding.
+
 Design intent: a calm, typographic, editorial app. Big bold headings, generous space, one column, hairline dividers. Content (file names, announcements) is the hero; chrome is nearly invisible. Read `AntiAISlop.md` alongside this file: it is binding.
 
 ---

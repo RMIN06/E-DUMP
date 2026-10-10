@@ -22,3 +22,6 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - Rules support/deletion/takedown contact: l250716@lhr.nu.edu.pk.
 - The owner will perform physical Android functional acceptance using the APK link. Do not label pending device acceptance as passed.
 - After each completed UI update, build and publish a new signed Android preview APK and provide its verified download link. Increment the app version and Android version code for each published build.
+
+## Owner visual redesign decision (10 October 2026)
+- The owner replaced the earlier text-only visual direction with filled controls and rows, sculpted functional icons, rounded surfaces and mobile-sized system fallback typography. These explicit exceptions supersede UI.md and AntiAISlop.md restrictions on filled panels, radii and functional icon style. Retain the assigned palette, single-column responsiveness, reduced-motion support, token-only styling and existing feature scope; do not add dependencies.

@@ -1,4 +1,27 @@
-# Android preview 0.1.4
+# Android preview 0.1.5
+
+Published 11 October 2026 (Asia/Karachi), Android version code `6`, application source `7b435e6`.
+
+- [Download for most Android phones (ARM64)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.5-arm64.apk)
+- [Download for older 32-bit Android phones (ARMv7)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.5-armv7.apk)
+- [Open the responsive web companion](https://edump-preview.pages.dev)
+
+Announcements appear once by ID: Coming up records are excluded from the remaining feed, overlapping pages are deduplicated, and filters apply to both sections. Both clients share the existing API/database and refresh active visible screens every 30 seconds. Rules lists l250716@lhr.nu.edu.pk and l250656@lhr.nu.edu.pk as support, deletion and takedown contacts. Native welcome, logo, file workflows, admin controls and Expo push remain available; browser platform adapters preserve the same features. See WebPreview.md for web storage, notification and hosting details.
+
+The final signed release build succeeded in 7m 44s. Both APKs passed package/version/signature checks, contain both support contacts and the hosted HTTPS API, exclude localhost configuration, and passed scans against the actual private database, JWT, R2, Firebase and VAPID credentials. The unchanged signing certificate supports installing over the previous preview. Android 8 or later is required.
+
+Both complete anonymous public downloads returned HTTP 200 and matched the signed local files:
+
+| APK | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ARM64 | 43740291 | `8c163b2c6ad1bbd260cd175efef192de16f2ea7b1d6dbd0e98a00a4759aecf30` |
+| ARMv7 | 37495929 | `e6600cd9b6d0c416323570bd304ee8d597bef6619eb064b4ba8a45ef06b4a48a` |
+
+`make verify` passed, including 243 backend tests and 214 mobile tests, coverage, lint, strict typing, schema, slop and security checks with the existing scoped tooling exception. After the direct-link navigation fix, the focused mobile/slop gate passed with 216 mobile tests and 13 edge/audit contract tests; backend code did not change. Signed-in desktop/narrow browser checks passed, browser push registration succeeded, and a provider accepted one owner-only test notification. Physical Android/iPhone functional, accessibility and notification receipt/tap acceptance remain pending the owner. Preview fallback fonts and free API cold starts continue to apply.
+
+Local evidence is under ignored artifacts/release: android-0.1.5-final.log, verify-web-0.1.5.log, verify-web-navigation-final.log, apks-0.1.5.json, public-download-verification-0.1.5.json, browser-push-live.log, web-public-verification.log and apk-upload-0.1.5.png.
+
+## Archived Android preview 0.1.4
 
 Published 10 October 2026 (Asia/Karachi), Android version code `5`. Welcome/logo source `80570df`; local build memory controls `83ec939`.
 

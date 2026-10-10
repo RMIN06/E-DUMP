@@ -113,6 +113,8 @@ async def test_development_openapi_exposes_only_current_milestones(
         "/api/v1/announcements/{id}",
         "/api/v1/announcements/{id}/attachments/{file_id}/download",
         "/api/v1/me/devices",
+        "/api/v1/me/web-devices",
+        "/api/v1/me/web-push-key",
         "/api/v1/me/devices/{token}",
         "/api/v1/me/seen-updates",
         "/api/v1/admin/users",

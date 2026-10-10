@@ -1,8 +1,10 @@
 from datetime import UTC, datetime
+from hashlib import sha256
 
 from bson import ObjectId
 
 from app.models.device import DeviceWrite
+from app.models.web_device import WebDeviceWrite
 from app.repositories.files import Database
 
 
@@ -29,7 +31,13 @@ async def delete_tokens(database: Database, tokens: list[str]) -> None:
 async def recipients(database: Database, author_id: ObjectId) -> list[str]:
     rows = await database.devices.aggregate(
         [
-            {"$match": {"notifications_enabled": True, "user_id": {"$ne": author_id}}},
+            {
+                "$match": {
+                    "notifications_enabled": True,
+                    "platform": {"$ne": "web"},
+                    "user_id": {"$ne": author_id},
+                }
+            },
             {
                 "$lookup": {
                     "from": "users",
@@ -43,3 +51,46 @@ async def recipients(database: Database, author_id: ObjectId) -> list[str]:
         ]
     )
     return [str(row["expo_push_token"]) async for row in rows]
+
+
+async def register_web(
+    database: Database, user_id: ObjectId, data: WebDeviceWrite
+) -> None:
+    token = "webpush:" + sha256(data.subscription.endpoint.encode()).hexdigest()
+    now = datetime.now(UTC)
+    await database.devices.update_one(
+        {"expo_push_token": token},
+        {
+            "$set": data.model_dump()
+            | {"expo_push_token": token, "user_id": user_id, "last_seen_at": now},
+            "$setOnInsert": {"created_at": now},
+        },
+        upsert=True,
+    )
+
+
+async def web_recipients(
+    database: Database, author_id: ObjectId
+) -> list[dict[str, object]]:
+    rows = await database.devices.aggregate(
+        [
+            {
+                "$match": {
+                    "platform": "web",
+                    "notifications_enabled": True,
+                    "user_id": {"$ne": author_id},
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "users",
+                    "localField": "user_id",
+                    "foreignField": "_id",
+                    "as": "owner",
+                }
+            },
+            {"$match": {"owner.is_active": True}},
+            {"$project": {"expo_push_token": 1, "subscription": 1}},
+        ]
+    )
+    return [row async for row in rows]

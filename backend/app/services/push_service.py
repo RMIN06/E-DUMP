@@ -1,5 +1,7 @@
 import logging
+from typing import cast
 
+from app.integrations import web_push
 from app.integrations.push import PushClient
 from app.models.announcement import AnnouncementRecord
 from app.repositories import devices, subjects
@@ -43,6 +45,22 @@ async def send(
                 logger.warning(
                     "Push batch failed; the announcement remains available in Updates."
                 )
+        for device in await devices.web_recipients(database, announcement.author_id):
+            try:
+                expired_web = await web_push.send(
+                    cast(dict[str, object], device["subscription"]),
+                    {
+                        "title": title,
+                        "body": announcement.title,
+                        "announcement_id": str(announcement.id),
+                    },
+                )
+                if expired_web:
+                    await devices.delete_tokens(
+                        database, [str(device["expo_push_token"])]
+                    )
+            except Exception:
+                logger.warning("Browser push failed; Updates remains available.")
     except Exception:
         logger.warning(
             "Push delivery failed; the announcement remains available in Updates."

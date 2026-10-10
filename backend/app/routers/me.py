@@ -3,6 +3,7 @@ from fastapi import APIRouter, Response
 from app.deps import AuthLock, CurrentUser, Database
 from app.models.device import DeviceWrite
 from app.models.user import NameRequest, User
+from app.models.web_device import WebDeviceWrite
 from app.services import admin_service, device_service, user_service
 
 router = APIRouter(prefix="/api/v1/me", tags=["me"])
@@ -45,4 +46,17 @@ async def unregister_device(
     token: str, user: CurrentUser, database: Database
 ) -> Response:
     await device_service.unregister(database, user, token)
+    return Response(status_code=204)
+
+
+@router.get("/web-push-key")
+async def web_push_key(user: CurrentUser) -> dict[str, str | None]:
+    return device_service.web_push_key()
+
+
+@router.put("/web-devices", status_code=204)
+async def register_web_device(
+    body: WebDeviceWrite, user: CurrentUser, database: Database
+) -> Response:
+    await device_service.register_web(database, user, body)
     return Response(status_code=204)

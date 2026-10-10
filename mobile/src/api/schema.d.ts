@@ -165,6 +165,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/web-push-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Web Push Key */
+    get: operations["web_push_key_api_v1_me_web_push_key_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/web-devices": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Register Web Device */
+    put: operations["register_web_device_api_v1_me_web_devices_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/subjects": {
     parameters: {
       query?: never;
@@ -866,6 +900,31 @@ export interface components {
       /** Context */
       ctx?: Record<string, never>;
     };
+    /** WebDeviceWrite */
+    WebDeviceWrite: {
+      /**
+       * Platform
+       * @default web
+       * @constant
+       */
+      platform: "web";
+      subscription: components["schemas"]["WebSubscription"];
+      /** Notifications Enabled */
+      notifications_enabled: boolean;
+    };
+    /** WebKeys */
+    WebKeys: {
+      /** P256Dh */
+      p256dh: string;
+      /** Auth */
+      auth: string;
+    };
+    /** WebSubscription */
+    WebSubscription: {
+      /** Endpoint */
+      endpoint: string;
+      keys: components["schemas"]["WebKeys"];
+    };
   };
   responses: never;
   parameters: never;
@@ -1151,6 +1210,59 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  web_push_key_api_v1_me_web_push_key_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: string | null;
+          };
+        };
+      };
+    };
+  };
+  register_web_device_api_v1_me_web_devices_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WebDeviceWrite"];
+      };
+    };
     responses: {
       /** @description Successful Response */
       204: {

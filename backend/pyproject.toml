@@ -11,6 +11,7 @@ dependencies = [
     "pydantic>=2.14.0",
     "pydantic-settings>=2.15.0",
     "pyjwt>=2.15.1",
+    "pywebpush>=2.0.3",
     "pymongo>=4.18.3",
     "python-multipart>=0.0.32",
     "slowapi>=0.1.10",
@@ -48,3 +49,7 @@ dev = [
     "respx>=0.23.1",
     "ruff>=0.16.10",
 ]
+
+[[tool.mypy.overrides]]
+module = "pywebpush"
+ignore_missing_imports = true

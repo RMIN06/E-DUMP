@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Switch, View, StyleSheet } from "react-native";
+import { Platform, Switch, View, StyleSheet } from "react-native";
 import { controls, space } from "../../theme/spacing";
 import { useFocusEffect } from "expo-router";
 import { api } from "../../api/client";
@@ -71,7 +71,9 @@ export function NotificationControl() {
       </View>
       {!pushProjectId() ? (
         <Text variant="caption" tone="muted">
-          Notifications will be available after the preview is configured.
+          {Platform.OS === "web"
+            ? "On iPhone, add E-DUMP to your Home Screen from Safari, then open it to enable notifications (iOS 16.4 or later)."
+            : "Notifications will be available after the preview is configured."}
         </Text>
       ) : null}
       {error ? <ErrorLine message={error} /> : null}

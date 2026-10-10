@@ -12,4 +12,4 @@ Frontend verification uses `make verify -o lint-backend -o test-backend -o check
 
 Result: exit 0. ESLint and strict TypeScript passed (three existing CommonJS test-mock warnings), all 20 mobile suites / 202 tests passed, six audit-policy tests passed, and `make slop-check` passed. No backend tests ran.
 
-No Android device/emulator was connected for this task. Native visual, keyboard and screen-reader acceptance remain pending; automated checks do not establish native layout correctness. The published 0.1.0 APK remains the previous UI and must be rebuilt to include these changes.
+No Android device/emulator was connected for this task. Native visual, keyboard and screen-reader acceptance remain pending; automated checks do not establish native layout correctness. The polished UI was rebuilt as 0.1.1, Android version code 2, from source commit af38ee4. Both signed APKs passed signature verification, the bundle contains the new upload copy and hosted API address, and the private-credential scan passed. Download publication is tracked in AndroidPreview.md.

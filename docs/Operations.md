@@ -22,6 +22,8 @@ Dedicated identity `edump-expo-push` has only the Firebase Cloud Messaging API A
 
 The app asks for notification permission after sign-in, registers enabled devices, supports the Me notification switch, unregisters on sign-out and opens the corresponding update from a notification tap. Admin-created updates notify other active users' enabled devices; the posting admin's devices are excluded. Edit notifications require the existing Notify again switch. Expo tickets reject/prune unregistered devices; delivery failures do not undo a published announcement.
 
+Class alerts use high delivery priority and the registered `default` Android channel. Expo's default priority is normal on Android, which can defer delivery while a phone sleeps; high priority supports ANN-3's timely class alerts. Provider acceptance does not certify a physical phone's receipt.
+
 Keep the Android signing key and password from `%LOCALAPPDATA%/EDUMP-release` in an owner-controlled encrypted backup. All updates must use that key. Store Expo FCM service account credentials in EAS, not in the app. The APK contains only the API URL and public project identifiers.
 
 If credentials leak: revoke refresh tokens, rotate JWT/R2/Atlas credentials, rebuild the backend secrets, and notify affected users through an admin announcement and the owner's email process within 72 hours of confirmation. Do not publish tokens or full-email logs. Retain service logs for at most 14 days.

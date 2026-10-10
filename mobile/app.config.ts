@@ -2,6 +2,7 @@ import type { ExpoConfig } from "expo/config";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { colors } from "./src/theme/tokens.ts";
+import { layout } from "./src/theme/spacing.ts";
 import withCompatibleGradle from "./plugins/withCompatibleGradle.ts";
 import withLocalAndroidRelease from "./plugins/withLocalAndroidRelease.ts";
 
@@ -82,7 +83,7 @@ const config: ExpoConfig = {
       {
         backgroundColor: colors.ink,
         image: "./assets/brand/splash.png",
-        imageWidth: 96,
+        imageWidth: layout.brandSize,
       },
     ],
     "./plugins/withPlainSplash.cjs",

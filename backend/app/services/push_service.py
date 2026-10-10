@@ -30,6 +30,8 @@ async def send(
                             "title": title,
                             "body": announcement.title,
                             "sound": "default",
+                            "priority": "high",
+                            "channelId": "default",
                             "data": {"announcement_id": str(announcement.id)},
                         }
                         for token in tokens[start : start + 100]

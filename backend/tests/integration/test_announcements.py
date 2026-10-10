@@ -303,6 +303,8 @@ async def test_device_ownership_push_batches_and_failure(
     ).json()
     assert [len(batch) for batch in push.batches] == [100, 100, 51]
     assert push.batches[0][0]["title"] == "Quiz · DS"
+    assert push.batches[0][0]["priority"] == "high"
+    assert push.batches[0][0]["channelId"] == "default"
     assert push.batches[0][0]["data"] == {"announcement_id": item["id"]}
     assert (
         await database.devices.count_documents(

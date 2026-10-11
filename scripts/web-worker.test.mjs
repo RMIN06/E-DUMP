@@ -1,9 +1,42 @@
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import worker from "../web/worker.mjs";
+import { readFileSync } from "node:fs";
+import { runInNewContext } from "node:vm";
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });
 const env = { ASSETS: { fetch: async () => new Response("shell") } };
+function pushWorker() {
+  const handlers = {};
+  const notices = [];
+  const opened = [];
+  let applied = false;
+  runInNewContext(readFileSync(new URL("../mobile/public/sw.js", import.meta.url), "utf8"), {
+    self: { addEventListener: (name, handler) => { handlers[name] = handler; }, location: { origin: "https://edump-preview.pages.dev" }, skipWaiting: async () => { applied = true; }, registration: { showNotification: async (title, options) => notices.push({ title, ...options }) }, clients: { matchAll: async () => [], openWindow: async (path) => opened.push(path) } },
+    caches: { open: async () => ({ addAll: async () => undefined }) }, URL,
+  });
+  const dispatch = async (type, input) => { let work; handlers[type]({ ...input, waitUntil: (promise) => { work = promise; } }); await work; };
+  return { dispatch, notices, opened, applied: () => applied };
+}
+
+test("Home Screen push shows material alerts and opens only validated material routes", async () => {
+  const sw = pushWorker();
+  const data = { title: "Material · COAL", body: "Chapter notes", material_id: "a".repeat(24) };
+  await sw.dispatch("push", { data: { json: () => data } });
+  assert.equal(sw.notices.length, 1);
+  await sw.dispatch("notificationclick", { notification: { data, close: () => undefined } });
+  assert.equal(sw.opened[0], `/material/${data.material_id}`);
+  await sw.dispatch("push", { data: { json: () => ({ material_id: "https://evil.test" }) } });
+  assert.equal(sw.notices.length, 1);
+});
+
+test("a new web shell waits for an explicit safe restart", async () => {
+  const sw = pushWorker();
+  await sw.dispatch("install", {});
+  assert.equal(sw.applied(), false);
+  await sw.dispatch("message", { data: { type: "APPLY_UPDATE" } });
+  assert.equal(sw.applied(), true);
+});
 function request(path, options = {}) {
   return new Request("https://edump-preview.pages.dev" + path, options);
 }

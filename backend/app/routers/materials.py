@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Query, Request
 from pydantic import ValidationError
 from starlette.datastructures import UploadFile
 
@@ -9,6 +9,7 @@ from app.deps import (
     Database,
     MaterialLock,
     ObjectStorage,
+    Push,
     limiter,
     user_rate_key,
 )
@@ -22,7 +23,7 @@ from app.models.material import (
     Removed,
 )
 from app.models.report import ReportCreate, ReportReceipt
-from app.services import material_service
+from app.services import material_service, push_service
 
 router = APIRouter(prefix="/api/v1", tags=["materials"])
 
@@ -49,10 +50,12 @@ async def list_materials(
 @limiter.shared_limit("20/hour", scope="uploads", key_func=user_rate_key)
 async def upload_material(
     request: Request,
+    background: BackgroundTasks,
     user: CurrentUser,
     database: Database,
     storage: ObjectStorage,
     lock: MaterialLock,
+    push: Push,
     slug: str,
 ) -> Material:
     async with request.form(max_files=1, max_fields=5, max_part_size=1024) as form:
@@ -79,9 +82,11 @@ async def upload_material(
             raise DomainError(
                 "validation_error", "Check the submitted fields.", 422
             ) from exc
-        return await material_service.upload_material(
+        item = await material_service.upload_material(
             database, storage, lock, user, slug, upload, data
         )
+        background.add_task(push_service.send_material, database, push, item)
+        return item
 
 
 @router.get("/materials/{id}", response_model=Material)

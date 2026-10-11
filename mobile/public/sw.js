@@ -18,18 +18,26 @@ self.addEventListener("fetch", (event) => {
 });
 self.addEventListener("push", (event) => {
   let data; try { data = event.data.json(); } catch { return; }
-  if (!/^[a-f\d]{24}$/.test(data.announcement_id ?? "")) return;
+  const path = notificationPath(data);
+  if (!path) return;
   event.waitUntil(Promise.all([
-    self.registration.showNotification(data.title, { body: data.body, icon: "/icon.png", badge: "/icon.png", tag: data.announcement_id, data: { announcement_id: data.announcement_id } }),
+    self.registration.showNotification(data.title, { body: data.body, icon: "/icon.png", badge: "/icon.png", tag: path, data }),
     self.clients.matchAll({ type: "window" }).then((clients) => clients.forEach((client) => client.postMessage(data))),
   ]));
 });
 self.addEventListener("notificationclick", (event) => {
-  event.notification.close(); const id = event.notification.data?.announcement_id;
-  if (!/^[a-f\d]{24}$/.test(id ?? "")) return;
+  event.notification.close(); const data = event.notification.data;
+  const path = notificationPath(data);
+  if (!path) return;
   event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (clients) => {
     const client = clients.find((client) => new URL(client.url).origin === self.location.origin);
-    if (client) { await client.focus(); client.postMessage({ announcement_id: id, open: true }); }
-    else await self.clients.openWindow(`/updates/${id}`);
+    if (client) { await client.focus(); client.postMessage({ ...data, open: true }); }
+    else await self.clients.openWindow(path);
   }));
 });
+function notificationPath(data) {
+  if (!data || typeof data !== "object" || (data.announcement_id && data.material_id)) return null;
+  if (typeof data.announcement_id === "string" && /^[a-f\d]{24}$/i.test(data.announcement_id)) return `/updates/${data.announcement_id}`;
+  if (typeof data.material_id === "string" && /^[a-f\d]{24}$/i.test(data.material_id)) return `/material/${data.material_id}`;
+  return null;
+}

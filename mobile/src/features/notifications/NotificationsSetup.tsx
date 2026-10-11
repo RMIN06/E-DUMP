@@ -5,13 +5,13 @@ import * as Notifications from "expo-notifications";
 import { api } from "../../api/client";
 import { useSession } from "../../lib/session";
 import {
-  announcementFromResponse,
   disableNotifications,
   notificationPromptKey,
   notificationsEnabled,
   pushProjectId,
   registerNotifications,
 } from "../../lib/notifications";
+import { notificationRoute } from "../../lib/notificationRoute";
 import { Sheet } from "../../components/Sheet";
 import { Heading } from "../../components/Heading";
 import { Text } from "../../components/Text";
@@ -42,9 +42,11 @@ export function NotificationsSetup() {
     }
     let alive = true;
     const open = (response: Notifications.NotificationResponse) => {
-      const id = announcementFromResponse(response);
-      if (alive && id) {
-        router.push(`/updates/${id}`);
+      const path = notificationRoute(
+        response.notification.request.content.data,
+      );
+      if (alive && path) {
+        router.push(path);
         void Notifications.clearLastNotificationResponseAsync().catch(
           () => undefined,
         );
@@ -102,7 +104,7 @@ export function NotificationsSetup() {
       }}
     >
       <Heading variant="h2">Class notifications</Heading>
-      <Text>Get quiz, task and datesheet updates from class admins.</Text>
+      <Text>Get class announcements and newly uploaded materials.</Text>
       <TextAction
         label="Allow notifications"
         disabled={busy}

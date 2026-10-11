@@ -9,6 +9,7 @@ import {
   registerNotifications,
 } from "../../lib/notifications.web";
 import { Text } from "../../components/Text";
+import { notificationRoute } from "../../lib/notificationRoute";
 
 export function NotificationsSetup() {
   const { status, user } = useSession();
@@ -27,13 +28,8 @@ export function NotificationsSetup() {
     };
     const message = (event: MessageEvent) => {
       sync();
-      const id: unknown = event.data?.announcement_id;
-      if (
-        event.data?.open &&
-        typeof id === "string" &&
-        /^[a-f\d]{24}$/.test(id)
-      )
-        router.push(`/updates/${id}`);
+      const path = notificationRoute(event.data);
+      if (event.data?.open && path) router.push(path);
     };
     setOffline(!navigator.onLine);
     document.addEventListener("visibilitychange", sync);

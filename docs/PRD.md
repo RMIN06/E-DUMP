@@ -189,3 +189,7 @@ Single release v1.0 containing all P0. Android: sideload APK from an EAS build. 
 ### Owner amendment — 11 October 2026
 
 MAT-4 now supports selecting multiple files in one picker interaction on Android and web. Each file creates its own material record and editable title; type, chapter and note are shared. Existing per-file format, 25 MB, duplicate, quota and authorization rules apply. Partial failures remain visible and retry skips uploaded files. ANN-1 supports selecting several attachments within its existing three-file total. No new backend endpoint or dependency is required.
+
+## Owner-approved notification and installed updates extension (11 October 2026)
+
+Successful material uploads notify other active users through their enabled Android/browser devices. Tapping opens that material; the existing per-device toggle controls both material and announcement notifications. Compatible Android JavaScript/UI updates use expo-updates after one bootstrap APK installation. The Home Screen web companion displays an update notice with a safe restart. Native Android changes still require a new runtime and APK. These owner decisions supersede the earlier announcement-only push and APK-per-UI-release constraints.

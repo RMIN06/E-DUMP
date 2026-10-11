@@ -13,6 +13,10 @@ await writeFile(resolve(output, "_headers"), `/*
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 /sw.js
   Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache
 /_expo/static/*
   Cache-Control: public, max-age=31536000, immutable
 `);

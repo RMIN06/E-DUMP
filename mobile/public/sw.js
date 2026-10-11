@@ -1,6 +1,9 @@
-const SHELL = "edump-shell-0.1.6";
+const SHELL = "edump-shell-0.1.7";
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(SHELL).then((cache) => cache.addAll(["/", "/manifest.webmanifest", "/icon.png"])).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(SHELL).then((cache) => cache.addAll(["/", "/manifest.webmanifest", "/icon.png"])));
+});
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "APPLY_UPDATE") event.waitUntil(self.skipWaiting());
 });
 self.addEventListener("activate", (event) => {
   event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith("edump-shell-") && key !== SHELL).map((key) => caches.delete(key)))).then(() => self.clients.claim()));

@@ -38,7 +38,13 @@ const config: ExpoConfig = {
   name: "E-DUMP",
   slug: "e-dump",
   owner: "rmin06s-team",
-  version: "0.1.6",
+  version: "0.1.7",
+  runtimeVersion: "edump-android-1",
+  updates: {
+    url: "https://u.expo.dev/37e1b246-6c7a-4c9c-926b-7a0be8095b02",
+    requestHeaders: { "expo-channel-name": "preview" },
+    checkAutomatically: "ON_LOAD",
+  },
   icon: "./assets/brand/icon.png",
   scheme: "edump",
   orientation: "portrait",
@@ -54,7 +60,7 @@ const config: ExpoConfig = {
   ios: { supportsTablet: true, bundleIdentifier: "com.edump.bcs3e" },
   android: {
     package: "com.edump.bcs3e",
-    versionCode: 7,
+    versionCode: 8,
     adaptiveIcon: {
       foregroundImage: "./assets/brand/adaptive-icon.png",
       backgroundColor: colors.ink,

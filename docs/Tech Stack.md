@@ -119,3 +119,7 @@ No secret ever goes into an `EXPO_PUBLIC_` variable.
 ## Approved web companion extension (10 October 2026)
 
 The owner approved `react-dom`, `react-native-web`, `@expo/metro-runtime`, `pywebpush` and free web hosting. Expo web shares the existing screens, API, MongoDB and private R2 storage. Platform adapters retain native Android behavior. Browser push uses Web Push with VAPID; no Firebase browser SDK is added.
+
+## Approved installed updates extension (11 October 2026)
+
+The owner approved Expo-compatible `expo-updates`. The signed Android preview uses EAS Update's `preview` channel and runtime `edump-android-1`. Increment the runtime before any native dependency, SDK or plugin change. Compatible JavaScript changes can ship through OTA without another APK. Browser updates use the existing service worker, with an in-app notice and user-controlled restart on read-only tab roots.

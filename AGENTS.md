@@ -34,3 +34,8 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 ## Owner batch upload decision (11 October 2026)
 - Multiple-file selection is approved on Android and web. Material batches create individual records with independent titles through the existing authorized upload endpoint. Shared type/chapter/note apply to each file; size, format, duplicate, quota and rate checks remain per file. Retry skips successful records. Announcement multi-selection retains the existing three-attachment limit.
 - Keep scroll rows stable without text-measurement-driven state changes; disable clipped-subview removal for animated rows while retaining list virtualization.
+
+## Owner notification and installed-update decisions (11 October 2026)
+- Successful material uploads notify other active users through their enabled devices; tapping opens the material. The existing notification toggle controls both material and announcement alerts.
+- expo-updates is approved. Publish one final bootstrap APK; compatible JavaScript/UI changes thereafter use the preview OTA channel. Native/SDK/plugin changes require a new runtime and APK. This supersedes the earlier APK-per-UI-change rule for compatible updates.
+- The Home Screen web companion offers an update notice and safe restart, without re-adding it. Never restart a form or upload automatically.

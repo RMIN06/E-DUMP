@@ -7,6 +7,7 @@ import { fontAssets } from "../src/theme/fontAssets";
 import { AuthGate } from "../src/features/auth/AuthGate";
 import { RulesGate } from "../src/features/rules/RulesGate";
 import { NotificationsSetup } from "../src/features/notifications/NotificationsSetup";
+import { AppUpdates } from "../src/features/appUpdates/AppUpdates";
 
 export default function RootLayout() {
   const [loaded, error] = useFonts(fontAssets);
@@ -21,6 +22,7 @@ export default function RootLayout() {
       ) : (
         <RulesGate>
           <AuthGate>
+            <AppUpdates />
             <NotificationsSetup />
           </AuthGate>
         </RulesGate>

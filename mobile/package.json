@@ -44,6 +44,7 @@
     "expo-sharing": "55.0.24",
     "expo-splash-screen": "55.0.25",
     "expo-system-ui": "55.0.22",
+    "expo-updates": "~55.0.33",
     "lucide-react-native": "1.54.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",

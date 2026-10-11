@@ -26,6 +26,7 @@ if (System.getenv("EDUMP_LOCAL_ANDROID_RELEASE") == "1") {
   subprojects {
     ["com.android.library", "com.android.application"].each { androidPlugin ->
       plugins.withId(androidPlugin) {
+        android.ndkVersion = rootProject.ext.ndkVersion
         android.defaultConfig.externalNativeBuild.cmake.arguments(
           "-DCMAKE_JOB_POOLS=edump_native=1",
           "-DCMAKE_JOB_POOL_COMPILE=edump_native",

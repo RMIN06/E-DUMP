@@ -1,6 +1,6 @@
 # Installed preview updates
 
-Android preview 0.1.7 is the first bootstrap APK with `expo-updates`. Install it once over the previous signed preview. It checks the EAS `preview` channel at startup and when returning to the foreground, with checks spaced at least five minutes apart. Downloaded compatible updates show an in-app notice. Restart is enabled only on the four read-only tab roots; forms and uploads are never interrupted. A downloaded native update can also apply at the next cold start. Offline failures retain the last working app.
+Android preview 0.1.7 is the first bootstrap APK with `expo-updates`. Install it once over the previous signed preview. It checks the EAS `preview` channel at startup and when returning to the foreground, with foreground checks spaced at least five minutes apart. Downloaded compatible updates show an in-app notice. Restart is enabled only on the four read-only tab roots; forms and uploads are never interrupted. A downloaded update can also apply at the next cold start. Offline failures retain the last working app.
 
 For future compatible JavaScript/UI changes, commit and verify the code, then run:
 

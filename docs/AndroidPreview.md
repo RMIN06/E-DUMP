@@ -1,4 +1,31 @@
-# Android preview 0.1.6
+# Android preview 0.1.7
+
+Published 11 October 2026 (Asia/Karachi), Android version code `8`, native/application source `c24d4f5`; material-notification API source `578c42a` is live on Render.
+
+- [Download for most Android phones (ARM64)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.7-arm64.apk)
+- [Download for older 32-bit phones (ARMv7)](https://pub-b29fbdc2dd2240a29913bd5614807f9e.r2.dev/edump-0.1.7-armv7.apk)
+- [Open the updated web companion](https://edump-preview.pages.dev)
+
+Install this bootstrap APK once over the previous preview to enable compatible Android OTA updates. Future JavaScript/UI fixes use the existing app's update notice; native/SDK/plugin changes require a new runtime and APK. See InstalledUpdates.md for the publication command and safe-restart behavior. The browser/Home Screen app updates through its existing service worker and keeps the same Home Screen icon.
+
+Successful material uploads now alert other active users through enabled Android/browser devices, including Apple Web Push subscriptions. Tapping opens the material. Duplicate/rejected uploads send no extra alerts, provider failures preserve uploaded records, and the existing per-device toggle controls material and announcement alerts. Announcements retain their existing feed behavior.
+
+Safari uses the Apple system font fallback, fixed text-size adjustment, dynamic viewport height and notch/home-indicator insets. All phone-width rows place metadata below titles. Desktop and 428 px browser checks showed no horizontal overflow; the live web update notice restarted into the new release without losing the signed-in session. These Chrome checks do not certify physical Safari rendering or iPhone push delivery.
+
+`make verify` ran backend/mobile lint, 245 backend tests, 224 app tests and 15 edge/audit contract tests with required coverage. The newly approved OTA package initially needed adding to the dependency allowlist; after that fix, `make verify -o lint -o test` completed the remaining slop/schema/security checks without repeating successful tests. Python audit and secret scanning passed; npm had no findings beyond the three existing owner-approved tooling exceptions. The native plugin change additionally passed mobile lint/typing. The 21st UI review reported zero findings in the four changed UI files.
+
+The signed native build succeeded in 49m 15s after aligning local library NDK selection with React Native's installed version. During compilation, selected generated Ninja pools temporarily used two jobs after a memory check; their original one-job settings were restored afterward. Both APKs passed package/version/certificate and actual private-credential scans, include material tap routing and OTA UI, and remain below 60 MiB. The signing certificate is unchanged. The built manifest enables updates with runtime `edump-android-1` and channel `preview`; the live EAS manifest matches update `01a12a15-501f-7b50-9c12-672400db280d` in group `2e3ed5e8-950d-48ca-89e1-989e043d7fcc`.
+
+Both full public downloads returned HTTP 200 without authentication and matched the signed local installers:
+
+| APK | Bytes | SHA-256 |
+| --- | ---: | --- |
+| ARM64 | 47468964 | `8bd1ca5a5c81744832a4ec19bb7d93920fa00f7a15b15e4a655a098fcce8ffc5` |
+| ARMv7 | 41175452 | `6dd668d77e391253244107de86c2c58958b66e1f4794ebf57dd7994c2d122d71` |
+
+Physical Android OTA application, iPhone material notification delivery, keyboard and accessibility checks remain owner acceptance. Existing preview font fallbacks, free API cold starts and native iOS deferral still apply. Local release evidence is in ignored artifacts/release/.
+
+## Archived Android preview 0.1.6
 
 Published 11 October 2026 (Asia/Karachi), Android version code `7`, application source `ad4fdca`.
 

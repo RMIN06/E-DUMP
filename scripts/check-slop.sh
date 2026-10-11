@@ -17,6 +17,8 @@ const approved = new Set([
   '@react-native-async-storage/async-storage', 'eslint', 'prettier', 'jest', 'jest-expo',
   // Owner approved the Expo-compatible native due-date picker for M4.
   '@react-native-community/datetimepicker',
+  // Owner approved compatible installed-app updates on 11 October 2026.
+  'expo-updates',
   '@testing-library/react-native', 'maestro',
   // Owner approved the required Expo peers and lint/test support packages.
   'react-dom', 'react-native-web', 'react', 'expo-linking', 'react-native-screens', 'react-native-safe-area-context',

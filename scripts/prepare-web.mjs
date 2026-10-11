@@ -1,8 +1,9 @@
 import { readFile, writeFile, copyFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { webViewport, webReset } from "../mobile/src/theme/web.ts";
 const output = resolve(import.meta.dirname, "../mobile/dist");
 const html = await readFile(resolve(output, "index.html"), "utf8");
-await writeFile(resolve(output, "index.html"), html.replace("</head>", '<link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon.png"><meta name="apple-mobile-web-app-capable" content="yes"></head>'));
+await writeFile(resolve(output, "index.html"), html.replace(/<meta name="viewport"[^>]*>/, `<meta name="viewport" content="${webViewport}" />`).replace("</head>", `<style id="edump-web-reset">${webReset}</style><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon.png"><meta name="apple-mobile-web-app-capable" content="yes"></head>`));
 await copyFile(resolve(import.meta.dirname, "../web/worker.mjs"), resolve(output, "_worker.js"));
 await writeFile(resolve(output, "_headers"), `/*
   X-Content-Type-Options: nosniff

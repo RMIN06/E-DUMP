@@ -65,7 +65,7 @@ export const Row = memo(function Row({
       : withTiming(value, { duration: motion.pressDuration });
   };
   const { sizeClass, fontScale } = useSizeClass();
-  const below = sizeClass === "compact" || fontScale > 1.3;
+  const below = sizeClass !== "tablet" || fontScale > 1.3;
   return (
     <Animated.View
       collapsable={false}

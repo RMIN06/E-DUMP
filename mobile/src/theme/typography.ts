@@ -32,8 +32,12 @@ const compactSizes = {
   h1: { fontSize: 28, lineHeight: 34 },
   h2: { fontSize: 18, lineHeight: 24 },
 } as const;
-const fallbackHeading = Platform.OS === "ios" ? "System" : "sans-serif";
-const fallbackBody = Platform.OS === "ios" ? "System" : "sans-serif";
+const fallbackBody = Platform.select({
+  ios: "System",
+  web: '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif',
+  default: "sans-serif",
+});
+const fallbackHeading = fallbackBody;
 
 export type HeadingVariant = "display" | "h1" | "h2";
 export type TextVariant = "h3" | "body" | "bodyStrong" | "caption" | "label";

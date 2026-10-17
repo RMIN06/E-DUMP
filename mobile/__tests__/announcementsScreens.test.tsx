@@ -130,6 +130,40 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
+test("new data uses the current clock after the screen has stayed open", async () => {
+  jest.useFakeTimers();
+  jest.setSystemTime(new Date("2026-10-18T05:00:00Z"));
+  jest
+    .mocked(useUpcoming)
+    .mockReturnValue({ ...base, data: [] } as unknown as ReturnType<
+      typeof useUpcoming
+    >);
+  jest
+    .mocked(useUpdates)
+    .mockReturnValue({
+      ...base,
+      data: { pages: [{ items: [] }] },
+    } as unknown as ReturnType<typeof useUpdates>);
+  const view = await render(<UpdatesScreen />);
+  await act(async () => {
+    await jest.advanceTimersByTimeAsync(60_000);
+  });
+  jest
+    .mocked(useUpdates)
+    .mockReturnValue({
+      ...base,
+      data: {
+        pages: [{ items: [{ ...item, due_at: "2026-10-18T05:01:01Z" }] }],
+      },
+    } as unknown as ReturnType<typeof useUpdates>);
+  await view.rerender(<UpdatesScreen />);
+  expect(screen.getByText("Linked lists")).toBeTruthy();
+  await act(async () => {
+    await jest.advanceTimersByTimeAsync(1000);
+  });
+  expect(screen.queryByText("Linked lists")).toBeNull();
+});
+
 test("cached alerts leave upcoming and subject feeds at their deadline", async () => {
   jest.useFakeTimers();
   jest.setSystemTime(new Date("2026-10-18T05:00:00Z"));
@@ -146,18 +180,14 @@ test("cached alerts leave upcoming and subject feeds at their deadline", async (
     title: "Old quiz",
     due_at: "2026-10-18T04:59:59Z",
   };
-  jest
-    .mocked(useUpcoming)
-    .mockReturnValue({
-      ...base,
-      data: [expiring, expired],
-    } as unknown as ReturnType<typeof useUpcoming>);
-  jest
-    .mocked(useUpdates)
-    .mockReturnValue({
-      ...base,
-      data: { pages: [{ items: [expiring, expired, undated] }] },
-    } as unknown as ReturnType<typeof useUpdates>);
+  jest.mocked(useUpcoming).mockReturnValue({
+    ...base,
+    data: [expiring, expired],
+  } as unknown as ReturnType<typeof useUpcoming>);
+  jest.mocked(useUpdates).mockReturnValue({
+    ...base,
+    data: { pages: [{ items: [expiring, expired, undated] }] },
+  } as unknown as ReturnType<typeof useUpdates>);
   const view = await render(<UpdatesScreen />);
   expect(screen.queryByText("Old quiz")).toBeNull();
   expect(screen.getByText("Linked lists")).toBeTruthy();

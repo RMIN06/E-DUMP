@@ -53,7 +53,10 @@ export function UpdatesScreen({
   useEffect(() => {
     const tick = () => setNow(Date.now());
     const timer = Number.isFinite(nextDeadline)
-      ? setTimeout(tick, Math.min(nextDeadline - now, 2_147_483_647))
+      ? setTimeout(
+          tick,
+          Math.min(Math.max(0, nextDeadline - Date.now()), 2_147_483_647),
+        )
       : undefined;
     const listener = AppState.addEventListener("change", (state) => {
       if (state === "active") tick();

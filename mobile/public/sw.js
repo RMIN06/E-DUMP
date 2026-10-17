@@ -1,4 +1,4 @@
-const SHELL = "edump-shell-2026-10-18";
+const SHELL = "edump-shell-2026-10-18.1";
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(SHELL).then((cache) => cache.addAll(["/", "/manifest.webmanifest", "/icon.png"])));
 });

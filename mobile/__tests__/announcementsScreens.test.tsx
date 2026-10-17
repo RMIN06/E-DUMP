@@ -88,7 +88,7 @@ const item: Announcement = {
   title: "Linked lists",
   body: "Read chapter three.",
   subject_slug: "ds",
-  due_at: "2026-10-10T05:00:00Z",
+  due_at: new Date(Date.now() + 86_400_000).toISOString(),
   file_ids: [attachment.file_id],
   attachments: [attachment],
   pinned: true,
@@ -127,6 +127,49 @@ beforeEach(() => {
       typeof useUnreadCount
     >);
   jest.mocked(api).mockResolvedValue(item);
+});
+afterEach(() => jest.useRealTimers());
+
+test("cached alerts leave upcoming and subject feeds at their deadline", async () => {
+  jest.useFakeTimers();
+  jest.setSystemTime(new Date("2026-10-18T05:00:00Z"));
+  const expiring = { ...item, due_at: "2026-10-18T05:00:01Z" };
+  const undated = {
+    ...item,
+    id: "undated",
+    title: "Class notice",
+    due_at: null,
+  };
+  const expired = {
+    ...item,
+    id: "expired",
+    title: "Old quiz",
+    due_at: "2026-10-18T04:59:59Z",
+  };
+  jest
+    .mocked(useUpcoming)
+    .mockReturnValue({
+      ...base,
+      data: [expiring, expired],
+    } as unknown as ReturnType<typeof useUpcoming>);
+  jest
+    .mocked(useUpdates)
+    .mockReturnValue({
+      ...base,
+      data: { pages: [{ items: [expiring, expired, undated] }] },
+    } as unknown as ReturnType<typeof useUpdates>);
+  const view = await render(<UpdatesScreen />);
+  expect(screen.queryByText("Old quiz")).toBeNull();
+  expect(screen.getByText("Linked lists")).toBeTruthy();
+  await act(async () => {
+    await jest.advanceTimersByTimeAsync(1000);
+  });
+  expect(screen.queryByText("Linked lists")).toBeNull();
+  expect(screen.queryByText("Coming up")).toBeNull();
+  expect(screen.getByText("Class notice")).toBeTruthy();
+  await view.rerender(<UpdatesScreen subjectSlug="ds" />);
+  expect(screen.queryByText("Linked lists")).toBeNull();
+  expect(screen.getByText("Class notice")).toBeTruthy();
 });
 test("student feed can read and filter but cannot post", async () => {
   jest
@@ -313,18 +356,16 @@ test("edit keeps notify again off by default and supports removing due date and 
 });
 
 test("announcement batch picker respects remaining slots before uploading", async () => {
-  jest
-    .mocked(Picker.getDocumentAsync)
-    .mockResolvedValue({
-      canceled: false,
-      assets: [0, 1, 2].map((i) => ({
-        uri: `file:///quiz-${i}.pdf`,
-        name: `quiz-${i}.pdf`,
-        size: 100,
-        mimeType: "application/pdf",
-        lastModified: 0,
-      })),
-    });
+  jest.mocked(Picker.getDocumentAsync).mockResolvedValue({
+    canceled: false,
+    assets: [0, 1, 2].map((i) => ({
+      uri: `file:///quiz-${i}.pdf`,
+      name: `quiz-${i}.pdf`,
+      size: 100,
+      mimeType: "application/pdf",
+      lastModified: 0,
+    })),
+  });
   await render(<UpdateFormScreen />);
   await fireEvent.press(screen.getByRole("button", { name: "Add file" }));
   expect(
@@ -334,18 +375,16 @@ test("announcement batch picker respects remaining slots before uploading", asyn
   expect(screen.getByText("Attachments (1/3)")).toBeTruthy();
 });
 test("announcement batch retains successful attachments when another file fails", async () => {
-  jest
-    .mocked(Picker.getDocumentAsync)
-    .mockResolvedValue({
-      canceled: false,
-      assets: [0, 1].map((i) => ({
-        uri: `file:///quiz-${i}.pdf`,
-        name: `quiz-${i}.pdf`,
-        size: 100,
-        mimeType: "application/pdf",
-        lastModified: 0,
-      })),
-    });
+  jest.mocked(Picker.getDocumentAsync).mockResolvedValue({
+    canceled: false,
+    assets: [0, 1].map((i) => ({
+      uri: `file:///quiz-${i}.pdf`,
+      name: `quiz-${i}.pdf`,
+      size: 100,
+      mimeType: "application/pdf",
+      lastModified: 0,
+    })),
+  });
   jest
     .mocked(api)
     .mockResolvedValueOnce({

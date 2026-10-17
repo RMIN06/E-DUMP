@@ -65,6 +65,65 @@ def update_body(**values: object) -> dict[str, object]:
     } | values
 
 
+async def test_deadlines_hide_expired_rows_before_pagination_and_unread_count(
+    client: AsyncClient,
+    database: Database,
+) -> None:
+    admin = await login(client, "l250002")
+    student = await login(client)
+    expired = []
+    for kind in ("quiz", "task", "datesheet", "general"):
+        response = await client.post(
+            "/api/v1/announcements",
+            headers=admin,
+            json=update_body(type=kind, due_at=datetime.now(UTC).isoformat()),
+        )
+        assert response.status_code == 201
+        expired.append(ObjectId(response.json()["id"]))
+    await database.announcements.update_many(
+        {"_id": {"$in": expired}}, {"$set": {"pinned": True}}
+    )
+    active = []
+    for due in (None, (datetime.now(UTC) + timedelta(days=2)).isoformat()):
+        response = await client.post(
+            "/api/v1/announcements", headers=admin, json=update_body(due_at=due)
+        )
+        active.append(response.json()["id"])
+    first = (
+        await client.get(
+            "/api/v1/announcements?type=quiz&subject=ds&limit=1", headers=student
+        )
+    ).json()
+    assert [row["id"] for row in first["items"]] == [active[1]]
+    second = (
+        await client.get(
+            "/api/v1/announcements",
+            headers=student,
+            params={
+                "limit": 1,
+                "cursor": first["next_cursor"],
+                "type": "quiz",
+                "subject": "ds",
+            },
+        )
+    ).json()
+    assert [row["id"] for row in second["items"]] == [active[0]]
+    assert second["next_cursor"] is None
+    assert (
+        await client.get("/api/v1/announcements/unread-count", headers=student)
+    ).json()["count"] == 2
+    assert [
+        row["id"]
+        for row in (
+            await client.get("/api/v1/announcements/upcoming", headers=student)
+        ).json()
+    ] == [active[1]]
+    assert await database.announcements.count_documents({}) == 6
+    assert (
+        await client.get(f"/api/v1/announcements/{expired[0]}", headers=admin)
+    ).status_code == 200
+
+
 @pytest.mark.parametrize(
     "method,path",
     [

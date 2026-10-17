@@ -1,7 +1,13 @@
+from datetime import UTC, datetime
+
 from bson import ObjectId
 
 from app.models.announcement import AnnouncementRecord
 from app.repositories.files import Database
+
+
+def active_filter(now: datetime) -> dict[str, object]:
+    return {"$or": [{"due_at": None}, {"due_at": {"$gt": now}}]}
 
 
 async def insert(database: Database, record: AnnouncementRecord) -> None:
@@ -45,6 +51,7 @@ async def referenced(database: Database, file_id: ObjectId) -> bool:
 
 
 async def unread(database: Database, since: object) -> int:
-    return await database.announcements.count_documents(
-        {"created_at": {"$gt": since}} if since else {}
-    )
+    query = active_filter(datetime.now(UTC))
+    if since:
+        query["created_at"] = {"$gt": since}
+    return await database.announcements.count_documents(query)

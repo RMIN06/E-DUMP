@@ -1,7 +1,7 @@
 import { goBack } from "../../lib/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { router, useFocusEffect } from "expo-router";
-import { RefreshControl, View, StyleSheet } from "react-native";
+import { AppState, RefreshControl, View, StyleSheet } from "react-native";
 import { api } from "../../api/client";
 import {
   useUpdates,
@@ -43,10 +43,31 @@ export function UpdatesScreen({
   const subject = useSubject(subjectSlug ?? "");
   const { user } = useSession();
   const theme = useTheme();
+  const [now, setNow] = useState(Date.now);
+  const cachedUpdates = query.data?.pages.flatMap((page) => page.items) ?? [];
+  const nextDeadline = Math.min(
+    ...[...cachedUpdates, ...(upcoming.data ?? [])]
+      .map((item) => (item.due_at ? Date.parse(item.due_at) : Infinity))
+      .filter((deadline) => deadline > now),
+  );
+  useEffect(() => {
+    const tick = () => setNow(Date.now());
+    const timer = Number.isFinite(nextDeadline)
+      ? setTimeout(tick, Math.min(nextDeadline - now, 2_147_483_647))
+      : undefined;
+    const listener = AppState.addEventListener("change", (state) => {
+      if (state === "active") tick();
+    });
+    return () => {
+      clearTimeout(timer);
+      listener.remove();
+    };
+  }, [nextDeadline, now]);
   const upcomingIds = new Set<string>();
   const upcomingItems = subjectSlug
     ? []
     : (upcoming.data ?? []).filter((item) => {
+        if (item.due_at && Date.parse(item.due_at) <= now) return false;
         if (type !== "all" && item.type !== type) return false;
         if (selectedSubject && item.subject_slug !== selectedSubject)
           return false;
@@ -55,9 +76,8 @@ export function UpdatesScreen({
         return true;
       });
   const renderedIds = new Set(upcomingIds);
-  const updates = (
-    query.data?.pages.flatMap((page) => page.items) ?? []
-  ).filter((item) => {
+  const updates = cachedUpdates.filter((item) => {
+    if (item.due_at && Date.parse(item.due_at) <= now) return false;
     if (renderedIds.has(item.id)) return false;
     renderedIds.add(item.id);
     return true;
@@ -80,7 +100,10 @@ export function UpdatesScreen({
   const header = (
     <>
       {subjectSlug ? (
-        <TextAction label="Subjects" onPress={() => goBack("/(tabs)/subjects")} />
+        <TextAction
+          label="Subjects"
+          onPress={() => goBack("/(tabs)/subjects")}
+        />
       ) : null}
 
       {subjectSlug && onMaterials ? (

@@ -44,3 +44,8 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - Preserve saved refresh credentials on transient network/server/storage failures. Offer reconnection without requesting the roll number again, and share concurrent restore work to avoid rotating a credential twice.
 - Continue requiring server validation before opening protected screens after a cold restart. Invalid/expired sessions, disabled accounts and explicit sign-out still clear access. This supersedes the M1 three-second timeout-and-sign-out behavior.
 - Ship compatible UI/session changes through Android preview OTA and the existing web companion; do not require another APK installation.
+
+## Owner deadline behavior (18 October 2026)
+- ANN-8: Hide every dated alert once due_at is reached, including pinned rows, subject feeds, Coming up and unread counts. Keep undated updates and preserve stored records/attachments; this is list expiry, not data deletion.
+- ANN-9: Send one 24-hour reminder per deadline for every dated alert through the existing enabled-device push path. The owner chose the existing API timer and accepts late reminders after free-host sleep; do not provision a scheduled worker or new endpoint.
+- Check reminders at API startup and every minute while running. Skip already expired alerts and alerts posted inside the last 24 hours (their creation notification already applies). Retain durable deadline markers across edits and process restarts. Compatible clients ship through the existing Android OTA/web channels.

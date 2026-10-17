@@ -108,13 +108,13 @@ async def list_updates(
     cursor: str | None,
     limit: int,
 ) -> AnnouncementPage:
-    query: dict[str, object] = {}
+    query = announcements.active_filter(datetime.now(UTC))
     if kind:
         query["type"] = kind
     if subject:
         query["subject_slug"] = subject
     if cursor:
-        query.update(cursor_query(cursor))
+        query = {"$and": [query, cursor_query(cursor)]}
     rows = await announcements.page(database, query, limit + 1)
     next_cursor = None
     if len(rows) > limit:

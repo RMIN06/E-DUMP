@@ -193,3 +193,9 @@ MAT-4 now supports selecting multiple files in one picker interaction on Android
 ## Owner-approved notification and installed updates extension (11 October 2026)
 
 Successful material uploads notify other active users through their enabled Android/browser devices. Tapping opens that material; the existing per-device toggle controls both material and announcement notifications. Compatible Android JavaScript/UI updates use expo-updates after one bootstrap APK installation. The Home Screen web companion displays an update notice with a safe restart. Native Android changes still require a new runtime and APK. These owner decisions supersede the earlier announcement-only push and APK-per-UI-release constraints.
+
+## Owner deadline extension - 18 October 2026
+
+ANN-8: Dated alerts leave Updates, subject update lists, Coming up and unread counts when their deadline is reached, including pinned items. Undated notices remain. Records and attachments are retained; existing authorized direct links and admin editing still work.
+
+ANN-9: Every dated alert (Quiz, Task, Datesheet, General) receives a reminder at 24 hours remaining through the existing other-active-users/enabled-devices push path. The owner chose the existing API timer rather than a new scheduled worker and accepts reminders being late after free Render sleep. Check on startup and once per minute while running, skip expired deadlines, and do not send a second immediate reminder for a newly posted alert already inside 24 hours. Persist one marker per reminded deadline; editing the due time schedules that new deadline without erasing previous markers. Provider delivery remains best effort; late reminders say less than one day remains.

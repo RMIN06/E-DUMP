@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from bson import ObjectId
 
@@ -34,8 +34,8 @@ async def page(
 
 
 async def update(database: Database, record: AnnouncementRecord) -> None:
-    await database.announcements.replace_one(
-        {"_id": record.id}, record.model_dump(by_alias=True)
+    await database.announcements.update_one(
+        {"_id": record.id}, {"$set": record.model_dump(exclude={"id"})}
     )
 
 
@@ -55,3 +55,35 @@ async def unread(database: Database, since: object) -> int:
     if since:
         query["created_at"] = {"$gt": since}
     return await database.announcements.count_documents(query)
+
+
+async def reminder_candidates(
+    database: Database, now: datetime
+) -> list[AnnouncementRecord]:
+    query: dict[str, object] = {
+        "due_at": {"$gt": now, "$lte": now + timedelta(hours=24)},
+        "$expr": {
+            "$and": [
+                {"$lte": ["$created_at", {"$subtract": ["$due_at", 86_400_000]}]},
+                {
+                    "$not": [
+                        {"$in": ["$due_at", {"$ifNull": ["$reminded_deadlines", []]}]}
+                    ]
+                },
+            ]
+        },
+    }
+    return await page(database, query, 100, upcoming=True)
+
+
+async def claim_reminder(database: Database, item: AnnouncementRecord) -> bool:
+    result = await database.announcements.update_one(
+        {
+            "_id": item.id,
+            "due_at": item.due_at,
+            "updated_at": item.updated_at,
+            "reminded_deadlines": {"$ne": item.due_at},
+        },
+        {"$addToSet": {"reminded_deadlines": item.due_at}},
+    )
+    return result.modified_count == 1

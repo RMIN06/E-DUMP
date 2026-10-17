@@ -10,7 +10,9 @@ from app.config import get_settings
 logger = logging.getLogger(__name__)
 
 
-async def send(subscription: dict[str, object], message: dict[str, object]) -> bool:
+async def send(
+    subscription: dict[str, object], message: dict[str, object], *, ttl: int = 3600
+) -> bool:
     settings = get_settings()
     if not settings.web_push_private_key:
         return False
@@ -21,7 +23,7 @@ async def send(subscription: dict[str, object], message: dict[str, object]) -> b
             data=json.dumps(message),
             vapid_private_key=settings.web_push_private_key.get_secret_value(),
             vapid_claims={"sub": "mailto:l250716@lhr.nu.edu.pk"},
-            ttl=3600,
+            ttl=ttl,
             timeout=15,
         )
     except WebPushException as error:

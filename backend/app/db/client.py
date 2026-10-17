@@ -7,7 +7,9 @@ from pymongo import AsyncMongoClient
 
 from app.config import get_settings
 from app.db.indexes import ensure_indexes
+from app.integrations.push import ExpoPushClient
 from app.integrations.r2 import R2Storage
+from app.services import reminder_service
 from app.tasks.housekeeping import run
 
 
@@ -17,6 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     client: AsyncMongoClient[dict[str, object]] | None = None
     app.state.db = None
     task: asyncio.Task[None] | None = None
+    reminder_task: asyncio.Task[None] | None = None
     if settings.mongodb_uri:
         client = AsyncMongoClient(
             settings.mongodb_uri,
@@ -29,6 +32,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     try:
         if app.state.db is not None:
             await ensure_indexes(app.state.db)
+            reminder_task = asyncio.create_task(
+                reminder_service.run(app.state.db, ExpoPushClient())
+            )
             if (
                 settings.r2_account_id
                 and settings.r2_access_key_id
@@ -39,6 +45,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 )
         yield
     finally:
+        if reminder_task is not None:
+            reminder_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await reminder_task
         if task is not None:
             task.cancel()
             with suppress(asyncio.CancelledError):

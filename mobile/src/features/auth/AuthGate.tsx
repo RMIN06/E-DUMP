@@ -1,5 +1,5 @@
 import { useEffect, type PropsWithChildren } from "react";
-import { AppState } from "react-native";
+import { AppState, Platform } from "react-native";
 import { focusManager, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, Redirect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -10,6 +10,10 @@ import { privateCache } from "../../api/cache";
 import { useMotionPreference } from "../../theme/animation";
 import { useLiveSync } from "../../lib/useLiveSync";
 import { motion } from "../../theme/motion";
+import { Screen } from "../../components/Screen";
+import { Text } from "../../components/Text";
+import { Button } from "../../components/Button";
+import { TextAction } from "../../components/TextAction";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -27,17 +31,43 @@ export function AuthGate({ children }: PropsWithChildren) {
     const listener = AppState.addEventListener("change", (state) => {
       focusManager.setFocused(state === "active");
       if (state === "active")
-        void sessionActions.syncProfile().catch(() => undefined);
+        void (
+          status === "restoreFailed"
+            ? sessionActions.restore()
+            : sessionActions.syncProfile()
+        ).catch(() => undefined);
     });
     return () => listener.remove();
-  }, []);
+  }, [status]);
   useEffect(() => {
     void sessionActions.restore();
   }, []);
   useEffect(() => {
-    if (status !== "restoring") void SplashScreen.hideAsync();
-  }, [status]);
-  if (status === "restoring") return null;
+    void SplashScreen.hideAsync();
+  }, []);
+  if (status === "restoring" || status === "restoreFailed")
+    return (
+      <Screen
+        title="E-DUMP"
+        subtitle="Your sign-in stays saved on this device."
+      >
+        <Text>
+          {status === "restoring"
+            ? "Connecting to your class. The server may take a moment to wake up."
+            : "Couldn't reconnect. Check your connection and try again."}
+        </Text>
+        <Button
+          label="Try again"
+          loading={status === "restoring"}
+          loadingLabel="Connecting…"
+          onPress={() => void sessionActions.restore()}
+        />
+        <TextAction
+          label="Sign out of this device"
+          onPress={() => void sessionActions.signOut().catch(() => undefined)}
+        />
+      </Screen>
+    );
   return (
     <QueryClientProvider client={queryClient}>
       {children}
@@ -45,7 +75,8 @@ export function AuthGate({ children }: PropsWithChildren) {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: theme.ink },
-          animation: reduced ? "none" : "slide_from_right",
+          animation:
+            reduced || Platform.OS === "web" ? "none" : "slide_from_right",
           animationDuration: motion.durationBase,
         }}
       >
@@ -71,7 +102,8 @@ export function AuthGate({ children }: PropsWithChildren) {
             name="upload/[slug]"
             options={{
               presentation: "modal",
-              animation: reduced ? "none" : "slide_from_bottom",
+              animation:
+                reduced || Platform.OS === "web" ? "none" : "slide_from_bottom",
             }}
           />
         </Stack.Protected>
@@ -84,7 +116,8 @@ export function AuthGate({ children }: PropsWithChildren) {
             name="updates/new"
             options={{
               presentation: "modal",
-              animation: reduced ? "none" : "slide_from_bottom",
+              animation:
+                reduced || Platform.OS === "web" ? "none" : "slide_from_bottom",
             }}
           />
         </Stack.Protected>
@@ -95,7 +128,7 @@ export function AuthGate({ children }: PropsWithChildren) {
 
 export function SessionRedirect() {
   const { status } = useSession();
-  if (status === "restoring") return null;
+  if (status === "restoring" || status === "restoreFailed") return null;
   const paths = {
     signedOut: "/sign-in",
     needsName: "/name",

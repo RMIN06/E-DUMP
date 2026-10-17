@@ -1,4 +1,5 @@
 import { ApiError, publicRequest } from "../src/api/transport";
+import { Platform } from "react-native";
 
 const reply = (status: number, body: unknown): Response =>
   ({
@@ -106,5 +107,56 @@ describe("AUTH-2: JSON transport", () => {
     await jest.advanceTimersByTimeAsync(4000);
     expect(await result).toEqual({ ok: true });
     expect(fetch).toHaveBeenCalledTimes(3);
+  });
+  test("session refresh permits a sleeping server without repeating a token rotation", async () => {
+    jest.useFakeTimers();
+    const fetch = jest
+      .spyOn(global, "fetch")
+      .mockImplementation(
+        async (_url, options) =>
+          new Promise((_resolve, reject) =>
+            options?.signal?.addEventListener("abort", () =>
+              reject(new Error("aborted")),
+            ),
+          ),
+      );
+    const result = expect(
+      publicRequest("/auth/refresh", { method: "POST", timeoutMs: 75_000 }),
+    ).rejects.toThrow("aborted");
+    await jest.advanceTimersByTimeAsync(15_000);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch.mock.calls[0]?.[1]?.signal?.aborted).toBe(false);
+    await jest.advanceTimersByTimeAsync(60_000);
+    await result;
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+  test("browser authentication uses a cross-tab cookie lock", async () => {
+    jest.replaceProperty(Platform, "OS", "web");
+    const original = Object.getOwnPropertyDescriptor(navigator, "locks");
+    const lock = jest.fn(
+      async (
+        _name: string,
+        _options: { signal?: AbortSignal },
+        action: () => Promise<unknown>,
+      ) => action(),
+    );
+    Object.defineProperty(navigator, "locks", {
+      configurable: true,
+      value: { request: lock },
+    });
+    jest.spyOn(global, "fetch").mockResolvedValue(reply(200, {}));
+    try {
+      await publicRequest("/auth/refresh", { method: "POST" });
+      expect(lock).toHaveBeenCalledWith(
+        "edump.session",
+        expect.any(Object),
+        expect.any(Function),
+      );
+      await publicRequest("/me");
+      expect(lock).toHaveBeenCalledTimes(1);
+    } finally {
+      if (original) Object.defineProperty(navigator, "locks", original);
+      else Reflect.deleteProperty(navigator, "locks");
+    }
   });
 });

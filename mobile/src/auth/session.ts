@@ -1,6 +1,11 @@
 import { createStore } from "zustand/vanilla";
 import type { components } from "../api/schema";
-import { ApiError, publicRequest, type Request } from "../api/transport";
+import {
+  ApiError,
+  publicRequest,
+  type Request,
+  type RequestOptions,
+} from "../api/transport";
 import {
   clearAdminCache,
   clearPrivateCache,
@@ -12,7 +17,12 @@ type User = components["schemas"]["User"];
 type Tokens = components["schemas"]["Tokens"];
 type LoginResponse = components["schemas"]["LoginResponse"];
 export type SessionStatus =
-  "restoring" | "signedOut" | "needsName" | "signedIn" | "blocked";
+  | "restoring"
+  | "restoreFailed"
+  | "signedOut"
+  | "needsName"
+  | "signedIn"
+  | "blocked";
 type SessionState = {
   status: SessionStatus;
   user: User | null;
@@ -39,6 +49,7 @@ export function createSession(dependencies: Dependencies) {
   let generation = 0;
   let refreshToken: string | null = null;
   let flight: Promise<string> | null = null;
+  let restoreFlight: Promise<void> | null = null;
   let storageQueue = Promise.resolve();
   const enqueue = (action: () => Promise<void>) => {
     storageQueue = storageQueue.catch(() => undefined).then(action);
@@ -57,6 +68,9 @@ export function createSession(dependencies: Dependencies) {
       throw new Error("Couldn't clear saved data. Try again.");
   };
   const save = async (tokens: Tokens, epoch: number) => {
+    if (epoch !== generation) throw new Error("Session changed.");
+    // Retain a rotated credential in memory if the device write needs retrying.
+    refreshToken = tokens.refresh_token;
     await enqueue(async () => {
       if (epoch === generation)
         await dependencies.storage.write(tokens.refresh_token);
@@ -73,20 +87,27 @@ export function createSession(dependencies: Dependencies) {
       status: user.name === null ? "needsName" : "signedIn",
     });
   };
-  const refresh = () => {
+  const refresh = (signal?: AbortSignal) => {
     if (flight) return flight;
     const epoch = generation;
     flight = (async () => {
       try {
         const raw = refreshToken ?? (await dependencies.storage.read());
-        if (!raw || epoch !== generation) throw new Error("Sign in again.");
+        if (epoch !== generation) throw new Error("Session changed.");
+        if (!raw) throw new ApiError(401, "invalid_token", "Sign in again.");
         const tokens = await dependencies.request<Tokens>("/auth/refresh", {
           method: "POST",
           body: { refresh_token: raw },
+          timeoutMs: 75_000,
+          signal,
         });
         return await save(tokens, epoch);
       } catch (error) {
-        if (epoch === generation)
+        if (
+          epoch === generation &&
+          error instanceof ApiError &&
+          (error.status === 401 || error.code === "account_disabled")
+        )
           await clear(
             error instanceof ApiError && error.code === "account_disabled"
               ? "blocked"
@@ -101,7 +122,7 @@ export function createSession(dependencies: Dependencies) {
   };
   const request: Request = async <T>(
     path: string,
-    options = {},
+    options: RequestOptions = {},
   ): Promise<T> => {
     const epoch = generation;
     const initialToken = store.getState().accessToken;
@@ -146,7 +167,7 @@ export function createSession(dependencies: Dependencies) {
       const token =
         currentToken && currentToken !== initialToken
           ? currentToken
-          : await refresh();
+          : await refresh(options.signal);
       try {
         return await dependencies.request<T>(path, { ...options, token });
       } catch (retryError) {
@@ -161,10 +182,53 @@ export function createSession(dependencies: Dependencies) {
       }
     }
   };
+  const restore = () => {
+    if (restoreFlight) return restoreFlight;
+    const epoch = generation;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    store.setState({ status: "restoring" });
+    restoreFlight = (async () => {
+      try {
+        await Promise.race([
+          (async () => {
+            if (!store.getState().accessToken) await refresh(controller.signal);
+            const user = await request<User>("/me", {
+              signal: controller.signal,
+            });
+            if (epoch === generation && !controller.signal.aborted)
+              setUser(user);
+          })(),
+          new Promise<never>((_, reject) => {
+            timer = setTimeout(() => {
+              controller.abort();
+              reject(new Error("Session restore timed out."));
+            }, 90_000);
+          }),
+        ]);
+      } catch (error) {
+        if (epoch === generation) {
+          if (
+            error instanceof ApiError &&
+            (error.status === 401 || error.code === "account_disabled")
+          )
+            await clear(
+              error.code === "account_disabled" ? "blocked" : "signedOut",
+            );
+          else store.setState({ status: "restoreFailed", user: null });
+        }
+      } finally {
+        clearTimeout(timer);
+        restoreFlight = null;
+      }
+    })();
+    return restoreFlight;
+  };
   return {
     store,
     request,
     refresh,
+    restore,
     block: () => clear("blocked"),
     async login(email: string) {
       const epoch = ++generation;
@@ -183,40 +247,6 @@ export function createSession(dependencies: Dependencies) {
               : "signedOut",
           );
         throw error;
-      }
-    },
-    async restore() {
-      const epoch = generation;
-      const controller = new AbortController();
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      try {
-        await Promise.race([
-          (async () => {
-            const raw = await dependencies.storage.read();
-            if (!raw || epoch !== generation) throw new Error("Sign in again.");
-            const tokens = await dependencies.request<Tokens>("/auth/refresh", {
-              method: "POST",
-              body: { refresh_token: raw },
-              signal: controller.signal,
-            });
-            await save(tokens, epoch);
-            const user = await dependencies.request<User>("/me", {
-              token: tokens.access_token,
-              signal: controller.signal,
-            });
-            if (epoch === generation) setUser(user);
-          })(),
-          new Promise<never>((_, reject) => {
-            timer = setTimeout(() => {
-              controller.abort();
-              reject(new Error("Session restore timed out."));
-            }, 3000);
-          }),
-        ]);
-      } catch {
-        if (epoch === generation) await clear();
-      } finally {
-        clearTimeout(timer);
       }
     },
     async updateName(name: string) {

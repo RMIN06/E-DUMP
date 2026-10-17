@@ -171,7 +171,7 @@ describe("AUTH-1…AUTH-4: session lifecycle and rotation", () => {
     ]);
     expect(storage.write).toHaveBeenCalledWith("refresh");
   });
-  test.each(["missing", "failed", "secure_read", "secure_write"])(
+  test.each(["missing", "failed"])(
     "restore failure %s clears the session",
     async (failure) => {
       const { auth, storage } = setup(async () => {
@@ -180,27 +180,77 @@ describe("AUTH-1…AUTH-4: session lifecycle and rotation", () => {
         return tokens;
       });
       if (failure === "missing") storage.read.mockResolvedValue(null);
-      if (failure === "secure_read")
-        storage.read.mockRejectedValue(new Error("storage"));
-      if (failure === "secure_write")
-        storage.write.mockRejectedValue(new Error("storage"));
       await auth.restore();
       expect(auth.store.getState().status).toBe("signedOut");
       expect(storage.remove).toHaveBeenCalled();
     },
   );
-  test("3 second restore deadline rejects late responses without resurrecting a session", async () => {
+  test("restore deadline preserves credentials and a late response cannot open private screens", async () => {
     jest.useFakeTimers();
     const late = deferred<typeof tokens>();
     const { auth, storage } = setup(async () => late.promise);
     const restore = auth.restore();
-    await jest.advanceTimersByTimeAsync(3000);
+    await jest.advanceTimersByTimeAsync(90_000);
     await restore;
     late.resolve(tokens);
     await Promise.resolve();
     await Promise.resolve();
-    expect(auth.store.getState().status).toBe("signedOut");
-    expect(storage.write).not.toHaveBeenCalled();
+    expect(auth.store.getState().status).toBe("restoreFailed");
+    expect(storage.remove).not.toHaveBeenCalled();
+  });
+  test("a sleeping server taking over three seconds still restores the saved sign-in", async () => {
+    jest.useFakeTimers();
+    const response = deferred<typeof tokens>();
+    const { auth, storage } = setup(async (path) =>
+      path === "/me" ? user : response.promise,
+    );
+    const first = auth.restore();
+    const second = auth.restore();
+    expect(first).toBe(second);
+    await jest.advanceTimersByTimeAsync(50_000);
+    expect(auth.store.getState().status).toBe("restoring");
+    response.resolve(tokens);
+    await first;
+    expect(auth.store.getState().status).toBe("signedIn");
+    expect(storage.remove).not.toHaveBeenCalled();
+  });
+  test.each(["network", "secure_read", "secure_write"])(
+    "transient %s failure keeps credentials for recovery",
+    async (failure) => {
+      const { auth, storage, send, clearCache } = setup(async (path) => {
+        if (failure === "network") throw new Error("offline");
+        return path === "/me" ? user : tokens;
+      });
+      if (failure === "secure_read")
+        storage.read.mockRejectedValueOnce(new Error("storage busy"));
+      if (failure === "secure_write")
+        storage.write.mockRejectedValueOnce(new Error("storage busy"));
+      await auth.restore();
+      expect(auth.store.getState().status).toBe("restoreFailed");
+      expect(storage.remove).not.toHaveBeenCalled();
+      expect(clearCache).not.toHaveBeenCalled();
+      send.mockImplementation(async (path) => (path === "/me" ? user : tokens));
+      await auth.restore();
+      expect(auth.store.getState().status).toBe("signedIn");
+    },
+  );
+  test("a rotated token survives a later profile failure and refresh network errors do not log out", async () => {
+    const { auth, send, storage } = setup(async (path) => {
+      if (path === "/me") throw new ApiError(503, "unavailable", "sleeping");
+      return tokens;
+    });
+    await auth.restore();
+    expect(storage.write).toHaveBeenCalledWith("refresh");
+    expect(auth.store.getState().status).toBe("restoreFailed");
+    send.mockImplementation(async (path) => (path === "/me" ? user : tokens));
+    await auth.restore();
+    expect(
+      send.mock.calls.filter(([path]) => path === "/auth/refresh"),
+    ).toHaveLength(1);
+    send.mockRejectedValue(new Error("offline"));
+    await expect(auth.refresh()).rejects.toThrow("offline");
+    expect(auth.store.getState().status).toBe("signedIn");
+    expect(storage.remove).not.toHaveBeenCalled();
   });
   test("five concurrent unauthorized requests share one refresh and retry once", async () => {
     const rotation = deferred<typeof tokens>();

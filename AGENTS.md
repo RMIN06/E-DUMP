@@ -39,3 +39,8 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - Successful material uploads notify other active users through their enabled devices; tapping opens the material. The existing notification toggle controls both material and announcement alerts.
 - expo-updates is approved. Publish one final bootstrap APK; compatible JavaScript/UI changes thereafter use the preview OTA channel. Native/SDK/plugin changes require a new runtime and APK. This supersedes the earlier APK-per-UI-change rule for compatible updates.
 - The Home Screen web companion offers an update notice and safe restart, without re-adding it. Never restart a form or upload automatically.
+
+## Owner session persistence correction (17 October 2026)
+- Preserve saved refresh credentials on transient network/server/storage failures. Offer reconnection without requesting the roll number again, and share concurrent restore work to avoid rotating a credential twice.
+- Continue requiring server validation before opening protected screens after a cold restart. Invalid/expired sessions, disabled accounts and explicit sign-out still clear access. This supersedes the M1 three-second timeout-and-sign-out behavior.
+- Ship compatible UI/session changes through Android preview OTA and the existing web companion; do not require another APK installation.

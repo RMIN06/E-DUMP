@@ -175,3 +175,7 @@ Jobs: `backend` (uv sync, services: mongo, ruff, mypy, pytest with coverage gate
 # Part C — Release gate
 
 Ship only when: all CI jobs green; B6 manual script passed on three devices; `Security and Compliance.md` §10 completed; every P0 requirement in `PRD.md` has a passing test; slop self-review (§7 of `AntiAISlop.md`) screenshots attached for every screen.
+
+## Owner session persistence correction (17 October 2026)
+
+AUTH-3 retains the saved refresh credential when a cold server, lost connection or temporary storage error prevents restoration. The app displays connection/retry UI instead of erasing the session after three seconds. Refresh permits the free preview server to wake up; restoration is single-flight. Protected screens remain gated until server validation. Missing, invalid or expired sessions and disabled accounts still sign out or block; explicit sign-out clears local credentials. This replaces the earlier three-second restoration deadline and its blanket sign-out rule.

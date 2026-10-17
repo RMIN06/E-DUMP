@@ -4,6 +4,7 @@ export type RequestOptions = {
   body?: unknown;
   token?: string | null;
   signal?: AbortSignal;
+  timeoutMs?: number;
   upload?: {
     uri: string;
     filename: string;
@@ -39,7 +40,7 @@ const sendOnce: Request = async <T>(
   const abort = () => controller.abort();
   options.signal?.addEventListener("abort", abort, { once: true });
   if (options.signal?.aborted) controller.abort();
-  const timer = setTimeout(abort, 15_000);
+  const timer = setTimeout(abort, options.timeoutMs ?? 15_000);
   try {
     const response = await fetch(base.replace(/\/$/, "") + path, {
       method: options.method ?? "GET",
@@ -91,7 +92,7 @@ const sendOnce: Request = async <T>(
   }
 };
 
-export const publicRequest: Request = async <T>(
+const sendWithRetries: Request = async <T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> => {
@@ -121,6 +122,26 @@ export const publicRequest: Request = async <T>(
       });
     }
   }
+};
+
+export const publicRequest: Request = async <T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> => {
+  if (
+    Platform.OS === "web" &&
+    path.startsWith("/auth/") &&
+    typeof navigator !== "undefined" &&
+    navigator.locks
+  ) {
+    // All tabs share one HttpOnly refresh cookie; rotate it serially.
+    return await navigator.locks.request(
+      "edump.session",
+      { signal: options.signal },
+      () => sendWithRetries<T>(path, options),
+    );
+  }
+  return sendWithRetries<T>(path, options);
 };
 
 async function uploadOnce<T>(url: string, options: RequestOptions): Promise<T> {

@@ -283,13 +283,11 @@ describe("AUTH-2/AUTH-3: navigation authorization and restore gate", () => {
   test.each(["student", "admin"] as const)(
     "%s can access only their update and admin routes",
     async (role) => {
-      jest
-        .mocked(useSession)
-        .mockReturnValue({
-          ...state,
-          status: "signedIn",
-          user: { id: "actor", role },
-        } as ReturnType<typeof useSession>);
+      jest.mocked(useSession).mockReturnValue({
+        ...state,
+        status: "signedIn",
+        user: { id: "actor", role },
+      } as ReturnType<typeof useSession>);
       await render(<AuthGate />);
       for (const name of ["updates/new", "admin/users", "admin/reports"])
         expect(Boolean(screen.queryByText(name))).toBe(role === "admin");
@@ -321,13 +319,26 @@ describe("AUTH-2/AUTH-3: navigation authorization and restore gate", () => {
     );
     expect(sessionActions.deleteAccount).toHaveBeenCalledTimes(2);
   });
-  test("splash remains during bounded session restore", async () => {
+  test("restoration shows connection progress without the sign-in form", async () => {
     jest.mocked(useSession).mockReturnValue({ ...state, status: "restoring" });
     const gate = await render(<AuthGate />);
-    expect(gate.toJSON()).toBeNull();
+    expect(gate.toJSON()).toBeTruthy();
+    expect(
+      screen.getByText("Your sign-in stays saved on this device."),
+    ).toBeTruthy();
     expect(sessionActions.restore).toHaveBeenCalled();
-    expect(SplashScreen.hideAsync).not.toHaveBeenCalled();
+    expect(SplashScreen.hideAsync).toHaveBeenCalled();
     const redirect = await render(<SessionRedirect />);
     expect(redirect.toJSON()).toBeNull();
+  });
+  test("temporary connection failure offers retry and keeps protected routes hidden", async () => {
+    jest
+      .mocked(useSession)
+      .mockReturnValue({ ...state, status: "restoreFailed", user: null });
+    await render(<AuthGate />);
+    expect(screen.queryByText("(tabs)")).toBeNull();
+    expect(screen.queryByRole("textbox", { name: "Student email" })).toBeNull();
+    await fireEvent.press(screen.getByRole("button", { name: "Try again" }));
+    expect(sessionActions.restore).toHaveBeenCalledTimes(2);
   });
 });

@@ -29,3 +29,13 @@ Keep the Android signing key and password from `%LOCALAPPDATA%/EDUMP-release` in
 If credentials leak: revoke refresh tokens, rotate JWT/R2/Atlas credentials, rebuild the backend secrets, and notify affected users through an admin announcement and the owner's email process within 72 hours of confirmation. Do not publish tokens or full-email logs. Retain service logs for at most 14 days.
 
 The owner decides archive or wipe at semester end before either is executed. Until that decision, preserve active class content. Android preview delivery does not authorize sending classmates an onboarding message or destructive semester cleanup.
+
+## Deadline expiry and reminders - 18 October 2026
+
+ANN-8 removes due_at <= now from all update feed queries before cursor pagination and from unread counts. Clients also expire their cached rows at the next deadline and refresh that clock on foreground, including active-session offline reads. Undated notices remain; database records, attachments and authorized direct links are preserved.
+
+ANN-9 checks all four dated alert types at API startup and every 60 seconds while running. The owner declined a separate scheduler and accepts late reminders after free-host sleep. A reminder is eligible once due_at - 24 hours is reached and before due_at; an alert created after that threshold gets its normal creation notification only. Catch-up reminders say less than one day remains. Reminders reuse existing other-active-users/enabled-device delivery and announcement deep links, with provider TTL capped at the remaining time. No new endpoints, credentials, dependencies or collections are needed.
+
+The announcements collection stores internal reminded_deadlines UTC dates. Atomic conditional claims prevent repeated broadcast across concurrent checks and process restarts. Edits preserve these markers; a different due time is eligible separately, but switching back to an already reminded deadline is not. Claims happen before contacting providers: delivery is best effort, and an ambiguous provider failure or process interruption after claiming can lose that reminder rather than broadcast it twice. Provider failures remain logged without sensitive payloads. Expired deadlines are skipped on wakeup.
+
+The free-service sleep behavior follows https://render.com/docs/free. Expo TTL semantics follow https://docs.expo.dev/push-notifications/sending-notifications/. Physical notification receipt remains device acceptance; automated tests use fake providers and never broadcast test alerts to classmates.

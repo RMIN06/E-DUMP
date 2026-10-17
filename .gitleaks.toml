@@ -3,7 +3,7 @@ useDefault = true
 
 [[allowlists]]
 description = "Installed dependencies and generated local caches"
-paths = ['''(^|[/\\])(node_modules|\.venv|\.venv-runtime|\.expo|coverage|\.git|\.gradle)([/\\]|$)''', '''^artifacts[/\\]mongo-push[/\\]''']
+paths = ['''(^|[/\\])(node_modules|\.venv|\.venv-runtime|\.expo|coverage|\.git|\.gradle)([/\\]|$)''', '''^artifacts[/\\]mongo-(push|test)[/\\]''', '''^mobile[/\\]android[/\\]app[/\\]build[/\\]intermediates[/\\]incremental[/\\]release-mergeJavaRes[/\\]zip-cache[/\\]''']
 
 [[allowlists]]
 description = "Local environment files; Make and CI reject these if tracked"

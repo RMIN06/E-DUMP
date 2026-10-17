@@ -1,5 +1,5 @@
 import { memo, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { layout, space, controls } from "../theme/spacing";
 import { useSizeClass } from "../theme/responsive";
 import { useTheme } from "../theme/tokens";
@@ -71,7 +71,7 @@ export const Row = memo(function Row({
       collapsable={false}
       style={[styles.row, { backgroundColor: theme.surface }]}
       entering={
-        reduced || entry === null
+        reduced || entry === null || Platform.OS === "web"
           ? undefined
           : FadeInUp.duration(motion.durationBase)
               .delay(entry * motion.stagger)
@@ -213,5 +213,10 @@ const styles = StyleSheet.create({
     flexBasis: layout.zero,
     minWidth: layout.zero,
   },
-  stackedTitle: { flexBasis: "auto" },
+  stackedTitle: {
+    flexBasis: "auto",
+    flexGrow: layout.zero,
+    flexShrink: layout.zero,
+    width: layout.columnWidth,
+  },
 });

@@ -24,7 +24,7 @@ const sizes = {
   h3: { fontSize: 18, lineHeight: 24, letterSpacing: 0 },
   body: { fontSize: 16, lineHeight: 24, letterSpacing: 0 },
   bodyStrong: { fontSize: 16, lineHeight: 24, letterSpacing: 0 },
-  caption: { fontSize: 13, lineHeight: 19, letterSpacing: 0.1 },
+  caption: { fontSize: 14, lineHeight: 20, letterSpacing: 0 },
   label: { fontSize: 14, lineHeight: 18, letterSpacing: 0 },
 } as const;
 const compactSizes = {
@@ -54,7 +54,8 @@ export function headingStyle(
       : fallbackHeading,
     fontWeight: "700",
     textAlign: "left",
-    flexShrink: 1,
+    flexShrink: 0,
+    minWidth: 0,
   };
 }
 
@@ -75,6 +76,7 @@ export function textStyle(variant: TextVariant): TextStyle {
           ? "500"
           : "400",
     textAlign: "left",
-    flexShrink: 1,
+    flexShrink: 0,
+    minWidth: 0,
   };
 }

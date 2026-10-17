@@ -91,7 +91,13 @@ export function Screen<T = never>({
   return (
     <EntryContext.Provider value={entry.current}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={
+          Platform.OS === "web"
+            ? undefined
+            : Platform.OS === "ios"
+              ? "padding"
+              : "height"
+        }
         style={[styles.screen, { backgroundColor: theme.ink }]}
       >
         <StatusBar barStyle="light-content" />
@@ -171,18 +177,27 @@ export function Screen<T = never>({
 
 const styles = StyleSheet.create({
   masthead: {
+    flexShrink: layout.zero,
+    minWidth: layout.zero,
     padding: space.xl,
     borderRadius: controls.panelRadius,
     gap: space.md,
   },
   headerTop: {
+    flexShrink: layout.zero,
+    minWidth: layout.zero,
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
     gap: space.sm,
   },
-  listHeader: { gap: space.lg, paddingBottom: space.lg },
+  listHeader: {
+    flexShrink: layout.zero,
+    minWidth: layout.zero,
+    gap: space.lg,
+    paddingBottom: space.lg,
+  },
   screen: { flex: layout.fill, minHeight: layout.zero },
   viewport: { flex: layout.fill, minHeight: layout.zero },
   scroll: { flexGrow: layout.fill, alignItems: "center" },
@@ -195,6 +210,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   column: {
+    minWidth: layout.zero,
     flexShrink: layout.zero,
     width: layout.columnWidth,
     maxWidth:

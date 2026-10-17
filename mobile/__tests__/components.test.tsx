@@ -64,6 +64,7 @@ describe("PRD §9 accessibility/platforms: M0 primitives", () => {
     expect(style.fontSize).toBe(width < 360 ? 28 : 32);
     expect(style.width).toBeUndefined();
     expect(style.height).toBeUndefined();
+    expect(style.flexShrink).toBe(0);
   });
   test("body wraps without truncation and supports large text", async () => {
     await render(
@@ -72,6 +73,7 @@ describe("PRD §9 accessibility/platforms: M0 primitives", () => {
     const text = screen.getByText("Class material and alerts, in one place.");
     expect(text.props.numberOfLines).toBeUndefined();
     expect(text.props.maxFontSizeMultiplier).toBe(1.6);
+    expect(Native.StyleSheet.flatten(text.props.style).flexShrink).toBe(0);
     expect(Native.StyleSheet.flatten(text.props.style).color).toBe(
       theme.boneMuted,
     );
@@ -91,6 +93,13 @@ describe("PRD §9 accessibility/platforms: M0 primitives", () => {
     expect(
       Native.StyleSheet.flatten(screen.getByText("Quiz").props.style).color,
     ).toBe(theme.moss);
+  });
+  test("browser headings enter in normal flow without a transform animation", async () => {
+    jest.replaceProperty(Native.Platform, "OS", "web");
+    await render(
+      <Heading>Computer Organization and Assembly Language</Heading>,
+    );
+    expect(screen.getByRole("header").props.entering).toBeUndefined();
   });
   test("screen respects safe areas and constrains tablet content", async () => {
     const metrics = {

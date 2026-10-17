@@ -1,4 +1,4 @@
-import { type TextProps } from "react-native";
+import { Platform, type TextProps } from "react-native";
 import Animated, { FadeInUp, Easing } from "react-native-reanimated";
 import { useMotionPreference } from "../theme/animation";
 import { motion } from "../theme/motion";
@@ -34,7 +34,7 @@ export function Heading({ variant = "h1", ...props }: Props) {
       maxFontSizeMultiplier={textLimits.headingScale}
       numberOfLines={textLimits.headingLines}
       entering={
-        reduced
+        reduced || Platform.OS === "web"
           ? undefined
           : FadeInUp.duration(motion.durationBase)
               .easing(Easing.bezier(...motion.easeOut))

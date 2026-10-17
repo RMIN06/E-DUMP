@@ -11,3 +11,5 @@ Use theme tokens, a centred tablet column, scalable text, 48 dp controls, and re
 The 21st catalogue search returned HTTP 401; no external catalogue code was retrieved. Decisions and the Figma reference are recorded in design.json.
 
 11 October 2026: stabilized scrolling by removing measurement-driven row state, bounding list/form viewports and retaining animated row views. Upload selection supports batches with independent titles, per-file errors and retry of unfinished files; update attachments keep the three-file limit. Existing reference, palette and primitives retained. Catalogue search again returned HTTP 401; no external code added.
+
+17 October 2026: preserve natural text height in vertical stacks. Typography does not shrink on the main axis; phone row titles have no flex growth or shrinkage and retain full available width. Browser heading and row entrance transforms are disabled; native reduced-motion-aware animation and button feedback remain. Captions use 14/20 for easier reading. Mastheads cannot collapse, and browser forms leave keyboard viewport sizing to the browser.

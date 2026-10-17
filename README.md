@@ -1,6 +1,15 @@
 <div align="center">
 
-<img src="./assets/edump_banner.svg" alt="E-DUMP" width="100%" />
+```
+███████╗    ██████╗ ██╗   ██╗███╗   ███╗██████╗
+██╔════╝    ██╔══██╗██║   ██║████╗ ████║██╔══██╗
+█████╗█████╗██║  ██║██║   ██║██╔████╔██║██████╔╝
+██╔══╝╚════╝██║  ██║██║   ██║██║╚██╔╝██║██╔═══╝
+███████╗    ██████╔╝╚██████╔╝██║ ╚═╝ ██║██║
+╚══════╝    ╚═════╝  ╚═════╝ ╚═╝     ╚═╝╚═╝
+```
+
+![Accent](https://img.shields.io/badge/-%20-A7AA63?style=flat-square&labelColor=A7AA63&color=A7AA63)
 
 **The class material hub for BCS-3E, FAST-NUCES Lahore.**
 

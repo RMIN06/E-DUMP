@@ -130,6 +130,51 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
+test.each([undefined, "ds"])(
+  "dated feed rows show deadlines outside Coming up (subject: %s)",
+  async (subjectSlug) => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-10-18T05:00:00Z"));
+    const upcoming = [1, 2, 3].map((number) => ({
+      ...item,
+      id: `upcoming-${number}`,
+      title: `Upcoming ${number}`,
+      due_at: "2026-10-19T05:00:00Z",
+    }));
+    const fourth = {
+      ...item,
+      id: "fourth",
+      title: "Assignment 2",
+      due_at: "2026-10-22T09:30:00Z",
+    };
+    const undated = {
+      ...item,
+      id: "undated",
+      title: "Class notice",
+      due_at: null,
+    };
+    jest.mocked(useUpcoming).mockReturnValue({
+      ...base,
+      data: upcoming,
+    } as unknown as ReturnType<typeof useUpcoming>);
+    jest.mocked(useUpdates).mockReturnValue({
+      ...base,
+      data: { pages: [{ items: [...upcoming, fourth, undated] }] },
+    } as unknown as ReturnType<typeof useUpdates>);
+    await render(<UpdatesScreen subjectSlug={subjectSlug} />);
+    expect(
+      screen.getByRole("button", {
+        name: /Assignment 2, .*Thu 22 Oct, 2:30 PM/,
+      }),
+    ).toBeTruthy();
+    expect(screen.getAllByText("Thu 22 Oct, 2:30 PM")).toHaveLength(1);
+    expect(
+      screen.getByRole("button", { name: /^Class notice,/ }).props
+        .accessibilityLabel,
+    ).not.toMatch(/AM|PM/);
+  },
+);
+
 test("new data uses the current clock after the screen has stayed open", async () => {
   jest.useFakeTimers();
   jest.setSystemTime(new Date("2026-10-18T05:00:00Z"));

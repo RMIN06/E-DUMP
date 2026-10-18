@@ -122,7 +122,7 @@ export function UpdateFormScreen() {
         setActiveFile(index + 1);
         setProgress(0);
         try {
-          let size = file.size;
+          let size = file.size ?? file.file?.size;
           if (size === undefined) {
             const info = await pickedFileInfo(file.uri);
             if (info.exists && !info.isDirectory) size = info.size;
@@ -150,6 +150,7 @@ export function UpdateFormScreen() {
             signal: controller.signal,
             upload: {
               uri: file.uri,
+              file: file.file,
               filename: file.name,
               mimeType: mime,
               fields: {},

@@ -122,6 +122,23 @@ beforeEach(() => {
 });
 
 test("MAT-4: picker prefills title and uploads explicit original filename and normalized metadata", async () => {
+  const selectedFile = Object.assign(new Blob(["selected document"]), {
+    name: "Lecture 3.pdf",
+    lastModified: 0,
+    webkitRelativePath: "",
+  });
+  jest.mocked(Picker.getDocumentAsync).mockResolvedValueOnce({
+    canceled: false,
+    assets: [
+      {
+        name: "Lecture 3.pdf",
+        uri: "blob:chosen",
+        size: 100,
+        mimeType: "application/pdf",
+        file: selectedFile,
+      },
+    ],
+  });
   await render(<UploadScreen />);
   await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
   expect(screen.getByLabelText("Title").props.value).toBe("Lecture 3");
@@ -137,6 +154,7 @@ test("MAT-4: picker prefills title and uploads explicit original filename and no
       expect.objectContaining({
         method: "POST",
         upload: expect.objectContaining({
+          file: selectedFile,
           filename: "Lecture 3.pdf",
           fields: {
             title: "Lecture 3",
@@ -378,20 +396,18 @@ test("batch material upload preserves independent titles and retries only failed
   );
 });
 test("batch selection retains valid files while rejecting an oversize file", async () => {
-  jest
-    .mocked(Picker.getDocumentAsync)
-    .mockResolvedValue({
-      canceled: false,
-      assets: [
-        ...batchAssets,
-        {
-          ...batchAssets[0]!,
-          uri: "file:///large.pdf",
-          name: "large.pdf",
-          size: 26 * 1024 * 1024,
-        },
-      ],
-    });
+  jest.mocked(Picker.getDocumentAsync).mockResolvedValue({
+    canceled: false,
+    assets: [
+      ...batchAssets,
+      {
+        ...batchAssets[0]!,
+        uri: "file:///large.pdf",
+        name: "large.pdf",
+        size: 26 * 1024 * 1024,
+      },
+    ],
+  });
   await render(<UploadScreen />);
   await fireEvent.press(screen.getByRole("button", { name: "Choose files" }));
   expect(Picker.getDocumentAsync).toHaveBeenCalledWith(

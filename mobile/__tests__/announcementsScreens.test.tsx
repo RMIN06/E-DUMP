@@ -138,24 +138,20 @@ test("new data uses the current clock after the screen has stayed open", async (
     .mockReturnValue({ ...base, data: [] } as unknown as ReturnType<
       typeof useUpcoming
     >);
-  jest
-    .mocked(useUpdates)
-    .mockReturnValue({
-      ...base,
-      data: { pages: [{ items: [] }] },
-    } as unknown as ReturnType<typeof useUpdates>);
+  jest.mocked(useUpdates).mockReturnValue({
+    ...base,
+    data: { pages: [{ items: [] }] },
+  } as unknown as ReturnType<typeof useUpdates>);
   const view = await render(<UpdatesScreen />);
   await act(async () => {
     await jest.advanceTimersByTimeAsync(60_000);
   });
-  jest
-    .mocked(useUpdates)
-    .mockReturnValue({
-      ...base,
-      data: {
-        pages: [{ items: [{ ...item, due_at: "2026-10-18T05:01:01Z" }] }],
-      },
-    } as unknown as ReturnType<typeof useUpdates>);
+  jest.mocked(useUpdates).mockReturnValue({
+    ...base,
+    data: {
+      pages: [{ items: [{ ...item, due_at: "2026-10-18T05:01:01Z" }] }],
+    },
+  } as unknown as ReturnType<typeof useUpdates>);
   await view.rerender(<UpdatesScreen />);
   expect(screen.getByText("Linked lists")).toBeTruthy();
   await act(async () => {
@@ -405,9 +401,15 @@ test("announcement batch picker respects remaining slots before uploading", asyn
   expect(screen.getByText("Attachments (1/3)")).toBeTruthy();
 });
 test("announcement batch retains successful attachments when another file fails", async () => {
+  const selectedFile = Object.assign(new Blob(["selected attachment"]), {
+    name: "quiz.pdf",
+    lastModified: 0,
+    webkitRelativePath: "",
+  });
   jest.mocked(Picker.getDocumentAsync).mockResolvedValue({
     canceled: false,
     assets: [0, 1].map((i) => ({
+      file: selectedFile,
       uri: `file:///quiz-${i}.pdf`,
       name: `quiz-${i}.pdf`,
       size: 100,
@@ -434,4 +436,10 @@ test("announcement batch retains successful attachments when another file fails"
     expect.objectContaining({ multiple: true }),
   );
   expect(api).toHaveBeenCalledTimes(2);
+  expect(api).toHaveBeenCalledWith(
+    "/announcements/attachments",
+    expect.objectContaining({
+      upload: expect.objectContaining({ file: selectedFile }),
+    }),
+  );
 });

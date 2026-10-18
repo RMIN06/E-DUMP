@@ -1,4 +1,5 @@
 import { publicRequest, type RequestOptions } from "../src/api/transport";
+import { Platform } from "react-native";
 
 class FakeXHR {
   static instances: FakeXHR[] = [];
@@ -45,10 +46,46 @@ beforeEach(() => {
   process.env.EXPO_PUBLIC_API_BASE_URL = "http://test/api/v1";
 });
 afterEach(() => {
+  jest.restoreAllMocks();
   global.XMLHttpRequest = original;
   global.FormData = originalForm;
   delete process.env.EXPO_PUBLIC_API_BASE_URL;
   jest.clearAllMocks();
+});
+test("browser multipart uses the selected file directly without fetching its local URL", async () => {
+  jest.replaceProperty(Platform, "OS", "web");
+  const fetch = jest
+    .spyOn(global, "fetch")
+    .mockRejectedValue(new Error("Blocked local URL"));
+  const file = new Blob(["chosen file"], { type: "application/pdf" });
+  if (!options.upload) throw new Error("Expected upload fixture.");
+  const pending = publicRequest("/subjects/coal/materials", {
+    ...options,
+    upload: {
+      ...options.upload,
+      uri: "blob:https://edump-preview.pages.dev/chosen",
+      file,
+    },
+  });
+  const xhr = activeXHR();
+  expect(fetch).not.toHaveBeenCalled();
+  expect(xhr.open).toHaveBeenCalledWith(
+    "POST",
+    "/api/v1/subjects/coal/materials",
+  );
+  const form = (xhr.send.mock.calls as unknown[][])[0]?.[0] as FormData;
+  expect(form.getAll("file")[0]).toBe(file);
+  xhr.onload?.();
+  await expect(pending).resolves.toEqual({ id: "created" });
+});
+test("a missing browser file asks for reselection without a fetch or upload", async () => {
+  jest.replaceProperty(Platform, "OS", "web");
+  const fetch = jest.spyOn(global, "fetch");
+  await expect(publicRequest("/upload", options)).rejects.toThrow(
+    "Choose it again",
+  );
+  expect(fetch).not.toHaveBeenCalled();
+  expect(FakeXHR.instances).toHaveLength(0);
 });
 test("multipart sends original filename, bearer, boundary managed by native transport, and progress", async () => {
   const pending = publicRequest("/subjects/coal/materials", options);

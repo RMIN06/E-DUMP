@@ -7,6 +7,7 @@ export type RequestOptions = {
   timeoutMs?: number;
   upload?: {
     uri: string;
+    file?: Blob;
     filename: string;
     mimeType: string;
     fields: Record<string, string>;
@@ -147,10 +148,9 @@ export const publicRequest: Request = async <T>(
 async function uploadOnce<T>(url: string, options: RequestOptions): Promise<T> {
   const upload = options.upload;
   if (!upload || options.signal?.aborted) throw new Error("Upload cancelled.");
-  const browserFile =
-    Platform.OS === "web"
-      ? await (await fetch(upload.uri, { signal: options.signal })).blob()
-      : null;
+  const browserFile = Platform.OS === "web" ? upload.file : null;
+  if (Platform.OS === "web" && !browserFile)
+    throw new Error("Couldn't read this file. Choose it again and retry.");
   if (options.signal?.aborted) throw new Error("Upload cancelled.");
   return new Promise<T>((resolve, reject) => {
     const xhr = new XMLHttpRequest();

@@ -109,6 +109,7 @@ export function UploadScreen() {
       const selected: ChosenFile[] = [];
       const rejected: string[] = [];
       for (const asset of result.assets) {
+        asset.size ??= asset.file?.size;
         if (asset.size === undefined) {
           const info = await pickedFileInfo(asset.uri);
           if (info.exists && !info.isDirectory) asset.size = info.size;
@@ -225,6 +226,7 @@ export function UploadScreen() {
               signal: controller.current.signal,
               upload: {
                 uri: file.asset.uri,
+                file: file.asset.file,
                 filename: file.asset.name,
                 mimeType: file.asset.mimeType ?? "application/octet-stream",
                 fields,

@@ -133,6 +133,7 @@ test("MAT-4: picker prefills title and uploads explicit original filename and no
       {
         name: "Lecture 3.pdf",
         uri: "blob:chosen",
+        lastModified: 0,
         size: 100,
         mimeType: "application/pdf",
         file: selectedFile,

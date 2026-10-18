@@ -39,3 +39,13 @@ Live browser diagnosis reproduced Failed to fetch using a deliberately invalid l
 The final scoped make verify -o lint-backend -o test-backend -o check-types returned exit 0: 235 app tests, 15 edge/audit tests, lint/strict TypeScript, slop, Python audit, secret scan and accepted npm audit policy. Unchanged backend and generated-schema checks reuse the successful full 18 October verification. The initial gate caught missing lastModified in a test fixture; 5cff0d5 repaired it before final verification. Actual private-credential export scans, published web HTML equality, security headers and anonymous profile rejection passed.
 
 Web shell edump-shell-2026-10-18.2 is live at https://edump-preview.pages.dev. Android OTA group d26863b8-67fb-45d2-850f-ea75ccc98503 / update 01a14e1c-b8e4-7616-ada7-5617d50070b7 is served on preview for edump-android-1; the live manifest matched. Installed Android 0.1.7 needs no replacement APK. Close an existing upload form, use Restart to update from a read-only tab, then select the files again.
+
+## Deadline badges in every feed - 18 October 2026
+
+Source c030f20 adds the existing Karachi deadline badge to main and subject update rows, including dated records beyond the three Coming up entries. Undated notices retain no deadline badge. The existing responsive Row layout, expiry rules and one-record-per-feed behavior remain unchanged. No dependencies, backend or native runtime changes were made.
+
+Scoped make verify -o lint-backend -o test-backend -o check-types passed (exit 0): 237 app tests across 28 suites, 15 edge/audit checks, lint/strict TypeScript, slop, Python audit, secret scan and the existing accepted npm audit policy. Unchanged backend/schema checks reuse the full 18 October verification. Regression coverage includes the fourth dated alert and subject feeds, with undated notices left undated.
+
+Web shell edump-shell-2026-10-18.3 is published at https://edump-preview.pages.dev. Actual private-credential scans, live HTML/export equality, security headers and anonymous profile rejection passed. The live Assignment 2 DS row now shows Sun 25 Oct, 9:21 PM; a safe update restart preserved sign-in. Physical iPhone/Android rendering remains an owner device check.
+
+Android OTA group 2c9e8247-5bc4-4cba-8d84-d4989fe66371 / update 01a14fda-7558-7dc8-ae1a-93fb0d78dd28 is published on preview for edump-android-1. The live Expo manifest matched the update and runtime; its exported bundle passed the actual private-credential scan. Installed Android 0.1.7 requires no replacement APK. Use Restart to update on a read-only tab after download, or reopen after the update has downloaded. Device apply acceptance remains pending the owner.

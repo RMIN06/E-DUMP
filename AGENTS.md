@@ -19,7 +19,7 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - M6 and M7 are authorized. Publish a standalone Android APK connected to a hosted HTTPS API; defer iOS setup and acceptance.
 - Use platform fallback fonts for the test preview only; production still requires licensed fonts.
 - Render free hosting and MongoDB Atlas free are approved for the preview, including idle sleep and cold starts.
-- Rules support/deletion/takedown contacts: l250716@lhr.nu.edu.pk and l250656@lhr.nu.edu.pk.
+- Rules support/deletion/takedown contact: l250716@lhr.nu.edu.pk only (owner correction, 19 October 2026). Admin roles do not add support contacts.
 - The owner will perform physical Android functional acceptance using the APK link. Do not label pending device acceptance as passed.
 - After each completed UI update, build and publish a new signed Android preview APK and provide its verified download link. Increment the app version and Android version code for each published build.
 

@@ -27,6 +27,16 @@ describe("PRD §10 first-launch content rules", () => {
     expect(
       screen.getByRole("button", { name: "l250716@lhr.nu.edu.pk" }),
     ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: "l250656@lhr.nu.edu.pk" }),
+    ).toBeNull();
+    for (const email of [
+      "l250630@lhr.nu.edu.pk",
+      "l250525@lhr.nu.edu.pk",
+      "l250893@lhr.nu.edu.pk",
+    ]) {
+      expect(screen.queryByRole("button", { name: email })).toBeNull();
+    }
     fireEvent.press(screen.getByRole("button", { name: "Continue" }));
     expect(await screen.findByText("Sign in")).toBeTruthy();
     expect(await AsyncStorage.getItem("edump.rules.v1")).toBe("accepted");

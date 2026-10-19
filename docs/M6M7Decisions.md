@@ -7,7 +7,7 @@ Owner decisions, 9 October 2026:
 - Publish an APK with bundled JavaScript and a hosted HTTPS API so testing needs neither Metro nor this PC.
 - Platform fallback fonts are allowed for the test preview only. Production retains the licensed font gate.
 - Render's free API and MongoDB Atlas free are approved. Render sleeps after 15 idle minutes; a cold start can take about a minute. This is a preview exception to the always-on host specification.
-- Rules support, deletion and takedown contacts are l250716@lhr.nu.edu.pk and l250656@lhr.nu.edu.pk.
+- Rules support, deletion and takedown contact is l250716@lhr.nu.edu.pk only (owner correction, 19 October 2026). Admin roles do not add support contacts.
 - Physical Android acceptance belongs to the owner after delivery. Pending acceptance is recorded honestly; this preview is not the final class rollout.
 
 References: [Render free services](https://render.com/docs/free), [Atlas free limits](https://www.mongodb.com/docs/atlas/reference/free-shared-limitations/).

@@ -6,10 +6,7 @@ import { TextAction } from "../../components/TextAction";
 import { Button } from "../../components/Button";
 import { ErrorLine } from "../../components/ErrorLine";
 
-export const supportEmails = [
-  "l250716@lhr.nu.edu.pk",
-  "l250656@lhr.nu.edu.pk",
-] as const;
+export const supportEmails = ["l250716@lhr.nu.edu.pk"] as const;
 export function RulesScreen({
   onContinue,
   onClose,

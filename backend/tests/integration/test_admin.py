@@ -10,6 +10,7 @@ from app.models.admin import UserPatch
 from app.models.user import UserRecord
 from app.repositories.files import Database
 from app.services import admin_service
+from tests.email_helpers import verified_login
 from tests.fakes import FakeStorage
 from tests.integration.test_announcements import (
     client as client,
@@ -132,9 +133,7 @@ async def test_seeded_admin_restoration_and_account_transfer(
         headers=replacement,
         json={"is_active": False},
     )
-    assert (
-        await client.post("/api/v1/auth/login", json={"email": "l250002@lhr.nu.edu.pk"})
-    ).status_code == 403
+    assert (await verified_login(client, "l250002@lhr.nu.edu.pk")).status_code == 403
     await client.patch(
         f"/api/v1/admin/users/{seeded_id}",
         headers=replacement,
@@ -237,9 +236,7 @@ async def test_delete_account_erases_credentials_and_anonymizes_retained_uploads
     assert (await database.materials.find_one({"_id": ObjectId(material["id"])}))[
         "uploader_name_snapshot"
     ] == "Former member"
-    fresh = (
-        await client.post("/api/v1/auth/login", json={"email": member["email"]})
-    ).json()
+    fresh = (await verified_login(client, member["email"])).json()
     assert fresh["needs_name"] and fresh["user"]["id"] != member["id"]
 
 

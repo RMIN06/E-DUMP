@@ -9,6 +9,7 @@ from slowapi.util import get_remote_address
 
 from app.config import get_settings
 from app.errors import DomainError, Unavailable
+from app.integrations.email import EmailSender, MailjetEmailSender
 from app.integrations.push import ExpoPushClient, PushClient
 from app.integrations.r2 import R2Storage, Storage
 from app.models.user import UserRecord
@@ -85,3 +86,10 @@ def get_push_client() -> PushClient:
 
 
 Push = Annotated[PushClient, Depends(get_push_client)]
+
+
+def get_email_sender() -> EmailSender:
+    return MailjetEmailSender()
+
+
+EmailDelivery = Annotated[EmailSender, Depends(get_email_sender)]

@@ -96,6 +96,7 @@ async def test_development_openapi_exposes_only_current_milestones(
         "/healthz",
         "/readyz",
         "/api/v1/auth/login",
+        "/api/v1/auth/verify",
         "/api/v1/auth/refresh",
         "/api/v1/auth/logout",
         "/api/v1/me",

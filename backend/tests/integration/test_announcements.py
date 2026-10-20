@@ -318,6 +318,7 @@ async def test_device_ownership_push_batches_and_failure(
                 "expo_push_token": f"ExpoPushToken[t{i}]",
                 "platform": "android",
                 "notifications_enabled": True,
+                "auth_version": 2,
                 "created_at": now,
             }
             for i in range(250)

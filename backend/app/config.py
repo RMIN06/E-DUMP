@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     web_push_public_key: str | None = None
     web_push_private_key: SecretStr | None = None
     expo_push_access_token: SecretStr | None = None
+    mailjet_api_key: SecretStr | None = None
+    mailjet_secret_key: SecretStr | None = None
+    email_sender: str | None = None
 
 
 @lru_cache

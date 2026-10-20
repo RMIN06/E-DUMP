@@ -41,3 +41,5 @@ async def ensure_indexes(database: AsyncDatabase[dict[str, object]]) -> None:
     await database.refresh_tokens.create_index("family_id")
     await database.refresh_tokens.create_index("user_id")
     await database.refresh_tokens.create_index("expires_at", expireAfterSeconds=0)
+    await database.email_codes.create_index("purge_at", expireAfterSeconds=0)
+    await database.email_delivery_limits.create_index("purge_at", expireAfterSeconds=0)

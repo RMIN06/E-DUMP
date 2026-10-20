@@ -11,6 +11,17 @@ class LoginRequest(BaseModel):
     email: str = Field(max_length=256)
 
 
+class CodeChallenge(BaseModel):
+    challenge_id: str
+    expires_in: int = 600
+    retry_after: int = 60
+
+
+class VerifyRequest(LoginRequest):
+    challenge_id: str = Field(min_length=20, max_length=128)
+    code: str = Field(min_length=6, max_length=6, pattern=r"^[0-9]{6}$")
+
+
 class RefreshRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     refresh_token: str = Field(min_length=1, max_length=256)
@@ -37,3 +48,4 @@ class RefreshRecord(BaseModel):
     replaced_by: ObjectId | None = None
     created_at: datetime
     user_agent: str
+    auth_version: int = 1

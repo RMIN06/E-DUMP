@@ -2,11 +2,18 @@ import hashlib
 
 from fastapi import APIRouter, Depends, Request, Response
 
-from app.deps import AuthLock, CurrentUser, Database
+from app.deps import AuthLock, CurrentUser, Database, EmailDelivery
 from app.deps import limiter as limiter
 from app.errors import DomainError
-from app.models.auth import LoginRequest, LoginResponse, RefreshRequest, Tokens
-from app.services import auth_service
+from app.models.auth import (
+    CodeChallenge,
+    LoginRequest,
+    LoginResponse,
+    RefreshRequest,
+    Tokens,
+    VerifyRequest,
+)
+from app.services import auth_service, email_auth_service
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -33,16 +40,33 @@ def existing_account(request: Request) -> bool:
 
 
 @router.post(
-    "/login", response_model=LoginResponse, dependencies=[Depends(login_context)]
+    "/login", response_model=CodeChallenge, dependencies=[Depends(login_context)]
 )
 @limiter.limit("10/minute")
 @limiter.limit("5/minute", key_func=email_key)
 @limiter.limit("20/hour", exempt_when=existing_account)
 async def login(
-    request: Request, body: LoginRequest, database: Database, lock: AuthLock
+    request: Request,
+    body: LoginRequest,
+    database: Database,
+    lock: AuthLock,
+    sender: EmailDelivery,
+) -> CodeChallenge:
+    return await email_auth_service.request_code(database, body.email, lock, sender)
+
+
+@router.post("/verify", response_model=LoginResponse)
+@limiter.limit("30/minute")
+async def verify(
+    request: Request, body: VerifyRequest, database: Database, lock: AuthLock
 ) -> LoginResponse:
-    return await auth_service.login_with_email(
-        database, body.email, lock, request.headers.get("user-agent", "")
+    return await email_auth_service.verify_code(
+        database,
+        body.email,
+        body.challenge_id,
+        body.code,
+        lock,
+        request.headers.get("user-agent", ""),
     )
 
 

@@ -63,6 +63,7 @@ def access_token(user_id: ObjectId) -> str:
             "iat": now,
             "exp": now + timedelta(minutes=get_settings().access_token_ttl_min),
             "typ": "access",
+            "auth_version": 2,
         },
         token_secret(),
         algorithm="HS256",
@@ -83,6 +84,7 @@ def decode_access(token: str) -> ObjectId:
         subject = claims["sub"]
         if (
             claims["typ"] != "access"
+            or claims.get("auth_version") != 2
             or not isinstance(subject, str)
             or not ObjectId.is_valid(subject)
         ):
@@ -118,6 +120,7 @@ async def issue_tokens(
         expires_at=now + timedelta(days=get_settings().refresh_token_ttl_days),
         created_at=now,
         user_agent=user_agent[:256],
+        auth_version=2,
     )
     await refresh_tokens.insert(database, record)
     return Tokens(access_token=access, refresh_token=raw)
@@ -164,6 +167,9 @@ async def rotate_refresh(
         record = await refresh_tokens.by_hash(database, hash_refresh(raw))
         if record is None:
             raise DomainError("invalid_token", "Sign in again.", 401)
+        if record.auth_version != 2:
+            await revoke_family(database, record.family_id)
+            raise DomainError("invalid_token", "Verify your email to sign in.", 401)
         if (
             record.revoked_at
             or record.replaced_by

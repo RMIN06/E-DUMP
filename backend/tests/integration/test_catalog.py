@@ -17,6 +17,7 @@ from app.main import create_app
 from app.models.schedule import ScheduleSeed
 from app.models.subject import SubjectSeed
 from app.services.schedule_service import seed_catalog
+from tests.email_helpers import verified_login
 
 
 def seed_data() -> tuple[list[SubjectSeed], list[ScheduleSeed]]:
@@ -57,10 +58,7 @@ async def client(
 
 
 async def login(client: AsyncClient, admin: bool = False) -> dict[str, str]:
-    response = await client.post(
-        "/api/v1/auth/login",
-        json={"email": f"l25000{2 if admin else 1}@lhr.nu.edu.pk"},
-    )
+    response = await verified_login(client, f"l25000{2 if admin else 1}@lhr.nu.edu.pk")
     assert response.status_code == 200
     return {"Authorization": "Bearer " + response.json()["access_token"]}
 

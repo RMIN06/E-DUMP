@@ -8,7 +8,7 @@ from app.errors import DomainError
 from app.integrations.r2 import Storage
 from app.models.admin import AdminReport, ReportAction, UserPatch
 from app.models.user import User, UserRecord
-from app.repositories import materials, refresh_tokens, reports, users
+from app.repositories import email_codes, materials, refresh_tokens, reports, users
 from app.repositories.files import Database
 from app.services import material_service
 
@@ -116,4 +116,5 @@ async def delete_account(
                 "Make another active member an admin before deleting your account.",
                 403,
             )
+        await email_codes.delete_for_email(database, current.email)
         await users.delete(database, user.id)

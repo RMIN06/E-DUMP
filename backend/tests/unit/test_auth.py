@@ -67,6 +67,7 @@ def test_auth_2_access_roundtrip() -> None:
         "string_iat",
         "string_exp",
         "backwards",
+        "legacy",
     ],
 )
 def test_auth_2_invalid_access_claims(change: str) -> None:
@@ -76,6 +77,7 @@ def test_auth_2_invalid_access_claims(change: str) -> None:
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(minutes=15)).timestamp()),
         "typ": "access",
+        "auth_version": 2,
     }
     secret = token_secret()
     algorithm = "HS256"
@@ -100,6 +102,8 @@ def test_auth_2_invalid_access_claims(change: str) -> None:
         claims["iat"] = str(claims["iat"])
     elif change == "string_exp":
         claims["exp"] = str(claims["exp"])
+    elif change == "legacy":
+        claims.pop("auth_version")
     elif change == "backwards":
         claims["exp"] = claims["iat"]
     with pytest.raises(DomainError):

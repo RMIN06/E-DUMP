@@ -18,6 +18,7 @@ from app.models.user import UserRecord
 from app.repositories import users
 from app.routers.auth import limiter
 from app.services.auth_service import hash_refresh
+from tests.email_helpers import verified_login
 
 TEST_DATABASE = "edump_m1_test_" + uuid4().hex
 
@@ -54,7 +55,7 @@ async def client(
 async def sign_in(
     client: AsyncClient, email: str = "l250001@lhr.nu.edu.pk"
 ) -> dict[str, object]:
-    response = await client.post("/api/v1/auth/login", json={"email": email})
+    response = await verified_login(client, email)
     assert response.status_code == 200, response.text
     return response.json()
 
@@ -248,9 +249,7 @@ async def test_auth_3_disable_and_role_change_apply_immediately(
             "/api/v1/auth/refresh", json={"refresh_token": session["refresh_token"]}
         )
     ).status_code == 401
-    assert (
-        await client.post("/api/v1/auth/login", json={"email": "l250001@lhr.nu.edu.pk"})
-    ).status_code == 403
+    assert (await verified_login(client, "l250001@lhr.nu.edu.pk")).status_code == 403
     assert await database.refresh_tokens.count_documents({"revoked_at": None}) == 0
 
 
@@ -305,7 +304,9 @@ async def test_auth_1_invalid_email_never_creates_user(
     ).status_code == 422
 
 
-async def test_auth_1_login_rate_limits(client: AsyncClient) -> None:
+async def test_auth_1_login_rate_limits(
+    client: AsyncClient, database: AsyncDatabase[dict[str, object]]
+) -> None:
     """AUTH-1/A9: sixth normalized email attempt and eleventh IP attempt are limited."""
     for _ in range(5):
         await sign_in(client)
@@ -314,6 +315,7 @@ async def test_auth_1_login_rate_limits(client: AsyncClient) -> None:
     )
     assert response.status_code == 429 and response.headers["retry-after"] == "60"
     limiter.reset()
+    await database.email_codes.delete_many({})
     for number in range(10):
         await sign_in(client, f"l25{number:04d}@lhr.nu.edu.pk")
     assert (

@@ -18,6 +18,7 @@ from app.repositories import materials
 from app.services.schedule_service import seed_catalog
 from app.services.upload_validation import MIMES
 from app.tasks.housekeeping import sweep
+from tests.email_helpers import verified_login
 from tests.fakes import FakeStorage
 from tests.fixtures import JPG, PDF, PNG, WEBP, office
 from tests.integration.test_catalog import seed_data
@@ -56,9 +57,7 @@ async def client(
 
 
 async def login(client: AsyncClient, roll: str = "l250001") -> dict[str, str]:
-    result = await client.post(
-        "/api/v1/auth/login", json={"email": roll + "@lhr.nu.edu.pk"}
-    )
+    result = await verified_login(client, roll + "@lhr.nu.edu.pk")
     headers = {"Authorization": "Bearer " + result.json()["access_token"]}
     await client.patch("/api/v1/me", headers=headers, json={"name": "Test member"})
     return headers

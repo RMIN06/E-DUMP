@@ -13,7 +13,8 @@ async def register(database: Database, user_id: ObjectId, data: DeviceWrite) -> 
     await database.devices.update_one(
         {"expo_push_token": data.expo_push_token},
         {
-            "$set": data.model_dump() | {"user_id": user_id, "last_seen_at": now},
+            "$set": data.model_dump()
+            | {"user_id": user_id, "last_seen_at": now, "auth_version": 2},
             "$setOnInsert": {"created_at": now},
         },
         upsert=True,
@@ -34,6 +35,7 @@ async def recipients(database: Database, author_id: ObjectId) -> list[str]:
             {
                 "$match": {
                     "notifications_enabled": True,
+                    "auth_version": 2,
                     "platform": {"$ne": "web"},
                     "user_id": {"$ne": author_id},
                 }
@@ -62,7 +64,12 @@ async def register_web(
         {"expo_push_token": token},
         {
             "$set": data.model_dump()
-            | {"expo_push_token": token, "user_id": user_id, "last_seen_at": now},
+            | {
+                "expo_push_token": token,
+                "user_id": user_id,
+                "last_seen_at": now,
+                "auth_version": 2,
+            },
             "$setOnInsert": {"created_at": now},
         },
         upsert=True,
@@ -78,6 +85,7 @@ async def web_recipients(
                 "$match": {
                     "platform": "web",
                     "notifications_enabled": True,
+                    "auth_version": 2,
                     "user_id": {"$ne": author_id},
                 }
             },

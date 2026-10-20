@@ -18,6 +18,8 @@ jest.mock("../src/lib/session", () => ({
   useSession: jest.fn(),
   sessionActions: {
     login: jest.fn(),
+    requestCode: jest.fn(),
+    block: jest.fn(async () => undefined),
     restore: jest.fn(),
     updateName: jest.fn(),
     signOut: jest.fn(),
@@ -62,23 +64,125 @@ beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(useSession).mockReturnValue(state);
   jest.mocked(sessionActions.login).mockResolvedValue(undefined);
+  jest.mocked(sessionActions.requestCode).mockResolvedValue({
+    challenge_id: "test-challenge",
+    expires_in: 600,
+    retry_after: 60,
+  });
   jest.mocked(sessionActions.updateName).mockResolvedValue(undefined);
   jest.mocked(sessionActions.restore).mockResolvedValue(undefined);
   jest.mocked(sessionActions.signOut).mockResolvedValue(undefined);
 });
 
 describe("AUTH-1: sign-in screen", () => {
+  test("email requests a code; only verified code signs in and changing email resets it", async () => {
+    await render(<SignInScreen />);
+    await fireEvent.changeText(
+      screen.getByLabelText("Student email"),
+      "l250001@lhr.nu.edu.pk",
+    );
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Send verification code" }),
+    );
+    expect(sessionActions.login).not.toHaveBeenCalled();
+    const field = screen.getByLabelText("Verification code");
+    expect(field.props.textContentType).toBe("oneTimeCode");
+    await fireEvent.changeText(field, "123");
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Verify and sign in" }),
+    );
+    expect(sessionActions.login).not.toHaveBeenCalled();
+    await fireEvent.changeText(field, "012345");
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Verify and sign in" }),
+    );
+    expect(sessionActions.login).toHaveBeenCalledWith(
+      "l250001@lhr.nu.edu.pk",
+      "012345",
+      "test-challenge",
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Change email" }));
+    expect(screen.queryByLabelText("Verification code")).toBeNull();
+    expect(screen.getByLabelText("Student email").props.editable).toBe(true);
+  });
+
+  test("resend waits a minute, requests a fresh challenge and clears the old code", async () => {
+    jest.useFakeTimers();
+    try {
+      await render(<SignInScreen />);
+      await fireEvent.changeText(
+        screen.getByLabelText("Student email"),
+        "l250001@lhr.nu.edu.pk",
+      );
+      await fireEvent.press(
+        screen.getByRole("button", { name: "Send verification code" }),
+      );
+      expect(
+        screen.getByRole("button", { name: "Resend code in 60s" }).props
+          .accessibilityState.disabled,
+      ).toBe(true);
+      await fireEvent.changeText(
+        screen.getByLabelText("Verification code"),
+        "012345",
+      );
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(60_000);
+      });
+      jest.mocked(sessionActions.requestCode).mockResolvedValue({
+        challenge_id: "replacement-challenge",
+        expires_in: 600,
+        retry_after: 60,
+      });
+      await fireEvent.press(
+        screen.getByRole("button", { name: "Resend code" }),
+      );
+      expect(sessionActions.requestCode).toHaveBeenCalledTimes(2);
+      expect(screen.getByLabelText("Verification code").props.value).toBe("");
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test("incorrect proof stays on the code form with an actionable error", async () => {
+    await render(<SignInScreen />);
+    await fireEvent.changeText(
+      screen.getByLabelText("Student email"),
+      "l250001@lhr.nu.edu.pk",
+    );
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Send verification code" }),
+    );
+    jest
+      .mocked(sessionActions.login)
+      .mockRejectedValue(new ApiError(400, "invalid_code", "Incorrect code"));
+    await fireEvent.changeText(
+      screen.getByLabelText("Verification code"),
+      "012345",
+    );
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Verify and sign in" }),
+    );
+    expect(
+      screen.getByText(
+        "Code is incorrect or expired. Request a new code if needed.",
+      ),
+    ).toBeTruthy();
+    expect(screen.getByLabelText("Verification code")).toBeTruthy();
+  });
+
   test("invalid address shows inline error without a request", async () => {
     await render(<SignInScreen />);
     await fireEvent.changeText(
       screen.getByLabelText("Student email"),
       "someone@gmail.com",
     );
-    await fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Send verification code" }),
+    );
     expect(
       screen.getByText("Use your student email, like l25xxxx@lhr.nu.edu.pk"),
     ).toBeTruthy();
-    expect(sessionActions.login).not.toHaveBeenCalled();
+    expect(sessionActions.requestCode).not.toHaveBeenCalled();
   });
   test("valid email uses normalized value and the specified native field options", async () => {
     await render(<SignInScreen />);
@@ -93,20 +197,24 @@ describe("AUTH-1: sign-in screen", () => {
     });
     await fireEvent.changeText(field, " L250001@LHR.NU.EDU.PK ");
     await fireEvent(field, "submitEditing");
-    expect(sessionActions.login).toHaveBeenCalledWith("l250001@lhr.nu.edu.pk");
+    expect(sessionActions.requestCode).toHaveBeenCalledWith(
+      "l250001@lhr.nu.edu.pk",
+    );
   });
   test.each(["invalid_email", "rate_limited", "account_disabled", "network"])(
     "handles %s",
     async (code) => {
       jest
-        .mocked(sessionActions.login)
+        .mocked(sessionActions.requestCode)
         .mockRejectedValue(
           code === "network"
             ? new Error("offline")
             : new ApiError(
                 code === "rate_limited" ? 429 : 403,
                 code,
-                "failure",
+                code === "rate_limited"
+                  ? "Too many attempts. Wait a minute."
+                  : "failure",
               ),
         );
       await render(<SignInScreen />);
@@ -114,7 +222,9 @@ describe("AUTH-1: sign-in screen", () => {
         screen.getByLabelText("Student email"),
         "l250001@lhr.nu.edu.pk",
       );
-      await fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+      await fireEvent.press(
+        screen.getByRole("button", { name: "Send verification code" }),
+      );
       if (code === "invalid_email")
         expect(
           screen.getByText(
@@ -132,7 +242,7 @@ describe("AUTH-1: sign-in screen", () => {
         await fireEvent.press(
           screen.getByRole("button", { name: "Try again" }),
         );
-        expect(sessionActions.login).toHaveBeenCalledTimes(2);
+        expect(sessionActions.requestCode).toHaveBeenCalledTimes(2);
       }
       if (code === "account_disabled")
         expect(
@@ -141,10 +251,18 @@ describe("AUTH-1: sign-in screen", () => {
     },
   );
   test("working state disables a second submit", async () => {
-    let complete: () => void = () => {};
-    jest.mocked(sessionActions.login).mockImplementation(
+    let complete: (value: {
+      challenge_id: string;
+      expires_in: number;
+      retry_after: number;
+    }) => void = () => {};
+    jest.mocked(sessionActions.requestCode).mockImplementation(
       () =>
-        new Promise<void>((resolve) => {
+        new Promise<{
+          challenge_id: string;
+          expires_in: number;
+          retry_after: number;
+        }>((resolve) => {
           complete = resolve;
         }),
     );
@@ -153,15 +271,23 @@ describe("AUTH-1: sign-in screen", () => {
       screen.getByLabelText("Student email"),
       "l250001@lhr.nu.edu.pk",
     );
-    await fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Send verification code" }),
+    );
     const working = screen.getByRole("button", { name: "Working…" });
     expect(working.props.accessibilityState).toMatchObject({
       disabled: true,
       busy: true,
     });
     await fireEvent(screen.getByLabelText("Student email"), "submitEditing");
-    expect(sessionActions.login).toHaveBeenCalledTimes(1);
-    await act(() => complete());
+    expect(sessionActions.requestCode).toHaveBeenCalledTimes(1);
+    await act(() =>
+      complete({
+        challenge_id: "test-challenge",
+        expires_in: 600,
+        retry_after: 60,
+      }),
+    );
   });
   test("field focus uses an underline and errors wrap at body scale", async () => {
     await render(<SignInScreen />);

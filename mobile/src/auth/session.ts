@@ -230,12 +230,23 @@ export function createSession(dependencies: Dependencies) {
     refresh,
     restore,
     block: () => clear("blocked"),
-    async login(email: string) {
+    async requestCode(email: string) {
+      return dependencies.request<{
+        challenge_id: string;
+        expires_in: number;
+        retry_after: number;
+      }>("/auth/login", { method: "POST", body: { email }, timeoutMs: 75_000 });
+    },
+    async login(email: string, code: string, challengeId: string) {
       const epoch = ++generation;
       try {
         const response = await dependencies.request<LoginResponse>(
-          "/auth/login",
-          { method: "POST", body: { email } },
+          "/auth/verify",
+          {
+            method: "POST",
+            body: { email, code, challenge_id: challengeId },
+            timeoutMs: 75_000,
+          },
         );
         await save(response, epoch);
         setUser(response.user);

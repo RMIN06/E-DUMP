@@ -44,15 +44,24 @@ test("cross-origin writes are rejected before API access", async () => {
   globalThis.fetch = () => { throw new Error("must not forward"); };
   assert.equal((await worker.fetch(request("/api/v1/auth/login", { method: "POST", headers: { Origin: "https://evil.test" }, body: "{}" }), env)).status, 403);
 });
-test("login holds refresh token in HttpOnly cookie and strips it from JSON", async () => {
+test("verification holds refresh token in HttpOnly cookie and strips it from JSON", async () => {
   globalThis.fetch = async (_url, options) => {
     assert.equal(options.headers.get("Cookie"), null);
+    assert.deepEqual(await new Response(options.body).json(), { email: "student@example.test", challenge_id: "challenge", code: "012345" });
     return Response.json({ access_token: "access", refresh_token: "private-refresh", user: { id: "id" } });
   };
-  const response = await worker.fetch(request("/api/v1/auth/login", { method: "POST", headers: { Origin: "https://edump-preview.pages.dev", Cookie: "other=secret" }, body: "{}" }), env);
+  const response = await worker.fetch(request("/api/v1/auth/verify", { method: "POST", headers: { Origin: "https://edump-preview.pages.dev", Cookie: "__Host-edump-refresh=legacy-cookie" }, body: JSON.stringify({ email: "student@example.test", challenge_id: "challenge", code: "012345" }) }), env);
   assert.equal((await response.json()).refresh_token, "browser-cookie");
   assert.match(response.headers.get("Set-Cookie"), /Secure; HttpOnly; SameSite=Strict/);
   assert.equal(response.headers.get("Cache-Control"), "private, no-store");
+});
+
+test("requesting a verification code needs no cookie and never creates a session", async () => {
+  globalThis.fetch = async () => Response.json({ challenge_id: "challenge", expires_in: 600, retry_after: 60 });
+  const response = await worker.fetch(request("/api/v1/auth/login", { method: "POST", headers: { Origin: "https://edump-preview.pages.dev" }, body: "{}" }), env);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Set-Cookie"), null);
+  assert.equal((await response.json()).refresh_token, undefined);
 });
 test("refresh uses only its private cookie and logout clears it", async () => {
   globalThis.fetch = async (_url, options) => {

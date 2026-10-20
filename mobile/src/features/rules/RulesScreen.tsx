@@ -42,6 +42,11 @@ export function RulesScreen({
         location, contacts or advertising data.
       </Text>
       <Text>
+        Mailjet processes your student email to deliver sign-in codes. Codes
+        expire after 10 minutes; the server stores only a protected code hash
+        temporarily.
+      </Text>
+      <Text>
         Delete account in Me removes your account, devices and sessions. Uploads
         remain as Former member. Delete your own files first if you want them
         removed too.

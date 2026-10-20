@@ -1,7 +1,7 @@
 const API = "https://edump-api.onrender.com";
 const R2_HOST = "c3306ffca33ee93f5416154e4cc37bca.r2.cloudflarestorage.com";
 const COOKIE = "__Host-edump-refresh";
-const authPaths = new Set(["/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/logout"]);
+const authPaths = new Set(["/api/v1/auth/login", "/api/v1/auth/verify", "/api/v1/auth/refresh", "/api/v1/auth/logout"]);
 function refreshCookie(request) {
   return (request.headers.get("Cookie") ?? "").split(";").map((part) => part.trim()).find((part) => part.startsWith(COOKIE + "="))?.slice(COOKIE.length + 1);
 }
@@ -37,7 +37,7 @@ export default {
       const headers = new Headers();
       for (const name of ["Content-Type", "Authorization", "Accept"]) { const value = request.headers.get(name); if (value) headers.set(name, value); }
       let body = request.method === "GET" ? undefined : request.body;
-      if (authPaths.has(url.pathname) && url.pathname !== "/api/v1/auth/login") {
+      if (["/api/v1/auth/refresh", "/api/v1/auth/logout"].includes(url.pathname)) {
         const refresh = refreshCookie(request); if (!refresh) return refuse(401);
         body = JSON.stringify({ refresh_token: refresh }); headers.set("Content-Type", "application/json");
       }

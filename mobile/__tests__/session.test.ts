@@ -54,6 +54,32 @@ function setup(
     clearAdminCache,
   };
 }
+test("requesting a code never saves credentials; verification submits the challenge", async () => {
+  const challenge = {
+    challenge_id: "test-challenge",
+    expires_in: 600,
+    retry_after: 60,
+  };
+  const { auth, send, storage } = setup(async (path) =>
+    path === "/auth/login" ? challenge : { ...tokens, user, needs_name: false },
+  );
+  expect(await auth.requestCode(user.email)).toEqual(challenge);
+  expect(storage.write).not.toHaveBeenCalled();
+  expect(auth.store.getState().accessToken).toBeNull();
+  await auth.login(user.email, "012345", challenge.challenge_id);
+  expect(send).toHaveBeenLastCalledWith(
+    "/auth/verify",
+    expect.objectContaining({
+      body: {
+        email: user.email,
+        code: "012345",
+        challenge_id: "test-challenge",
+      },
+    }),
+  );
+  expect(storage.write).toHaveBeenCalledWith(tokens.refresh_token);
+});
+
 test("profile refresh updates permissions and account deletion clears private credentials", async () => {
   const { auth, send, storage, clearCache } = setup(async (path, options) => {
     if (path === "/me" && options?.method === "DELETE") return undefined;
@@ -62,7 +88,7 @@ test("profile refresh updates permissions and account deletion clears private cr
   });
   await auth.syncProfile();
   expect(send).not.toHaveBeenCalled();
-  await auth.login(user.email);
+  await auth.login(user.email, "123456", "test-challenge");
   await auth.syncProfile();
   expect(auth.store.getState().user?.role).toBe("admin");
   await auth.deleteAccount();
@@ -84,7 +110,7 @@ test("a denied account deletion retains the signed-in session", async () => {
       throw new ApiError(403, "forbidden", "Make another admin first.");
     return { ...tokens, user, needs_name: false };
   });
-  await auth.login(user.email);
+  await auth.login(user.email, "123456", "test-challenge");
   await expect(auth.deleteAccount()).rejects.toThrow(
     "Make another admin first.",
   );
@@ -98,7 +124,7 @@ test("a forbidden admin request updates the role and evicts cached admin data wi
     if (path === "/me") return user;
     return { ...tokens, user: { ...user, role: "admin" }, needs_name: false };
   });
-  await auth.login(user.email);
+  await auth.login(user.email, "123456", "test-challenge");
   await expect(auth.request("/admin/users")).rejects.toThrow(
     "An admin is required.",
   );
@@ -128,7 +154,7 @@ describe("AUTH-1…AUTH-4: session lifecycle and rotation", () => {
         ? user
         : { ...tokens, user: { ...user, name: null }, needs_name: true },
     );
-    await auth.login(user.email);
+    await auth.login(user.email, "123456", "test-challenge");
     expect(auth.store.getState().status).toBe("needsName");
     expect(storage.write).toHaveBeenCalledWith("refresh");
     expect(storage.write).not.toHaveBeenCalledWith("access");
@@ -147,7 +173,9 @@ describe("AUTH-1…AUTH-4: session lifecycle and rotation", () => {
               "failure",
             );
       });
-      await expect(auth.login(user.email)).rejects.toThrow();
+      await expect(
+        auth.login(user.email, "123456", "test-challenge"),
+      ).rejects.toThrow();
       expect(auth.store.getState().status).toBe(
         code === "account_disabled" ? "blocked" : "signedOut",
       );
@@ -255,14 +283,14 @@ describe("AUTH-1…AUTH-4: session lifecycle and rotation", () => {
   test("five concurrent unauthorized requests share one refresh and retry once", async () => {
     const rotation = deferred<typeof tokens>();
     const { auth, send } = setup(async (path, options) => {
-      if (path === "/auth/login")
+      if (path === "/auth/verify")
         return { ...tokens, access_token: "old", user, needs_name: false };
       if (path === "/auth/refresh") return rotation.promise;
       if (options?.token === "old")
         throw new ApiError(401, "unauthorized", "expired");
       return user;
     });
-    await auth.login(user.email);
+    await auth.login(user.email, "123456", "test-challenge");
     const requests = Promise.all(
       Array.from({ length: 5 }, () => auth.request("/me")),
     );
@@ -327,7 +355,7 @@ describe("AUTH-1…AUTH-4: session lifecycle and rotation", () => {
       if (path === "/auth/logout") throw new Error("offline");
       return { ...tokens, user, needs_name: false };
     });
-    await auth.login(user.email);
+    await auth.login(user.email, "123456", "test-challenge");
     await auth.signOut();
     expect(auth.store.getState()).toEqual({
       status: "signedOut",
@@ -339,7 +367,7 @@ describe("AUTH-1…AUTH-4: session lifecycle and rotation", () => {
   });
   test("sign-out still revokes remotely if local cache deletion fails", async () => {
     const { auth, send, clearCache } = setup();
-    await auth.login(user.email);
+    await auth.login(user.email, "123456", "test-challenge");
     clearCache.mockRejectedValue(new Error("files"));
     await expect(auth.signOut()).rejects.toThrow("clear saved data");
     expect(send.mock.calls.some(([path]) => path === "/auth/logout")).toBe(
@@ -349,7 +377,7 @@ describe("AUTH-1…AUTH-4: session lifecycle and rotation", () => {
   test("sign-out prevents a late login or profile save from restoring private state", async () => {
     const late = deferred<unknown>();
     const { auth, storage } = setup(async () => late.promise);
-    const login = auth.login(user.email);
+    const login = auth.login(user.email, "123456", "test-challenge");
     await auth.signOut();
     late.resolve({ ...tokens, user, needs_name: false });
     await expect(login).rejects.toThrow("Session changed");

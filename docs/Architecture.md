@@ -1,5 +1,8 @@
 # Architecture — E-DUMP
 
+Owner correction, 21 October 2026: email-code authentication replaces the historical pattern-only flow below. POST /auth/login sends a challenge; POST /auth/verify requires mailbox proof before issuing sessions. Mailjet HTTPS delivery is a backend integration. Legacy sessions and notification registrations are rejected. See EmailAuthentication.md.
+
+
 ## 1. System overview
 
 ```mermaid
@@ -103,7 +106,8 @@ Auth is `Authorization: Bearer <access_jwt>` unless marked public. Errors share 
 ### Auth and profile
 | Method | Path | Who | Purpose |
 |---|---|---|---|
-| POST | `/auth/login` | public | Body `{email}` → trim, lowercase, full-match `ALLOWED_EMAIL_REGEX`, find or create user → `{access_token, refresh_token, user, needs_name}` |
+| POST | `/auth/login` | public | Body `{email}` validates the student pattern and sends a code; returns `{challenge_id, expires_in, retry_after}`, never tokens |
+| POST | `/auth/verify` | public, mailbox proof | Body `{email, challenge_id, code}` consumes a valid one-use code before issuing `{access_token, refresh_token, user, needs_name}` |
 | POST | `/auth/refresh` | public | Body `{refresh_token}` → rotates → new pair |
 | POST | `/auth/logout` | user | Revokes the presented refresh token family |
 | GET | `/me` | user | Current user |
@@ -168,7 +172,7 @@ sequenceDiagram
   App->>App: store refresh token in SecureStore, access token in memory
   App->>API: PATCH /me {name} (only when needs_name)
 ```
-The email check is the only gate and proves nothing about who typed the email (accepted risk, `Security and Compliance.md` §2.4). Keep all of it inside `auth_service.login_with_email` so an email-code step can be added later without touching other code.
+Mailbox proof is mandatory before session issuance. email_auth_service consumes the code, then auth_service.login_with_email applies active-account checks, admin bootstrap and account onboarding. Private routes reject legacy sessions without auth_version=2.
 
 Refresh tokens rotate on every use; presenting an already-rotated token revokes the whole family. The access JWT carries only `sub`, `iat`, `exp`; the API loads the user from the database on each request so role changes and disables apply immediately.
 
@@ -225,7 +229,7 @@ Codes: `unauthorized`, `forbidden`, `not_found`, `validation_error`, `duplicate`
 |---|---|---|---|
 | 1 | Proxy uploads through API | Server-side validation and dedupe, simple | Files > 50 MB or > 500 users |
 | 2 | Presigned GET for downloads | Keeps bandwidth off the API | Never needed |
-| 3 | Own JWT issued after the email pattern check | Short sessions, instant revoke | Moving to email code or SSO |
-| 4 | Email-pattern gate only (no roster, no verification) | Owner's choice: simplest possible login | Before launch if impersonation is a concern; see Security doc §2.4 |
+| 3 | Own JWT issued after mailbox verification | Short sessions, instant revoke, no password | If SSO becomes required |
+| 4 | Student pattern plus one-use email code | Proves access to the student mailbox | If class roster enforcement becomes required |
 | 5 | No Redis/queue | 60 users, in-process tasks suffice | Multiple API instances |
 | 6 | System viewer for PDFs | Zero native PDF dependencies | Students request in-app viewing |

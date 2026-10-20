@@ -24,7 +24,7 @@ A private mobile app for the ~60 students of BCS-3E where **material is organise
 
 ## 4. Non-goals (hard scope boundary)
 
-Not in v1, and Codex must not add them: chat or direct messages, comments, likes, reactions, feeds with algorithms, stories, AI features (summaries, chatbots, OCR), gamification or leaderboards, multiple sections or multiple semesters, a web app or web admin panel, payments, analytics dashboards, calendar sync, email notifications, in-app PDF annotation, file versioning, folders nested more than one level, user-to-user profiles, any content that is not course related.
+Not in v1, and Codex must not add them: chat or direct messages, comments, likes, reactions, feeds with algorithms, stories, AI features (summaries, chatbots, OCR), gamification or leaderboards, multiple sections or multiple semesters, a web app or web admin panel, payments, analytics dashboards, calendar sync, email notifications (except sign-in verification codes), in-app PDF annotation, file versioning, folders nested more than one level, user-to-user profiles, any content that is not course related.
 
 ## 5. Users and roles
 
@@ -75,14 +75,14 @@ Priority: **P0** = must ship in v1.0, **P1** = ship if time allows, never at the
 
 | ID | Requirement | Pri |
 |---|---|---|
-| AUTH-1 | The sign-in screen asks for one thing: the student email. The backend trims and lowercases it, and accepts it only if it fully matches `ALLOWED_EMAIL_REGEX` (default `^l25\d{4}@lhr\.nu\.edu\.pk$`, i.e. `l25xxxx@lhr.nu.edu.pk`). A match signs the user in. No password, no verification code, no third-party login. | P0 |
+| AUTH-1 | Owner correction, 21 Oct 2026: ask for the student email, normalize and fully match the existing allowlist, then send a six-digit verification code through Mailjet. Only a correct unexpired one-use code signs in or creates a user. No password. Codes expire after 10 minutes with five guesses; resend replaces prior proof. | P0 |
 | AUTH-2 | First sign-in creates the user. The app then asks once for a display name (2–40 characters), shown next to uploads and editable later in Me. | P0 |
 | AUTH-3 | Session persists across app restarts (refresh token). Sign out clears it. | P0 |
 | AUTH-4 | A non-matching email shows the inline message "Use your student email, like l25xxxx@lhr.nu.edu.pk". A disabled user sees an "Account disabled" screen with a Sign out action. | P0 |
 | AUTH-5 | Delete my account: removes the user record, device tokens and refresh tokens. Uploaded material stays but is shown as "Former member". | P0 |
 | AUTH-6 | Admin role is assigned by seed (`ADMIN_EMAILS` env) and afterwards by other admins. Owner decision, 9 Oct 2026: enabled seeded users regain admin on each login; disabled accounts remain blocked. | P0 |
 
-Known trade-off: email-only login proves nothing about who is typing the email. See `Security and Compliance.md` §2.4 for the accepted risk and the upgrade path.
+Owner correction, 21 October 2026: mailbox proof is required for every account, including previously signed-in students and admins. Legacy sessions and device registrations cannot bypass verification. Verified sessions stay saved. Mailbox ownership does not prove membership of BCS-3E.
 
 Owner extension, 10 October 2026: a branded welcome screen precedes sign-in once per installation. Continue saves the local preference and opens the existing student-email form. Returning signed-in students continue directly to Updates. The same palette-based logo is used for the launcher and splash; no onboarding tour or additional features are introduced.
 

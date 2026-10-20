@@ -49,3 +49,9 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - ANN-8: Hide every dated alert once due_at is reached, including pinned rows, subject feeds, Coming up and unread counts. Keep undated updates and preserve stored records/attachments; this is list expiry, not data deletion.
 - ANN-9: Send one 24-hour reminder per deadline for every dated alert through the existing enabled-device push path. The owner chose the existing API timer and accepts late reminders after free-host sleep; do not provision a scheduled worker or new endpoint.
 - Check reminders at API startup and every minute while running. Skip already expired alerts and alerts posted inside the last 24 hours (their creation notification already applies). Retain durable deadline markers across edits and process restarts. Compatible clients ship through the existing Android OTA/web channels.
+
+## Owner email authentication decision (21 October 2026)
+- Replace email-pattern-only login with student email plus an emailed verification code; no passwords. Mailjet free transactional email API is approved. No new dependencies are needed.
+- Everyone must verify once, including previously signed-in students and admins. Reject legacy access/refresh sessions and exclude device registrations made before verification. Preserve saved sessions after verified login.
+- Use the existing security document's six-digit, ten-minute, five-attempt code policy. Codes work once, resends replace older challenges, and delivery/guess limits survive API restarts. Never return or log codes, credentials or provider response bodies.
+- Publish compatible Android changes through preview OTA and the web companion. Do not switch the hosted authentication flow until delivery is configured and the release is verified.

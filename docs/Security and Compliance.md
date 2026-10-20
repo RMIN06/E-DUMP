@@ -1,5 +1,8 @@
 # Security and Compliance — E-DUMP
 
+Owner correction, 21 October 2026: every account must prove mailbox access through a six-digit emailed code. This supersedes the historical accepted risk of pattern-only sign-in. Mailjet receives the destination and code; Mongo stores a protected digest. Legacy sessions and unverified notification registrations are rejected. See EmailAuthentication.md.
+
+
 Scope: a private app for ≤ 60 students handling names, FAST emails, push tokens and course files. Risk is low in volume but the app is internet-facing, so the basics are mandatory. This is engineering guidance, not legal advice.
 
 ---
@@ -8,7 +11,7 @@ Scope: a private app for ≤ 60 students handling names, FAST emails, push token
 
 | Asset | Threat | Control |
 |---|---|---|
-| Access to the class space | Outsiders joining; anyone typing a classmate's or admin's email | Email pattern check, admin disable, rate limits (§2); **impersonation is an accepted risk (§2.4)** |
+| Access to the class space | Outsiders joining or impersonating another address | Student email pattern plus mailbox verification; admin disable; no class roster enforcement |
 | Admin powers (alerts, deletes) | Student escalates privileges | Server-side role checks on every route, role loaded from DB per request (§3) |
 | Sessions | Token theft, replay | Short access JWT, rotating refresh with reuse detection, SecureStore (§2.3) |
 | Uploaded files | Malware, spoofed types, oversized files, storage abuse | Allowlist, magic-byte check, size cap, quotas, private bucket, no inline execution (§4) |
@@ -18,16 +21,16 @@ Scope: a private app for ≤ 60 students handling names, FAST emails, push token
 
 ## 2. Authentication controls
 
-### 2.1 Login check (the only gate)
-1. Normalise: trim, lowercase; reject if longer than 64 characters, non-ASCII, or containing whitespace or control characters.
-2. `re.fullmatch(ALLOWED_EMAIL_REGEX, email, re.ASCII)`; default `^l25\d{4}@lhr\.nu\.edu\.pk$`. Always `fullmatch`, never `search`. The pattern must stay linear (no nested quantifiers).
-3. Find or create the user. Reject if `is_active=false` with `account_disabled`.
-4. Pattern mismatch returns `invalid_email` with the message "Use your student email, like l25xxxx@lhr.nu.edu.pk".
-5. Rate limits: 10 attempts/min/IP, 5/min/email, 20 new accounts/hour/IP.
-The mobile client mirrors the regex for instant feedback; it is a UX aid, not a control.
+### 2.1 Student email and mailbox proof
+
+1. Trim and lowercase the address; retain the complete ASCII student pattern and rejection of control characters, suffixes and look-alikes.
+2. POST /auth/login reserves a challenge and sends a six-digit code through Mailjet. It does not create a user or issue credentials.
+3. POST /auth/verify checks the email-bound, delivered, unexpired challenge and consumes the code atomically. Only then apply active-account checks, admin bootstrap and find/create the account.
+4. Codes expire in ten minutes, permit five guesses and work once. Resends replace old challenges. Store only an HMAC-SHA256 digest with purpose, email and challenge binding; never log/return raw codes or provider credentials.
+5. Keep IP/new-account quotas; persist per-email cooldown/hour limits and a global daily delivery reservation cap in Mongo. Expiry checks do not rely on TTL deletion. See EmailAuthentication.md for limits and retention.
 
 ### 2.2 Own tokens
-- Access token: JWT HS256, 15 min, claims `sub`, `iat`, `exp`, `typ=access`. Secret ≥ 32 random bytes. Reject `alg=none` and any alg other than HS256 explicitly.
+- Access token: JWT HS256, 15 min, claims `sub`, `iat`, `exp`, `typ=access`, `auth_version=2`. Secret ≥ 32 random bytes. Reject `alg=none` and any alg other than HS256 explicitly.
 - Refresh token: 256-bit random, URL-safe, stored **hashed** (SHA-256) with `family_id`, expiry 30 days, TTL index.
 - Rotation on every refresh. If a revoked/replaced token is presented, revoke the whole family and require sign-in.
 - Logout revokes the family. Account deletion and user disable revoke all families.
@@ -37,15 +40,11 @@ The mobile client mirrors the regex for instant feedback; it is a UX aid, not a 
 - Never store tokens in AsyncStorage, logs, or query cache persistence. The persisted query cache must exclude auth data.
 - Clear the persisted query cache and cached files on sign-out and account deletion.
 
-### 2.4 Accepted risk: no proof of email ownership
-The owner chose email-only login. Consequences, stated plainly:
-- Anyone can type any matching email and sign in as that person. That includes an admin's email, which would allow fake quiz alerts, deleting material and disabling users.
-- The pattern is guessable (`l25` + 4 digits is about 10,000 addresses), so students from other sections or batches can join and read all material.
-- Admin emails must therefore never be shown to students: the API returns `author_name` only.
+### 2.4 Email ownership required
 
-Controls kept: admins can disable any user (effective on the next request), rate limits (§2.1), per-item `author_id` and `uploader_id` for accountability, reports and admin removal.
+The owner replaced the accepted pattern-only impersonation risk on 21 October 2026. Every account, including admins and existing installations, must verify once. Reject legacy access JWTs and refresh records without auth_version=2. Notify only device registrations made through verified sessions. After verification, saved sessions persist with the existing secure storage, rotation and revocation behavior.
 
-Recommended hardening (needs owner approval, small change): email a 6-digit code (10 min expiry, 5 attempts) through a transactional email provider, at minimum for admin accounts. Keep the login logic isolated in `auth_service.login_with_email` so this is a contained change. Not part of v1 as specified.
+Mailbox ownership confirms access to the student address; it does not establish class-section membership. Continue enforcing the existing role checks, active-account checks and student-email pattern. Brevo signup was abandoned; Mailjet is the chosen transactional provider. Open and click tracking are disabled for sign-in emails.
 
 ## 3. Authorization matrix (enforced server-side, tested)
 

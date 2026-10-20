@@ -1,5 +1,8 @@
 # Testing and Authentication — E-DUMP
 
+Owner correction, 21 October 2026: email-code verification is mandatory for all users and admins. Use the injected fake sender for automated tests, never a production bypass or fixed code. See EmailAuthentication.md for the current delivery and migration contract.
+
+
 Part A defines the authentication implementation Codex must build. Part B defines the tests. Part C is the release gate.
 
 ---
@@ -8,31 +11,17 @@ Part A defines the authentication implementation Codex must build. Part B define
 
 ## A1. Setup
 
-No external identity provider. Set `ALLOWED_EMAIL_REGEX` (default `^l25\d{4}@lhr\.nu\.edu\.pk$`) and `ADMIN_EMAILS` in the backend environment. Confirm the pattern with 2–3 real student emails before building the UI.
+Use Mailjet for transactional verification delivery with MAILJET_API_KEY, MAILJET_SECRET_KEY and EMAIL_SENDER. No external identity provider. Set `ALLOWED_EMAIL_REGEX` (default `^l25\d{4}@lhr\.nu\.edu\.pk$`) and `ADMIN_EMAILS` in the backend environment. Confirm the pattern with 2–3 real student emails before building the UI.
 
-## A2. Mobile flow
+## A2. Mobile and web flow
 
-```
-sign-in screen (email Field)
-  └─ client pattern check (src/lib/email.ts) → inline error if no match, no network call
-  └─ POST /auth/login { email }
-        ├─ 200 → store refresh token (SecureStore), access token (memory)
-        │         ├─ needs_name = true  → name screen → PATCH /me { name } → tabs
-        │         └─ needs_name = false → register push → tabs
-        ├─ 422 invalid_email   → inline ErrorLine "Use your student email, like l25xxxx@lhr.nu.edu.pk"
-        ├─ 403 account_disabled → (auth)/blocked
-        └─ 429 rate_limited    → inline "Too many attempts. Wait a minute."
-```
+Student email -> POST /auth/login -> code entry -> POST /auth/verify -> existing name onboarding or class tabs. Requesting a code does not save a session. Allow code paste, resend after the server cooldown and a Change email action. Incorrect/expired codes stay on the code form. Only successful verification saves native refresh credentials or the browser HttpOnly refresh cookie.
 
-Session restore on app start: read refresh token → `POST /auth/refresh` → on success load `/me` and enter tabs; on failure clear and show sign-in. A splash screen stays up until this finishes (max 3 s then fall through to sign-in).
-
-HTTP client behaviour: attach `Authorization`; on `401` with code `unauthorized` try **one** refresh (single-flight: concurrent requests wait for the same refresh promise), then retry once; if refresh fails, sign out. Never retry on `403`.
-
-Sign-out: `DELETE /me/devices/{token}` (best effort) → `POST /auth/logout` → clear SecureStore, query cache, cached files → sign-in screen.
+Session restoration shares concurrent work, retains credentials on temporary network/server/storage failure and validates with the server before opening private screens. Invalid/expired or legacy sessions require sign-in; disabled accounts remain blocked. Verified refresh sessions persist normally. Sign-out clears private local data and revokes its server session. See InstalledUpdates.md for the owner-approved restore behavior and update delivery.
 
 ## A3. Backend implementation checklist
 
-- `services/auth_service.py`: `normalize_email`, `is_allowed_email`, `login_with_email(email) -> (user, tokens, needs_name)`, `issue_tokens`, `rotate_refresh`, `revoke_family`, `logout`. All login logic lives in `login_with_email` so an email-code step can be added later.
+- `services/auth_service.py`: `normalize_email`, `is_allowed_email`, `login_with_email(email) -> (user, tokens, needs_name)`, `issue_tokens`, `rotate_refresh`, `revoke_family`, `logout`. Only email_auth_service.verify_code calls login_with_email after consuming a matching proof.
 - `deps.py`: `get_current_user` decodes the access JWT (HS256 only, `typ=access`, required claims), loads the user, raises `unauthorized` / `account_disabled`; `require_admin` wraps it.
 - Admin bootstrap: a user whose email is in `ADMIN_EMAILS` gets `role=admin` on login (this also recovers a locked-out admin).
 - Last-admin protection: refuse demote/disable/delete if it would leave zero active admins.
@@ -45,6 +34,7 @@ Sign-out: `DELETE /me/devices/{token}` (best effort) → `POST /auth/logout` →
 |---|---|---|
 | Missing/invalid/expired access token | 401 | `unauthorized` |
 | Email does not match the pattern | 422 | `invalid_email` |
+| Incorrect, expired, exhausted or reused verification code | 400 | `invalid_code` |
 | Disabled user | 403 | `account_disabled` |
 | Student calling admin route | 403 | `forbidden` |
 | Refresh token reuse or expired | 401 | `invalid_token` |
@@ -77,10 +67,10 @@ Tooling: `pytest`, `pytest-asyncio`, `httpx.AsyncClient(ASGITransport(app))`, a 
 
 ### Integration tests (per router)
 **Auth**
-- A1 matching email → 200, user created, tokens returned, `needs_name=true`; after `PATCH /me` the next login returns `needs_name=false`.
+- A1 matching email requests a code without creating a user; valid proof returns tokens and needs_name=true. After PATCH /me, a later verified login returns needs_name=false.
 - A2 non-matching emails (see unit list) → 422 `invalid_email`, no user created.
 - A3 uppercase and padded input is accepted, stored lowercase, and maps to the same user (no duplicates).
-- A4 disabled user → 403 `account_disabled`.
+- A4 disabled user remains blocked with 403 account_disabled after correct mailbox proof.
 - A5 email in `ADMIN_EMAILS` gets role admin; any other matching email is a student.
 - A6 refresh rotates; old refresh token then fails and revokes the family.
 - A7 deleting account revokes refresh tokens and removes devices.
@@ -133,7 +123,7 @@ Coverage gate: ≥ 70% lines on `src/`, 90% on `src/auth` and `src/lib`.
 
 ## B4. End-to-end (Maestro, on an Android emulator in CI, iOS locally)
 
-No special flag is needed. E2E signs in with seeded emails: `l250001@lhr.nu.edu.pk` (student) and `l250002@lhr.nu.edu.pk` (admin, listed in `ADMIN_EMAILS` in the test environment).
+No production bypass or fixed verification code is allowed. Device E2E signs in through a real test mailbox or an injected fake sender in an isolated test harness. Existing seeded test accounts still require proof. Physical-device mailbox acceptance is a separate release check.
 
 Flows:
 1. **F1 find a file**: sign in as student → Subjects → COAL → search "3" → open first result.

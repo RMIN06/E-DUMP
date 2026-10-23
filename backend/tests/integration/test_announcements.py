@@ -189,7 +189,7 @@ async def test_feed_pin_pagination_filters_and_seen(client: AsyncClient) -> None
         )
     ).status_code == 200
     first = (await client.get("/api/v1/announcements?limit=2", headers=student)).json()
-    assert [item["id"] for item in first["items"]] == [ids[0], ids[3]]
+    assert [item["id"] for item in first["items"]] == [ids[0], ids[1]]
     last = (
         await client.get(
             "/api/v1/announcements",
@@ -197,7 +197,7 @@ async def test_feed_pin_pagination_filters_and_seen(client: AsyncClient) -> None
             params={"limit": 2, "cursor": first["next_cursor"]},
         )
     ).json()
-    assert [item["id"] for item in last["items"]] == [ids[2], ids[1]]
+    assert [item["id"] for item in last["items"]] == [ids[2], ids[3]]
     assert last["next_cursor"] is None
     assert (
         len(
@@ -432,3 +432,60 @@ async def test_invalid_updates(client: AsyncClient, change: dict[str, object]) -
             "/api/v1/announcements", headers=admin, json=update_body(**change)
         )
     ).status_code in (422, 404)
+
+
+async def test_deadline_order_spans_pages_types_and_undated_rows(
+    client: AsyncClient, database: Database
+) -> None:
+    admin = await login(client, "l250002")
+    student = await login(client)
+    now = datetime.now(UTC)
+    definitions = [
+        ("Late pinned", 5, "quiz"),
+        ("Undated old", None, "general"),
+        ("Soon", 1, "task"),
+        ("Same deadline old", 2, "datesheet"),
+        ("Same deadline new", 2, "quiz"),
+        ("Undated new", None, "general"),
+    ]
+    ids = []
+    for index, (title, days, kind) in enumerate(definitions):
+        response = await client.post(
+            "/api/v1/announcements",
+            headers=admin,
+            json=update_body(
+                title=title,
+                type=kind,
+                due_at=(now + timedelta(days=days)).isoformat() if days else None,
+            ),
+        )
+        assert response.status_code == 201
+        ids.append(response.json()["id"])
+        await database.announcements.update_one(
+            {"_id": ObjectId(ids[-1])},
+            {
+                "$set": {
+                    "created_at": now + timedelta(seconds=index),
+                    "pinned": index == 0,
+                }
+            },
+        )
+    expected = [ids[2], ids[4], ids[3], ids[0], ids[5], ids[1]]
+    actual = []
+    cursor = None
+    for _ in range(6):
+        params = {"limit": "1"}
+        if cursor:
+            params["cursor"] = cursor
+        response = await client.get(
+            "/api/v1/announcements", headers=student, params=params
+        )
+        assert response.status_code == 200
+        actual.extend(row["id"] for row in response.json()["items"])
+        cursor = response.json()["next_cursor"]
+    assert actual == expected
+    assert cursor is None
+    filtered = await client.get(
+        "/api/v1/announcements?type=quiz&subject=ds", headers=student
+    )
+    assert [row["id"] for row in filtered.json()["items"]] == [ids[4], ids[0]]

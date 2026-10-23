@@ -199,3 +199,7 @@ Successful material uploads notify other active users through their enabled Andr
 ANN-8: Dated alerts leave Updates, subject update lists, Coming up and unread counts when their deadline is reached, including pinned items. Undated notices remain. Records and attachments are retained; existing authorized direct links and admin editing still work.
 
 ANN-9: Every dated alert (Quiz, Task, Datesheet, General) receives a reminder at 24 hours remaining through the existing other-active-users/enabled-devices push path. The owner chose the existing API timer rather than a new scheduled worker and accepts reminders being late after free Render sleep. Check on startup and once per minute while running, skip expired deadlines, and do not send a second immediate reminder for a newly posted alert already inside 24 hours. Persist one marker per reminded deadline; editing the due time schedules that new deadline without erasing previous markers. Provider delivery remains best effort; late reminders say less than one day remains.
+
+## Owner deadline ordering correction (23 October 2026)
+
+ANN-2/ANN-4: Sort every Updates list by earliest future deadline first, across types, subjects and pagination. Undated updates follow dated updates, newest first. Equal deadlines use newest creation time then descending ID. Pinning remains visible metadata and does not override deadline order. Coming up retains its next-three ownership without duplicate rows. This supersedes pinned-first/newest-first ordering.

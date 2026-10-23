@@ -488,3 +488,49 @@ test("announcement batch retains successful attachments when another file fails"
     }),
   );
 });
+
+test("updates sort cached pages by deadline without pinning ahead of nearer work", async () => {
+  jest
+    .mocked(useUpcoming)
+    .mockReturnValue({ ...base, data: [] } as unknown as ReturnType<
+      typeof useUpcoming
+    >);
+  const near = {
+    ...item,
+    id: "near",
+    title: "Nearest deadline",
+    pinned: false,
+    due_at: new Date(Date.now() + 86_400_000).toISOString(),
+  };
+  const later = {
+    ...item,
+    id: "later",
+    title: "Later pinned",
+    pinned: true,
+    due_at: new Date(Date.now() + 3 * 86_400_000).toISOString(),
+  };
+  const undated = {
+    ...item,
+    id: "undated",
+    title: "Undated notice",
+    due_at: null,
+  };
+  jest
+    .mocked(useUpdates)
+    .mockReturnValue({
+      ...base,
+      data: { pages: [{ items: [undated, later] }, { items: [near, later] }] },
+    } as unknown as ReturnType<typeof useUpdates>);
+  await render(<UpdatesScreen />);
+  const labels = screen
+    .getAllByRole("button")
+    .map((row) => row.props.accessibilityLabel)
+    .filter(
+      (label: string | undefined) =>
+        label && /^(Nearest deadline|Later pinned|Undated notice),/.test(label),
+    );
+  expect(labels).toHaveLength(3);
+  expect(labels[0]).toMatch(/^Nearest deadline,/);
+  expect(labels[1]).toMatch(/^Later pinned,/);
+  expect(labels[2]).toMatch(/^Undated notice,/);
+});

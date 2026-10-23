@@ -49,3 +49,7 @@ Read docs/PRD.md, docs/Architecture.md, docs/UI.md, docs/MobileResponsiveness.md
 - ANN-8: Hide every dated alert once due_at is reached, including pinned rows, subject feeds, Coming up and unread counts. Keep undated updates and preserve stored records/attachments; this is list expiry, not data deletion.
 - ANN-9: Send one 24-hour reminder per deadline for every dated alert through the existing enabled-device push path. The owner chose the existing API timer and accepts late reminders after free-host sleep; do not provision a scheduled worker or new endpoint.
 - Check reminders at API startup and every minute while running. Skip already expired alerts and alerts posted inside the last 24 hours (their creation notification already applies). Retain durable deadline markers across edits and process restarts. Compatible clients ship through the existing Android OTA/web channels.
+
+## Owner deadline ordering correction (23 October 2026)
+
+ANN-2/ANN-4: Sort every Updates list by earliest future deadline first, across types, subjects and pagination. Undated updates follow dated updates, newest first. Equal deadlines use newest creation time then descending ID. Pinning remains visible metadata and does not override deadline order. Coming up retains its next-three ownership without duplicate rows. This supersedes pinned-first/newest-first ordering.

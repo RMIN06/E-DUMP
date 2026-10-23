@@ -44,7 +44,14 @@ export function UpdatesScreen({
   const { user } = useSession();
   const theme = useTheme();
   const [now, setNow] = useState(Date.now);
-  const cachedUpdates = query.data?.pages.flatMap((page) => page.items) ?? [];
+  const byDeadline = (left: Announcement, right: Announcement) =>
+    (left.due_at ? Date.parse(left.due_at) : Infinity) -
+      (right.due_at ? Date.parse(right.due_at) : Infinity) ||
+    Date.parse(right.created_at) - Date.parse(left.created_at) ||
+    right.id.localeCompare(left.id);
+  const cachedUpdates = (
+    query.data?.pages.flatMap((page) => page.items) ?? []
+  ).sort(byDeadline);
   const nextDeadline = Math.min(
     ...[...cachedUpdates, ...(upcoming.data ?? [])]
       .map((item) => (item.due_at ? Date.parse(item.due_at) : Infinity))
@@ -69,7 +76,7 @@ export function UpdatesScreen({
   const upcomingIds = new Set<string>();
   const upcomingItems = subjectSlug
     ? []
-    : (upcoming.data ?? []).filter((item) => {
+    : [...(upcoming.data ?? [])].sort(byDeadline).filter((item) => {
         if (item.due_at && Date.parse(item.due_at) <= now) return false;
         if (type !== "all" && item.type !== type) return false;
         if (selectedSubject && item.subject_slug !== selectedSubject)

@@ -80,22 +80,23 @@ def cursor_query(value: str) -> dict[str, object]:
         raw = json.loads(
             base64.b64decode(value.encode("ascii"), altchars=b"-_", validate=True)
         )
-        if (
-            not isinstance(raw, dict)
-            or set(raw) != {"pinned", "created_at", "_id"}
-            or type(raw["pinned"]) is not bool
-        ):
+        if not isinstance(raw, dict) or set(raw) != {"due_at", "created_at", "_id"}:
             raise ValueError()
         created = datetime.fromisoformat(raw["created_at"])
         if created.tzinfo is None:
             raise ValueError()
         last_id = ObjectId(raw["_id"])
+        due = (
+            datetime.fromisoformat(raw["due_at"]) if raw["due_at"] is not None else None
+        )
+        if due is not None and due.tzinfo is None:
+            raise ValueError()
         terms: list[dict[str, object]] = [
-            {"pinned": raw["pinned"], "created_at": {"$lt": created}},
-            {"pinned": raw["pinned"], "created_at": created, "_id": {"$lt": last_id}},
+            {"due_at": due, "created_at": {"$lt": created}},
+            {"due_at": due, "created_at": created, "_id": {"$lt": last_id}},
         ]
-        if raw["pinned"]:
-            terms.append({"pinned": False})
+        if due is not None:
+            terms.extend([{"due_at": {"$gt": due}}, {"due_at": None}])
         return {"$or": terms}
     except (ValueError, TypeError, KeyError, binascii.Error, InvalidId) as exc:
         raise DomainError("validation_error", "Invalid page cursor.", 422) from exc
@@ -122,7 +123,7 @@ async def list_updates(
         next_cursor = base64.urlsafe_b64encode(
             json.dumps(
                 {
-                    "pinned": last.pinned,
+                    "due_at": last.due_at.isoformat() if last.due_at else None,
                     "created_at": last.created_at.isoformat(),
                     "_id": str(last.id),
                 }

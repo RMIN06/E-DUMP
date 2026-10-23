@@ -16,7 +16,7 @@ export function updatePath(type: string, subject?: string, cursor?: string) {
 }
 export const useUpdates = (type = "all", subject?: string) =>
   useInfiniteQuery({
-    queryKey: ["announcements", type, subject],
+    queryKey: ["announcements", type, subject, "deadline-order"],
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam, signal }) =>
       api<components["schemas"]["AnnouncementPage"]>(

@@ -22,15 +22,22 @@ async def by_id(database: Database, identifier: ObjectId) -> AnnouncementRecord 
 async def page(
     database: Database, query: dict[str, object], limit: int, upcoming: bool = False
 ) -> list[AnnouncementRecord]:
-    order = (
-        [("due_at", 1), ("_id", 1)]
-        if upcoming
-        else [("pinned", -1), ("created_at", -1), ("_id", -1)]
+    cursor = await database.announcements.aggregate(
+        [
+            {"$match": query},
+            {
+                "$addFields": {
+                    "_undated": {
+                        "$cond": [{"$eq": [{"$ifNull": ["$due_at", None]}, None]}, 1, 0]
+                    }
+                }
+            },
+            {"$sort": {"_undated": 1, "due_at": 1, "created_at": -1, "_id": -1}},
+            {"$limit": limit},
+            {"$project": {"_undated": 0}},
+        ]
     )
-    return [
-        AnnouncementRecord.model_validate(row)
-        async for row in database.announcements.find(query).sort(order).limit(limit)
-    ]
+    return [AnnouncementRecord.model_validate(row) async for row in cursor]
 
 
 async def update(database: Database, record: AnnouncementRecord) -> None:

@@ -131,7 +131,7 @@ Auth is `Authorization: Bearer <access_jwt>` unless marked public. Errors share 
 | POST | `/materials/{id}/report` | user | Body `{reason, note?}` |
 
 ### Announcements
-| GET | `/announcements?type=&subject=&cursor=&limit=20` | user | List (pinned first, then newest) |
+| GET | `/announcements?type=&subject=&cursor=&limit=20` | user | List (future deadlines ascending, undated last; newest creation/descending ID break ties) |
 | GET | `/announcements/upcoming?limit=3` | user | Next due items |
 | GET | `/announcements/unread-count` | user | Count since `last_seen_updates_at` |
 | GET | `/announcements/{id}` | user | Detail with attachment descriptors |

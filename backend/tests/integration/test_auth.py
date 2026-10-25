@@ -345,3 +345,27 @@ async def test_auth_3_bad_bearer(client: AsyncClient) -> None:
         response = await client.get("/api/v1/me", headers={"Authorization": token})
         assert response.status_code == 401
         assert response.headers["www-authenticate"] == "Bearer"
+
+
+async def test_exact_exception_gets_student_access_and_respects_disablement(
+    client: AsyncClient, database: AsyncDatabase[dict[str, object]]
+) -> None:
+    email = "l242530@lhr.nu.edu.pk"
+    first = await sign_in(client, " L242530@LHR.NU.EDU.PK ")
+    assert first["user"]["email"] == email
+    assert first["user"]["role"] == "student"
+    assert (
+        await client.get("/api/v1/me", headers=authorization(first))
+    ).status_code == 200
+    assert (
+        await client.get("/api/v1/admin/users", headers=authorization(first))
+    ).status_code == 403
+    rejected = await client.post(
+        "/api/v1/auth/login", json={"email": "l242531@lhr.nu.edu.pk"}
+    )
+    assert rejected.status_code == 422
+    assert await database.users.find_one({"email": "l242531@lhr.nu.edu.pk"}) is None
+    await database.users.update_one({"email": email}, {"$set": {"is_active": False}})
+    blocked = await client.post("/api/v1/auth/login", json={"email": email})
+    assert blocked.status_code == 403
+    assert blocked.json()["error"]["code"] == "account_disabled"

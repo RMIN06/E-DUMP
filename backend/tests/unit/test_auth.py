@@ -22,11 +22,23 @@ def test_auth_1_normalization(email: str) -> None:
     assert allowed_email(email) == "l251234@lhr.nu.edu.pk"
 
 
+@pytest.mark.parametrize("email", ["l242530@lhr.nu.edu.pk", " L242530@LHR.NU.EDU.PK "])
+def test_auth_1_exact_owner_exception(email: str) -> None:
+    assert allowed_email(email) == "l242530@lhr.nu.edu.pk"
+
+
 @pytest.mark.parametrize(
     "email",
     [
         "l25123@lhr.nu.edu.pk",
         "l261234@lhr.nu.edu.pk",
+        "l242531@lhr.nu.edu.pk",
+        "l242529@lhr.nu.edu.pk",
+        "l242530+class@lhr.nu.edu.pk",
+        "l242530@lhr.nu.edu.pk.evil.com",
+        "l242530@lhr.nu.edu.pk\n",
+        "l242530@gmail.com",
+        "l２42530@lhr.nu.edu.pk",
         "l251234@gmail.com",
         "l251234@lhr.nu.edu.pk.evil.com",
         "x@l251234@lhr.nu.edu.pk",

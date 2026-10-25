@@ -203,3 +203,7 @@ ANN-9: Every dated alert (Quiz, Task, Datesheet, General) receives a reminder at
 ## Owner deadline ordering correction (23 October 2026)
 
 ANN-2/ANN-4: Sort every Updates list by earliest future deadline first, across types, subjects and pagination. Undated updates follow dated updates, newest first. Equal deadlines use newest creation time then descending ID. Pinning remains visible metadata and does not override deadline order. Coming up retains its next-three ownership without duplicate rows. This supersedes pinned-first/newest-first ordering.
+
+## Owner exact email exception (25 October 2026)
+
+AUTH-1: Permit only l242530@lhr.nu.edu.pk in addition to the existing l25 student pattern. Apply the same ASCII/case/space normalization, saved sessions, rate limits and disabled-account checks. This does not permit other l24 addresses or grant admin/support status. Mirror the exact exception on Android and web.

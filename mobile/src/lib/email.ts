@@ -4,7 +4,9 @@ export const emailMessage =
 export function studentEmail(value: string): string | null {
   if (/[^\x20-\x7e]/.test(value)) return null;
   const email = value.replace(/^ +| +$/g, "").toLowerCase();
-  return email.length <= 64 && /^l25[0-9]{4}@lhr\.nu\.edu\.pk$/.test(email)
+  return email.length <= 64 &&
+    (email === "l242530@lhr.nu.edu.pk" ||
+      /^l25[0-9]{4}@lhr\.nu\.edu\.pk$/.test(email))
     ? email
     : null;
 }

@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const exceptions = {
+  "GHSA-mrhx-c7xc-m3w5": { name: "zod", version: "3.25.76", nodes: ["node_modules/expo/node_modules/zod"] },
   "GHSA-vfj7-8cjw-p6xm": { name: "braces", version: "3.0.3" },
   "GHSA-86w9-cpqp-85rv": { name: "node-forge", version: "1.4.0" },
   "GHSA-hp3w-g68c-fv3c": { name: "sprintf-js", version: "1.0.3" },
@@ -44,6 +45,9 @@ export function evaluateAudit(audit, lock, now = Date.now()) {
           throw new Error(`Missing package locations: ${current}`);
         }
         for (const node of dependency.nodes) {
+          if (exception.nodes && !exception.nodes.includes(node)) {
+            throw new Error(`Exception path mismatch: ${node}`);
+          }
           if (lock.packages?.[node]?.version !== exception.version) {
             throw new Error(`Exception version mismatch: ${node}`);
           }

@@ -13,3 +13,14 @@ Owner approved temporary acceptance on 25 October 2026: allow only GHSA-mrhx-c7x
 The owner also confirmed deployment granting this exact address ordinary student access and restored the Cloudflare login. The scoped policy is implemented in scripts/audit-policy.mjs, with tests rejecting app/other package locations, version drift and expiry. Deployment verification follows below.
 
 Source: https://github.com/advisories/GHSA-mrhx-c7xc-m3w5
+
+
+## Published release
+
+The approved security stage completed successfully after the previously passed verification targets; the full make verify gate is satisfied with the recorded owner-approved tooling exceptions. All 18 edge/audit policy contract tests pass, including the new path/version/expiry checks. App checks were repeated after patching Zod; no backend behavior changed after its 263 passing tests.
+
+Source 389ba1ec4ed27f090180a89f57fe6d1da493c903 is live on Render deploy dep-dbesho29lscs73808tpg. Readiness is healthy. A live neighboring l24 login was rejected with 422 invalid_email; no production sign-in was performed as the newly allowed student.
+
+The web companion is published at https://edump-preview.pages.dev. Its HTML and JavaScript match the prepared build, the exact exception appears in the served app bundle, security headers pass and anonymous profile requests return 401.
+
+Android preview OTA group: 5ed0d8f8-6e5b-4853-b67b-b1727f4474d8. Update: 01a17258-845e-7644-b296-b1ee3fd831aa. The preview manifest serves this exact update on runtime edump-android-1. No new APK is required. Student/device acceptance remains with the owner; existing clients may need the available safe update/restart before entering the exception email.

@@ -23,7 +23,7 @@ Scope: a private app for ≤ 60 students handling names, FAST emails, push token
 2. `re.fullmatch(ALLOWED_EMAIL_REGEX, email, re.ASCII)`; default `^l25\d{4}@lhr\.nu\.edu\.pk$`. Always `fullmatch`, never `search`. The pattern must stay linear (no nested quantifiers).
 3. Find or create the user. Reject if `is_active=false` with `account_disabled`.
 4. Pattern mismatch returns `invalid_email` with the message "Use your student email, like l25xxxx@lhr.nu.edu.pk".
-5. Rate limits: 10 attempts/min/IP, 5/min/email, 20 new accounts/hour/IP.
+5. Rate limits: 60 attempts/min/IP, 5/min/email, 200 new accounts/hour/IP. The IP seen by the API is shared (Render proxy and the web worker), so the per-IP limits are sized for the whole class.
 The mobile client mirrors the regex for instant feedback; it is a UX aid, not a control.
 
 ### 2.2 Own tokens

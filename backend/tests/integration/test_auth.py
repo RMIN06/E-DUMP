@@ -306,7 +306,7 @@ async def test_auth_1_invalid_email_never_creates_user(
 
 
 async def test_auth_1_login_rate_limits(client: AsyncClient) -> None:
-    """AUTH-1/A9: sixth normalized email attempt and eleventh IP attempt are limited."""
+    """AUTH-1/A9: sixth email attempt and sixty-first IP attempt are limited."""
     for _ in range(5):
         await sign_in(client)
     response = await client.post(
@@ -314,10 +314,10 @@ async def test_auth_1_login_rate_limits(client: AsyncClient) -> None:
     )
     assert response.status_code == 429 and response.headers["retry-after"] == "60"
     limiter.reset()
-    for number in range(10):
+    for number in range(60):
         await sign_in(client, f"l25{number:04d}@lhr.nu.edu.pk")
     assert (
-        await client.post("/api/v1/auth/login", json={"email": "l250100@lhr.nu.edu.pk"})
+        await client.post("/api/v1/auth/login", json={"email": "l250999@lhr.nu.edu.pk"})
     ).status_code == 429
 
 
@@ -329,15 +329,15 @@ async def test_auth_1_new_account_hourly_limit(
     """AUTH-1: new account quota is independent from the minute quotas."""
     clock = time.time()
     monkeypatch.setattr("limits.storage.memory.time.time", lambda: clock)
-    for number in range(20):
+    for number in range(200):
         if number % 5 == 0:
             clock += 61
         await sign_in(client, f"l25{number:04d}@lhr.nu.edu.pk")
     clock += 61
     assert (
-        await client.post("/api/v1/auth/login", json={"email": "l250100@lhr.nu.edu.pk"})
+        await client.post("/api/v1/auth/login", json={"email": "l250999@lhr.nu.edu.pk"})
     ).status_code == 429
-    assert await database.users.count_documents({}) == 20
+    assert await database.users.count_documents({}) == 200
 
 
 async def test_auth_3_bad_bearer(client: AsyncClient) -> None:

@@ -35,9 +35,9 @@ def existing_account(request: Request) -> bool:
 @router.post(
     "/login", response_model=LoginResponse, dependencies=[Depends(login_context)]
 )
-@limiter.limit("10/minute")
+@limiter.limit("60/minute")
 @limiter.limit("5/minute", key_func=email_key)
-@limiter.limit("20/hour", exempt_when=existing_account)
+@limiter.limit("200/hour", exempt_when=existing_account)
 async def login(
     request: Request, body: LoginRequest, database: Database, lock: AuthLock
 ) -> LoginResponse:

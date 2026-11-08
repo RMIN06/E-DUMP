@@ -235,7 +235,7 @@ export function createSession(dependencies: Dependencies) {
       try {
         const response = await dependencies.request<LoginResponse>(
           "/auth/login",
-          { method: "POST", body: { email } },
+          { method: "POST", body: { email }, timeoutMs: 75_000 },
         );
         await save(response, epoch);
         setUser(response.user);

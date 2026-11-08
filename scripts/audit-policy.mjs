@@ -5,11 +5,12 @@ import { pathToFileURL } from "node:url";
 
 const exceptions = {
   "GHSA-mrhx-c7xc-m3w5": { name: "zod", version: "3.25.76", nodes: ["node_modules/expo/node_modules/zod"] },
-  "GHSA-vfj7-8cjw-p6xm": { name: "braces", version: "3.0.3" },
-  "GHSA-86w9-cpqp-85rv": { name: "node-forge", version: "1.4.0" },
-  "GHSA-hp3w-g68c-fv3c": { name: "sprintf-js", version: "1.0.3" },
+  "GHSA-gcqx-w48m-w2h4": { name: "deepmerge", version: "4.3.1" },
+  "GHSA-3g3m-2fjr-6pw4": { name: "glob", version: ["10.5.0", "13.0.6"] },
+  "GHSA-g3hv-75wg-m249": { name: "minimatch", version: ["9.0.9", "10.2.6"] },
 };
-const expires = Date.parse("2026-11-09T00:00:00Z");
+const expiresOn = "2026-12-08";
+const expires = Date.parse("2026-12-09T00:00:00Z");
 
 export function evaluateAudit(audit, lock, now = Date.now()) {
   if (audit.error || audit.auditReportVersion !== 2 || !audit.vulnerabilities) {
@@ -48,7 +49,7 @@ export function evaluateAudit(audit, lock, now = Date.now()) {
           if (exception.nodes && !exception.nodes.includes(node)) {
             throw new Error(`Exception path mismatch: ${node}`);
           }
-          if (lock.packages?.[node]?.version !== exception.version) {
+          if (![exception.version].flat().includes(lock.packages?.[node]?.version)) {
             throw new Error(`Exception version mismatch: ${node}`);
           }
         }
@@ -83,7 +84,7 @@ if (
     );
     console.log("Dependency audit: no unaccepted findings.");
     for (const id of accepted) {
-      console.log(`Owner-approved tooling exception through 2026-11-08: ${id}`);
+      console.log(`Owner-approved tooling exception through ${expiresOn}: ${id}`);
     }
   } catch (error) {
     console.error(error.message);

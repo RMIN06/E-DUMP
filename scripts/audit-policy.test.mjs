@@ -8,43 +8,43 @@ function fixture() {
     audit: {
       auditReportVersion: 2,
       vulnerabilities: {
-        braces: {
-          nodes: ["node_modules/braces"],
+        deepmerge: {
+          nodes: ["node_modules/deepmerge"],
           via: [
             {
-              name: "braces",
-              url: "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+              name: "deepmerge",
+              url: "https://github.com/advisories/GHSA-gcqx-w48m-w2h4",
             },
           ],
         },
-        micromatch: { via: ["braces"], nodes: ["node_modules/micromatch"] },
+        "jest-config": { via: ["deepmerge"], nodes: ["node_modules/jest-config"] },
       },
     },
-    lock: { packages: { "node_modules/braces": { version: "3.0.3" } } },
+    lock: { packages: { "node_modules/deepmerge": { version: "4.3.1" } } },
   };
 }
 
 test("accepts approved advisory and its dependent findings", () => {
   const { audit, lock } = fixture();
-  assert.deepEqual(evaluateAudit(audit, lock, now), ["GHSA-vfj7-8cjw-p6xm"]);
+  assert.deepEqual(evaluateAudit(audit, lock, now), ["GHSA-gcqx-w48m-w2h4"]);
 });
 test("rejects newly reported advisory", () => {
   const { audit, lock } = fixture();
-  audit.vulnerabilities.braces.via.push({
-    name: "braces",
+  audit.vulnerabilities.deepmerge.via.push({
+    name: "deepmerge",
     url: "https://github.com/advisories/GHSA-new",
   });
   assert.throws(() => evaluateAudit(audit, lock, now), /Unaccepted/);
 });
 test("rejects changed package version", () => {
   const { audit, lock } = fixture();
-  lock.packages["node_modules/braces"].version = "3.0.4";
+  lock.packages["node_modules/deepmerge"].version = "4.3.2";
   assert.throws(() => evaluateAudit(audit, lock, now), /version mismatch/);
 });
 test("rejects expired exception", () => {
   const { audit, lock } = fixture();
   assert.throws(
-    () => evaluateAudit(audit, lock, Date.parse("2026-11-09T00:00:00Z")),
+    () => evaluateAudit(audit, lock, Date.parse("2026-12-09T00:00:00Z")),
     /expired/,
   );
 });
@@ -53,7 +53,7 @@ test("rejects failed or malformed audit", () => {
 });
 test("rejects unresolved dependent findings", () => {
   const { audit, lock } = fixture();
-  audit.vulnerabilities.micromatch.via = ["missing"];
+  audit.vulnerabilities["jest-config"].via = ["missing"];
   assert.throws(() => evaluateAudit(audit, lock, now), /Unresolved/);
 });
 
@@ -81,5 +81,25 @@ test("rejects changed CLI Zod version and expired acceptance", () => {
   const changed = cliZodFixture(undefined, "4.6.5");
   assert.throws(() => evaluateAudit(changed.audit, changed.lock, now), /version mismatch/);
   const { audit, lock } = cliZodFixture();
-  assert.throws(() => evaluateAudit(audit, lock, Date.parse("2026-11-09T00:00:00Z")), /expired/);
+  assert.throws(() => evaluateAudit(audit, lock, Date.parse("2026-12-09T00:00:00Z")), /expired/);
+});
+test("accepts any listed version of a multi-version exception", () => {
+  const audit = {
+    auditReportVersion: 2,
+    vulnerabilities: {
+      glob: {
+        nodes: ["node_modules/glob", "node_modules/jest-runner/node_modules/glob"],
+        via: [{ name: "glob", url: "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4" }],
+      },
+    },
+  };
+  const lock = {
+    packages: {
+      "node_modules/glob": { version: "13.0.6" },
+      "node_modules/jest-runner/node_modules/glob": { version: "10.5.0" },
+    },
+  };
+  assert.deepEqual(evaluateAudit(audit, lock, now), ["GHSA-3g3m-2fjr-6pw4"]);
+  lock.packages["node_modules/glob"].version = "13.0.7";
+  assert.throws(() => evaluateAudit(audit, lock, now), /version mismatch/);
 });

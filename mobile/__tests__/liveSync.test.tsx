@@ -10,47 +10,72 @@ jest.mock("../src/api/queryClient", () => ({
   queryClient: { invalidateQueries: jest.fn(async () => undefined) },
 }));
 
-test("syncs visible data, pauses in background and stops after sign-out", async () => {
+const syncProfile = sessionActions.syncProfile as jest.Mock;
+const invalidate = queryClient.invalidateQueries as jest.Mock;
+let change: (state: AppStateStatus) => void = () => undefined;
+const remove = jest.fn();
+let listener: jest.SpyInstance;
+const tick = (ms: number) =>
+  act(async () => {
+    jest.advanceTimersByTime(ms);
+  });
+const focus = () =>
+  act(async () => {
+    change("active");
+  });
+
+beforeEach(() => {
   jest.useFakeTimers();
+  syncProfile.mockReset().mockResolvedValue(undefined);
+  invalidate.mockClear();
+  remove.mockClear();
   Object.defineProperty(AppState, "currentState", {
     configurable: true,
     value: "active",
     writable: true,
   });
-  let change: (state: AppStateStatus) => void = () => undefined;
-  const remove = jest.fn();
-  const listener = jest
+  listener = jest
     .spyOn(AppState, "addEventListener")
     .mockImplementation((_event, callback) => {
       change = callback;
       return { remove };
     });
+});
+afterEach(() => {
+  listener.mockRestore();
+  jest.useRealTimers();
+});
+
+test("syncs every two minutes, skips background or hidden tabs and ignores rapid refocus", async () => {
   const { rerender, unmount } = await renderHook<void, { enabled: boolean }>(
     ({ enabled }) => useLiveSync(enabled),
     { initialProps: { enabled: false } },
   );
-  await act(() => jest.advanceTimersByTime(30_000));
-  expect(queryClient.invalidateQueries).not.toHaveBeenCalled();
+  await tick(120_000);
+  expect(syncProfile).not.toHaveBeenCalled();
   await rerender({ enabled: true });
-  await act(() => jest.advanceTimersByTime(30_000));
-  expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(1);
+  await tick(119_999);
+  expect(syncProfile).not.toHaveBeenCalled();
+  await tick(1);
+  expect(syncProfile).toHaveBeenCalledTimes(1);
+  expect(invalidate).toHaveBeenCalledTimes(1);
   AppState.currentState = "background";
-  await act(() => {
-    change("background");
-    jest.advanceTimersByTime(30_000);
-  });
-  expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(1);
+  await act(async () => change("background"));
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(1);
   AppState.currentState = "active";
-  await act(() => change("active"));
-  expect(sessionActions.syncProfile).toHaveBeenCalledTimes(2);
+  await focus();
+  expect(syncProfile).toHaveBeenCalledTimes(2);
+  await focus();
+  expect(syncProfile).toHaveBeenCalledTimes(2);
   const original = Platform.OS;
   Object.defineProperty(Platform, "OS", { configurable: true, value: "web" });
   Object.defineProperty(globalThis, "navigator", {
     configurable: true,
     value: { onLine: false },
   });
-  await act(() => jest.advanceTimersByTime(30_000));
-  expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(2);
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(2);
   Object.defineProperty(globalThis, "navigator", {
     configurable: true,
     value: { onLine: true },
@@ -59,21 +84,44 @@ test("syncs visible data, pauses in background and stops after sign-out", async 
     configurable: true,
     value: { visibilityState: "hidden" },
   });
-  await act(() => jest.advanceTimersByTime(30_000));
-  expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(2);
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(2);
   Object.defineProperty(globalThis, "document", {
     configurable: true,
     value: { visibilityState: "visible" },
   });
-  await act(() => jest.advanceTimersByTime(30_000));
-  expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(3);
-  await rerender({ enabled: false });
-  await unmount();
-  expect(remove).toHaveBeenCalled();
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(3);
+  expect(invalidate).toHaveBeenCalledTimes(3);
   Object.defineProperty(Platform, "OS", {
     configurable: true,
     value: original,
   });
-  listener.mockRestore();
-  jest.useRealTimers();
+  await rerender({ enabled: false });
+  await unmount();
+  expect(remove).toHaveBeenCalled();
+});
+
+test("backs off while the server is failing and resumes after it recovers", async () => {
+  syncProfile.mockRejectedValue(new Error("Too many requests"));
+  await renderHook(() => useLiveSync(true));
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(1);
+  expect(invalidate).not.toHaveBeenCalled();
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(2);
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(2);
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(3);
+  await focus();
+  expect(syncProfile).toHaveBeenCalledTimes(3);
+  syncProfile.mockResolvedValue(undefined);
+  await tick(360_000);
+  expect(syncProfile).toHaveBeenCalledTimes(3);
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(4);
+  expect(invalidate).toHaveBeenCalledTimes(1);
+  await tick(120_000);
+  expect(syncProfile).toHaveBeenCalledTimes(5);
 });

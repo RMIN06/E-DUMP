@@ -1,4 +1,12 @@
-// Apply only on read-only tab roots; never restart during a form or upload.
+// Updates remain reachable when login/restoration is unavailable. Restart is
+// always explicit; content forms and uploads must still finish first.
 export function canApplyAppUpdate(path: string) {
-  return ["/updates", "/subjects", "/schedule", "/me"].includes(path);
+  return [
+    "/",
+    "/sign-in",
+    "/updates",
+    "/subjects",
+    "/schedule",
+    "/me",
+  ].includes(path);
 }

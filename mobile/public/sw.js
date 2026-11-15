@@ -1,4 +1,4 @@
-const SHELL = "edump-shell-2026-10-25";
+const SHELL = "edump-shell-2026-11-15-login-recovery";
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(SHELL).then((cache) => cache.addAll(["/", "/manifest.webmanifest", "/icon.png"])));
 });

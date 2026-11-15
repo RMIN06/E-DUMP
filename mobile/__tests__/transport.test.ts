@@ -159,4 +159,55 @@ describe("AUTH-2: JSON transport", () => {
       else Reflect.deleteProperty(navigator, "locks");
     }
   });
+  test("login recovers from cold-start gateway responses without user retries", async () => {
+    jest.useFakeTimers();
+    const fetch = jest
+      .spyOn(global, "fetch")
+      .mockResolvedValueOnce({
+        status: 503,
+        ok: false,
+        json: async () => {
+          throw new SyntaxError("HTML");
+        },
+      } as unknown as Response)
+      .mockResolvedValueOnce(reply(503, { error: { code: "unavailable" } }))
+      .mockRejectedValueOnce(new TypeError("Network request failed"))
+      .mockResolvedValueOnce(reply(200, { access_token: "access" }));
+    const result = publicRequest("/auth/login", {
+      method: "POST",
+      body: { email: "l250001@lhr.nu.edu.pk" },
+    });
+    await jest.advanceTimersByTimeAsync(50_000);
+    expect(await result).toEqual({ access_token: "access" });
+    expect(fetch).toHaveBeenCalledTimes(4);
+  });
+  test.each([401, 403, 422, 429])(
+    "login never retries an API refusal (%s)",
+    async (status) => {
+      const fetch = jest
+        .spyOn(global, "fetch")
+        .mockResolvedValue(reply(status, { error: { code: "refused" } }));
+      await expect(
+        publicRequest("/auth/login", { method: "POST" }),
+      ).rejects.toMatchObject({ status });
+      expect(fetch).toHaveBeenCalledTimes(1);
+    },
+  );
+  test("login recovery stops within ninety seconds when connections keep timing out", async () => {
+    jest.useFakeTimers();
+    const fetch = jest.spyOn(global, "fetch").mockImplementation(
+      (_url, options) =>
+        new Promise((_resolve, reject) => {
+          options?.signal?.addEventListener("abort", () =>
+            reject(new TypeError("timeout")),
+          );
+        }),
+    );
+    const result = expect(
+      publicRequest("/auth/login", { method: "POST", timeoutMs: 75_000 }),
+    ).rejects.toThrow("timeout");
+    await jest.advanceTimersByTimeAsync(90_000);
+    await result;
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
 });

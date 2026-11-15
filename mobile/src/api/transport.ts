@@ -56,7 +56,17 @@ const sendOnce: Request = async <T>(
       signal: controller.signal,
     });
     if (response.status === 204) return undefined as T;
-    const body: unknown = await response.json();
+    let body: unknown;
+    try {
+      body = await response.json();
+    } catch {
+      // Hosting gateways can return HTML while the API is starting.
+      throw new ApiError(
+        response.ok ? 502 : response.status,
+        "gateway_response",
+        "The connection service is temporarily unavailable. Try again shortly.",
+      );
+    }
     if (!response.ok) {
       const error =
         typeof body === "object" && body !== null && "error" in body
@@ -97,17 +107,34 @@ const sendWithRetries: Request = async <T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> => {
-  const delays = [1000, 3000];
+  // Login can issue another independent session; rotating a refresh token cannot
+  // safely be repeated after a lost response. Keep every other write single-shot.
+  const login = path === "/auth/login" && options.method === "POST";
+  const delays = login ? [5000, 15000, 30000] : [1000, 3000];
+  const deadline = login ? Date.now() + 90_000 : Infinity;
   for (let attempt = 0; ; attempt += 1) {
     try {
-      return await sendOnce<T>(path, options);
+      return await sendOnce<T>(
+        path,
+        login
+          ? {
+              ...options,
+              timeoutMs: Math.min(
+                options.timeoutMs ?? 75_000,
+                deadline - Date.now(),
+              ),
+            }
+          : options,
+      );
     } catch (error) {
+      const delay = delays[attempt];
       if (
         options.upload ||
-        (options.method && options.method !== "GET") ||
+        (!login && options.method && options.method !== "GET") ||
         options.signal?.aborted ||
-        attempt >= delays.length ||
-        (error instanceof ApiError && error.status < 500)
+        delay === undefined ||
+        (error instanceof ApiError && error.status < 500) ||
+        Date.now() + delay >= deadline
       )
         throw error;
       await new Promise<void>((resolve, reject) => {
@@ -118,7 +145,7 @@ const sendWithRetries: Request = async <T>(
         const timer = setTimeout(() => {
           options.signal?.removeEventListener("abort", abort);
           resolve();
-        }, delays[attempt]);
+        }, delay);
         options.signal?.addEventListener("abort", abort, { once: true });
       });
     }

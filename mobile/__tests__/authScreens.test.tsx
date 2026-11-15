@@ -140,6 +140,30 @@ describe("AUTH-1: sign-in screen", () => {
         ).toBeNull();
     },
   );
+  test.each([
+    ["unavailable", "The service is not ready. Try again shortly."],
+    [
+      "gateway_response",
+      "The connection service refused the request (HTTP 503). Try again shortly.",
+    ],
+  ])(
+    "shows %s instead of incorrectly blaming connectivity",
+    async (code, message) => {
+      jest
+        .mocked(sessionActions.login)
+        .mockRejectedValue(new ApiError(503, code, message));
+      await render(<SignInScreen />);
+      await fireEvent.changeText(
+        screen.getByLabelText("Student email"),
+        "l250001@lhr.nu.edu.pk",
+      );
+      await fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+      expect(screen.getByText(message)).toBeTruthy();
+      expect(
+        screen.queryByText("Can't reach the server. Try again."),
+      ).toBeNull();
+    },
+  );
   test("working state disables a second submit", async () => {
     let complete: () => void = () => {};
     jest.mocked(sessionActions.login).mockImplementation(

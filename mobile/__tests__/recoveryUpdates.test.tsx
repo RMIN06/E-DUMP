@@ -14,7 +14,8 @@ jest.mock("../src/features/notifications/NotificationsSetup", () => ({
 }));
 jest.mock("../src/features/appUpdates/AppUpdates", () => ({
   AppUpdates: () => {
-    const { Text } = require("react-native");
+    const { Text } =
+      jest.requireActual<typeof import("react-native")>("react-native");
     return <Text>Recovery update ready</Text>;
   },
 }));

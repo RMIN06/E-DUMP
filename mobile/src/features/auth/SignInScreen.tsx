@@ -36,9 +36,11 @@ export function SignInScreen() {
       ))
         setError(
           failure instanceof ApiError
-            ? failure.code === "gateway_response"
-              ? `The connection service refused the request (HTTP ${failure.status}). Try again shortly.`
-              : failure.message
+            ? failure.code === "rate_limited"
+              ? "Too many attempts. Wait a minute."
+              : failure.code === "gateway_response"
+                ? `The connection service refused the request (HTTP ${failure.status}). Try again shortly.`
+                : failure.message
             : "Can't reach the server. Try again.",
         );
     } finally {

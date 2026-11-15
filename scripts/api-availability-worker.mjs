@@ -1,7 +1,9 @@
 export default {
   async scheduled() {
     const response = await fetch("https://edump-api.onrender.com/readyz", {
-      redirect: "error",
+      // Workers supports manual/follow, not the browser's "error" mode.
+      // A redirect fails the readiness check below rather than being followed.
+      redirect: "manual",
       signal: AbortSignal.timeout(75_000),
       headers: { Accept: "application/json" },
     });
